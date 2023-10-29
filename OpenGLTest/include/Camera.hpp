@@ -133,7 +133,7 @@ public:
         this->pan_ *= glm::translate(-sensivity * glm::vec3(-u, v, 0.0f));
     }
 
-    glm::mat4 GetViewMatrix() const {
+    glm::mat4 CalcViewMatrix() const {
         return this->pan_ * glm::lookAt(
             glm::vec3(glm::vec4(this->origin_, 1.0f)),
             glm::vec3(glm::vec4(this->target_, 1.0f)),

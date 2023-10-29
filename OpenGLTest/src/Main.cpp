@@ -12,6 +12,8 @@
 #include "Window.hpp"
 #include "Renderer.hpp"
 #include "Texture.hpp"
+#include "Camera.hpp"
+#include "Viewport.hpp"
 
 #include "TextureLoader/TextureLoaderCV.hpp"
 #include "TextureLoader/TextureLoaderSTB.hpp"
@@ -22,7 +24,6 @@
 #include "MeshGenerators/UVSphereGenerator.hpp"
 #include "MeshGenerators/IcosahedronGenerator.hpp"
 #include "MeshGenerators/ConeGenerator.hpp"
-#include <Camera.hpp>
 
 int main(int argc, char** argv) {
     try {
@@ -34,22 +35,19 @@ int main(int argc, char** argv) {
         Window window {
             windowHeight, windowWidth, "OpenGL Test",
             [](Window& window, int button, int action, int mods, double xpos, double ypos) {
-                std::cout << std::format("Click! Button = {}, Action = {}, Mods = {}\n", button, action, mods);
-                std::cout << std::format("X: {}, Y: {}\n", xpos, ypos);
+
             },
             [](Window&, double, double) {
+
             },
             [](Window& window, int key, int scancode, int action, int mods) {
                 std::cout << std::format("Pressed! Key = {}, Scancode = {}, Action = {}, Mods = {}\n", key, scancode, action, mods);
             },
             [](Window& window, double xoffset, double yoffset) {
-                std::cout << std::format("Scrolled! X: {}, Y: {}\n", xoffset, yoffset);
+
             },
             [](Window& window, int width, int height) {
-                window.SetWidth(width);
-                window.SetHeight(height);
 
-                std::cout << std::format("Window resized to {} x {}\n", width, height);
             }
         };
 
@@ -107,6 +105,14 @@ int main(int argc, char** argv) {
             glm::vec3(0.0f, 0.0f, -1.0f)
         );
 
+        // Viewport
+        const float fieldOfViewStep    = 3.0f;
+        const float fieldOfViewDegrees = 90.0f;
+        Viewport viewport(
+            0.0f, 0.0f, window.GetWidth(), window.GetHeight(),
+            glm::radians(fieldOfViewDegrees), 0.1f, 500.0f
+        );
+
         // Window callbacks
         window.SetMouseButtonCallback([&camera, &imgui](Window& window, int button, int action, int mods, double xpos, double ypos) {
             if (imgui.GetIO()->WantCaptureMouse) {
@@ -148,6 +154,27 @@ int main(int argc, char** argv) {
                 camera.Arcball(static_cast<float>(x1), static_cast<float>(y1), static_cast<float>(x2), static_cast<float>(y2));
             }
         });
+        window.SetScrollCallbackFunc([&viewport, &imgui, &fieldOfViewStep](Window& window, double xpos, double ypos) {
+            if (imgui.GetIO()->WantCaptureMouse) {
+                return;
+            }
+
+            viewport.SetFieldOfView(
+                glm::radians(
+                    glm::degrees(viewport.GetFieldOfView()) + (ypos > 0 ? -fieldOfViewStep : fieldOfViewStep)
+                )
+            );
+        });
+        window.SetFramebufferResizeCallback([&viewport](Window& window, int width, int height) {
+            window.SetWidth(width);
+            window.SetHeight(height);
+
+            viewport.SetBottomX(width);
+            viewport.SetBottomY(height);
+            viewport.UpdateViewport();
+
+            std::cout << std::format("Window resized to {} x {}\n", width, height);
+        });
 
         // Creating shader program
         Shader basicVertexShader{"shaders\\BasicShader.vert", ShaderType::VERTEX_SHADER};
@@ -178,7 +205,6 @@ int main(int argc, char** argv) {
                 backgroundColor.a / rgbLimit
             };
             static float viewPos[]{ origin.x, origin.y, 400.0f };
-            static float fovDegrees{ 90.0f };
             static float viewRotate[]{ 0.0f, 0.0f, 0.0f };
             static bool isFlatShading{};
             static bool isDrawNormals{};
@@ -206,14 +232,9 @@ int main(int argc, char** argv) {
 
                 //camera.RotateCamera(origin, glm::vec3(glm::radians(viewRotate[0]), glm::radians(viewRotate[1]), glm::radians(viewRotate[2])));
 
-                viewMatrix = camera.GetViewMatrix();
+                viewMatrix = camera.CalcViewMatrix();
 
-                projectionMatrix = 
-                    glm::perspective(glm::radians(fovDegrees),
-                        static_cast<float>(window.GetWidth()) / static_cast<float>(window.GetHeight()),
-                        0.1f,
-                        10000.0f
-                    );
+                projectionMatrix = viewport.CalcPerspectiveMatrix();
 
                 normalsShaderProgram.SetUniformMatrix("u_proj", projectionMatrix);
                 normalsShaderProgram.SetUniformMatrix("u_view", viewMatrix);
@@ -223,7 +244,6 @@ int main(int argc, char** argv) {
                 meshShaderProgram.SetUniformMatrix("u_proj", projectionMatrix);
                 meshShaderProgram.SetUniformMatrix("u_view", viewMatrix);
                 meshShaderProgram.SetUniformMatrix("u_model", modelMatrix);
-                //meshShaderProgram.SetUniformInt("u_count", i);
                 meshShaderProgram.SetUniformInt("u_isFlat", isFlatShading);
 
                 if (isDrawNormals) {
@@ -237,8 +257,6 @@ int main(int argc, char** argv) {
 
             meshShaderProgram.SetUniformFloat("u_time", timeInSeconds);
 
-            glViewport(0, 0, window.GetWidth(), window.GetHeight());
-
             imgui.Bind();
 
             const ImVec2 center{ImGui::GetMainViewport()->GetCenter().x, 0.0f};
@@ -249,7 +267,7 @@ int main(int argc, char** argv) {
             ImGui::ColorEdit3("Clear color", reinterpret_cast<float*>(&clear_color));
             //ImGui::SliderFloat3("Camera pos", viewPos, -1000.0f, 1000.0f);
             //ImGui::SliderFloat3("Camera rotate:", viewRotate, -360.0f, 360.0f);
-            //ImGui::SliderFloat("FOV Y", &fovDegrees, 0.1f, 90.0f);
+            //ImGui::SliderFloat("FOV Y", &fieldOfViewDegrees, 0.1f, 90.0f);
             //if (ImGui::Button("Reset", ImVec2(50, 25))) {
             //    viewPos[0] = origin.x;
             //    viewPos[1] = origin.y;
@@ -259,12 +277,14 @@ int main(int argc, char** argv) {
             //    viewRotate[1] = 0.0f;
             //    viewRotate[2] = 0.0f;
 
-            //    fovDegrees = 90.0f;
+            //    fieldOfViewDegrees = 90.0f;
             //}
             ImGui::Text("Display settings:");
             ImGui::Checkbox("Flat shading", &isFlatShading);
             ImGui::SameLine();
             ImGui::Checkbox("Draw normals", &isDrawNormals);
+            ImGui::Text("Display info:");
+            ImGui::Text(std::format("Field of view: {:.2f} degrees", glm::degrees(viewport.GetFieldOfView())).c_str());
             ImGui::Text("Application data:");
             ImGui::Text(std::format("Application average {:.0f} FPS", ImGui::GetIO().Framerate).c_str());
             ImGui::Text(std::format("Application time: {:02d}:{:02d}:{:02d}:{:02d}", hours, minutes, seconds, milliseconds).c_str());
