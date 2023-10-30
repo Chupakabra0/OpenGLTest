@@ -13,7 +13,7 @@ using UniqueGLFWWindowPtr = std::unique_ptr<GLFWwindow, decltype([](GLFWwindow* 
 
 class Mouse {
 public:
-    static const int MAX_BUTTONS_COUNT = 8;
+    static const int MAX_BUTTONS_COUNT  = 8;
 
     explicit Mouse() = default;
 
@@ -28,41 +28,82 @@ public:
     ~Mouse() = default;
 
     void PushNewPos(double x, double y) {
-        this->positionX2_ = this->positionX1_;
-        this->positionY2_ = this->positionY1_;
+        this->mousePositionX2_ = this->mousePositionX1_;
+        this->mousePositionY2_ = this->mousePositionY1_;
 
-        this->positionX1_ = x;
-        this->positionY1_ = y;
+        this->mousePositionX1_ = x;
+        this->mousePositionY1_ = y;
 
-        std::cout << std::format("X: {} Y: {}\n Xprev: {} Yprev: {}\n", this->positionX1_, this->positionY1_, this->positionX2_, this->positionY2_);
+        std::cout << std::format("X: {} Y: {}\n Xprev: {} Yprev: {}\n", this->mousePositionX1_, this->mousePositionY1_, this->mousePositionX2_, this->mousePositionY2_);
     }
 
     std::pair<double, double> GetCurrPos() const {
-        return std::make_pair(this->positionX1_, this->positionY1_);
+        return std::make_pair(this->mousePositionX1_, this->mousePositionY1_);
     }
 
     std::pair<double, double> GetPrevPos() const {
-        return std::make_pair(this->positionX2_, this->positionY2_);
+        return std::make_pair(this->mousePositionX2_, this->mousePositionY2_);
     }
 
     void SetClicked(int index) {
-        this->isClickedArr_.at(index) = true;
+        this->isMouseClickedArr_.at(index) = true;
     }
 
     void SetUnclicked(int index) {
-        this->isClickedArr_.at(index) = false;
+        this->isMouseClickedArr_.at(index) = false;
     }
 
     bool IsClicked(int index) const {
-        return this->isClickedArr_.at(index);
+        return this->isMouseClickedArr_.at(index);
     }
 
 private:
-    double positionX2_{};
-    double positionY2_{};
-    double positionX1_{};
-    double positionY1_{};
-    std::array<bool, Mouse::MAX_BUTTONS_COUNT> isClickedArr_{};
+    double mousePositionX2_{};
+    double mousePositionY2_{};
+    double mousePositionX1_{};
+    double mousePositionY1_{};
+    std::array<bool, Mouse::MAX_BUTTONS_COUNT> isMouseClickedArr_{};
+};
+
+class Keyboard {
+public:
+    static const int MAX_KEYS_COUNT = 348;
+
+    explicit Keyboard() = default;
+
+    Keyboard(const Keyboard&) = default;
+
+    Keyboard(Keyboard&&) noexcept = default;
+
+    Keyboard& operator=(const Keyboard&) = default;
+
+    Keyboard& operator=(Keyboard&&) noexcept = default;
+
+    ~Keyboard() = default;
+
+    void PressKey(int key) {
+        this->isMouseClickedArr_.at(key) = true;
+    }
+
+    void UnpressKey(int key) {
+        this->isMouseClickedArr_.at(key) = false;
+    }
+
+    bool IsPressed(int key) const {
+        return this->isMouseClickedArr_.at(key);
+    }
+
+    int GetMods() const {
+        return this->mods_;
+    }
+
+    void SetMods(int mods) {
+        this->mods_ = mods;
+    }
+
+private:
+    std::array<bool, Keyboard::MAX_KEYS_COUNT> isMouseClickedArr_{};
+    int mods_{};
 };
 
 class Window {
@@ -73,14 +114,324 @@ public:
     using ScrollCallbackFunc            = std::function<void(Window&, double, double)>;
     using FramebufferResizeCallbackFunc = std::function<void(Window&, int, int)>;
 
+    class MouseClickCallback {
+    public:
+        explicit MouseClickCallback() = default;
+
+        explicit MouseClickCallback(const MouseButtonCallbackFunc& func)
+            : next_(nullptr), func_(func) {
+
+        }
+
+        explicit MouseClickCallback(const MouseButtonCallbackFunc& func, const std::shared_ptr<MouseClickCallback>& next)
+            : next_(next), func_(func) {
+
+        }
+
+        MouseClickCallback(const MouseClickCallback&) = default;
+
+        MouseClickCallback(MouseClickCallback&&) noexcept = default;
+
+        MouseClickCallback& operator=(const MouseClickCallback&) = default;
+
+        MouseClickCallback& operator=(MouseClickCallback&&) noexcept = default;
+
+        ~MouseClickCallback() = default;
+
+        void Call(Window& window, int button, int action, int mods, double xpos, double ypos) {
+            if (this->func_ != nullptr) {
+                this->func_(window, button, action, mods, xpos, ypos);
+            }
+
+            if (this->next_ != nullptr) {
+                this->next_->Call(window, button, action, mods, xpos, ypos);
+            }
+        }
+
+        const MouseButtonCallbackFunc& GetFunc() const {
+            return this->func_;
+        }
+
+        MouseButtonCallbackFunc& GetFunc() {
+            return this->func_;
+        }
+
+        void SetFunc(const MouseButtonCallbackFunc& func) {
+            this->func_ = func;
+        }
+
+        const std::shared_ptr<MouseClickCallback>& GetNext() const {
+            return this->next_;
+        }
+
+        std::shared_ptr<MouseClickCallback>& GetNext() {
+            return this->next_;
+        }
+
+        void SetNext(const std::shared_ptr<MouseClickCallback>& next) {
+            this->next_ = next;
+        }
+
+    private:
+        std::shared_ptr<MouseClickCallback> next_{};
+        MouseButtonCallbackFunc func_{};
+    };
+
+    class MouseMoveCallback {
+    public:
+        explicit MouseMoveCallback() = default;
+
+        explicit MouseMoveCallback(const CursorPosCallbackFunc& func)
+            : next_(nullptr), func_(func) {
+
+        }
+
+        explicit MouseMoveCallback(const CursorPosCallbackFunc& func, const std::shared_ptr<MouseMoveCallback>& next)
+            : next_(next), func_(func) {
+
+        }
+
+        MouseMoveCallback(const MouseMoveCallback&) = default;
+
+        MouseMoveCallback(MouseMoveCallback&&) noexcept = default;
+
+        MouseMoveCallback& operator=(const MouseMoveCallback&) = default;
+
+        MouseMoveCallback& operator=(MouseMoveCallback&&) noexcept = default;
+
+        ~MouseMoveCallback() = default;
+
+        void Call(Window& window, double xpos, double ypos) {
+            if (this->func_ != nullptr) {
+                this->func_(window, xpos, ypos);
+            }
+
+            if (this->next_ != nullptr) {
+                this->next_->Call(window, xpos, ypos);
+            }
+        }
+
+        const CursorPosCallbackFunc& GetFunc() const {
+            return this->func_;
+        }
+
+        CursorPosCallbackFunc& GetFunc() {
+            return this->func_;
+        }
+
+        void SetFunc(const CursorPosCallbackFunc& func) {
+            this->func_ = func;
+        }
+
+        const std::shared_ptr<MouseMoveCallback>& GetNext() const {
+            return this->next_;
+        }
+
+        std::shared_ptr<MouseMoveCallback>& GetNext() {
+            return this->next_;
+        }
+
+        void SetNext(const std::shared_ptr<MouseMoveCallback>& next) {
+            this->next_ = next;
+        }
+
+    private:
+        std::shared_ptr<MouseMoveCallback> next_{};
+        CursorPosCallbackFunc func_{};
+    };
+
+    class MouseScrollCallback {
+    public:
+        explicit MouseScrollCallback() = default;
+
+        explicit MouseScrollCallback(const ScrollCallbackFunc& func)
+            : next_(nullptr), func_(func) {
+
+        }
+
+        explicit MouseScrollCallback(const ScrollCallbackFunc& func, const std::shared_ptr<MouseScrollCallback>& next)
+            : next_(next), func_(func) {
+
+        }
+
+        MouseScrollCallback(const MouseScrollCallback&) = default;
+
+        MouseScrollCallback(MouseScrollCallback&&) noexcept = default;
+
+        MouseScrollCallback& operator=(const MouseScrollCallback&) = default;
+
+        MouseScrollCallback& operator=(MouseScrollCallback&&) noexcept = default;
+
+        ~MouseScrollCallback() = default;
+
+        void Call(Window& window, double xpos, double ypos) {
+            if (this->func_ != nullptr) {
+                this->func_(window, xpos, ypos);
+            }
+
+            if (this->next_ != nullptr) {
+                this->next_->Call(window, xpos, ypos);
+            }
+        }
+
+        const ScrollCallbackFunc& GetFunc() const {
+            return this->func_;
+        }
+
+        ScrollCallbackFunc& GetFunc() {
+            return this->func_;
+        }
+
+        void SetFunc(const ScrollCallbackFunc& func) {
+            this->func_ = func;
+        }
+
+        const std::shared_ptr<MouseScrollCallback>& GetNext() const {
+            return this->next_;
+        }
+
+        std::shared_ptr<MouseScrollCallback>& GetNext() {
+            return this->next_;
+        }
+
+        void SetNext(const std::shared_ptr<MouseScrollCallback>& next) {
+            this->next_ = next;
+        }
+
+    private:
+        std::shared_ptr<MouseScrollCallback> next_{};
+        ScrollCallbackFunc func_{};
+    };
+
+    class KeyPressCallback {
+    public:
+        explicit KeyPressCallback() = default;
+
+        explicit KeyPressCallback(const KeyCallbackFunc& func)
+            : next_(nullptr), func_(func) {
+
+        }
+
+        explicit KeyPressCallback(const KeyCallbackFunc& func, const std::shared_ptr<KeyPressCallback>& next)
+            : next_(next), func_(func) {
+
+        }
+
+        KeyPressCallback(const KeyPressCallback&) = default;
+
+        KeyPressCallback(KeyPressCallback&&) noexcept = default;
+
+        KeyPressCallback& operator=(const KeyPressCallback&) = default;
+
+        KeyPressCallback& operator=(KeyPressCallback&&) noexcept = default;
+
+        ~KeyPressCallback() = default;
+
+        void Call(Window& window, int key, int scancode, int action, int mods) {
+            if (this->func_ != nullptr) {
+                this->func_(window, key, scancode, action, mods);
+            }
+
+            if (this->next_ != nullptr) {
+                this->next_->Call(window, key, scancode, action, mods);
+            }
+        }
+
+        const KeyCallbackFunc& GetFunc() const {
+            return this->func_;
+        }
+
+        KeyCallbackFunc& GetFunc() {
+            return this->func_;
+        }
+
+        void SetFunc(const KeyCallbackFunc& func) {
+            this->func_ = func;
+        }
+
+        const std::shared_ptr<KeyPressCallback>& GetNext() const {
+            return this->next_;
+        }
+
+        std::shared_ptr<KeyPressCallback>& GetNext() {
+            return this->next_;
+        }
+
+        void SetNext(const std::shared_ptr<KeyPressCallback>& next) {
+            this->next_ = next;
+        }
+
+    private:
+        std::shared_ptr<KeyPressCallback> next_{};
+        KeyCallbackFunc func_{};
+    };
+
+    class WindowResizeCallback {
+    public:
+        explicit WindowResizeCallback() = default;
+
+        explicit WindowResizeCallback(const FramebufferResizeCallbackFunc& func)
+            : next_(nullptr), func_(func) {
+
+        }
+
+        explicit WindowResizeCallback(const FramebufferResizeCallbackFunc& func, const std::shared_ptr<WindowResizeCallback>& next)
+            : next_(next), func_(func) {
+
+        }
+
+        WindowResizeCallback(const WindowResizeCallback&) = default;
+
+        WindowResizeCallback(WindowResizeCallback&&) noexcept = default;
+
+        WindowResizeCallback& operator=(const WindowResizeCallback&) = default;
+
+        WindowResizeCallback& operator=(WindowResizeCallback&&) noexcept = default;
+
+        ~WindowResizeCallback() = default;
+
+        void Call(Window& window, int x, int y) {
+            if (this->func_ != nullptr) {
+                this->func_(window, x, y);
+            }
+
+            if (this->next_ != nullptr) {
+                this->next_->Call(window, x, y);
+            }
+        }
+
+        const FramebufferResizeCallbackFunc& GetFunc() const {
+            return this->func_;
+        }
+
+        FramebufferResizeCallbackFunc& GetFunc() {
+            return this->func_;
+        }
+
+        void SetFunc(const FramebufferResizeCallbackFunc& func) {
+            this->func_ = func;
+        }
+
+        const std::shared_ptr<WindowResizeCallback>& GetNext() const {
+            return this->next_;
+        }
+
+        std::shared_ptr<WindowResizeCallback>& GetNext() {
+            return this->next_;
+        }
+
+        void SetNext(const std::shared_ptr<WindowResizeCallback>& next) {
+            this->next_ = next;
+        }
+
+    private:
+        std::shared_ptr<WindowResizeCallback> next_{};
+        FramebufferResizeCallbackFunc func_{};
+    };
+
     Window() = delete;
 
-    explicit Window(int height, int width, const std::string& title,
-        const MouseButtonCallbackFunc& mouseButtonCallbakFunction = nullptr,
-        const CursorPosCallbackFunc& cursorPosCallbackFunction = nullptr,
-        const KeyCallbackFunc& keyCallbackFunction = nullptr,
-        const ScrollCallbackFunc& scrollCallbackFunction = nullptr,
-        const FramebufferResizeCallbackFunc& framebufferResizeCallbackFunction = nullptr);
+    explicit Window(int height, int width, const std::string& title);
 
     Window(const Window&) = delete;
 
@@ -112,24 +463,64 @@ public:
 
     void SetTitle(const std::string& title);
 
-    void SetMouseButtonCallback(MouseButtonCallbackFunc mouseButtonCallbackFunction) {
-        this->mouseButtonCallbackFunction_ = mouseButtonCallbackFunction;
+    const std::shared_ptr<MouseClickCallback>& GetMouseClickCallback() const {
+        return this->mouseClickCallback_;
     }
 
-    void SetCursorPosCallback(CursorPosCallbackFunc cursorPosCallbackFunction) {
-        this->cursorPosCallbackFunction_ = cursorPosCallbackFunction;
+    std::shared_ptr<MouseClickCallback>& GetMouseClickCallback() {
+        return this->mouseClickCallback_;
     }
 
-    void SetKeyCallbackFunc(KeyCallbackFunc keyCallbackFunction) {
-        this->keyCallbackFunction_ = keyCallbackFunction;
+    void SetMouseClickCallback(const std::shared_ptr<MouseClickCallback>& mouseButtonCallback) {
+        this->mouseClickCallback_ = mouseButtonCallback;
     }
 
-    void SetScrollCallbackFunc(ScrollCallbackFunc scrollCallbackFunction) {
-        this->scrollCallbackFunction_ = scrollCallbackFunction;
+    const std::shared_ptr<MouseMoveCallback>& GetMouseMoveCallback() const {
+        return this->mouseMoveCallback_;
     }
 
-    void SetFramebufferResizeCallback(FramebufferResizeCallbackFunc framebufferResizeCallbackFunction) {
-        this->framebufferResizeCallbackFunction_ = framebufferResizeCallbackFunction;
+    std::shared_ptr<MouseMoveCallback>& GetMouseMoveCallback() {
+        return this->mouseMoveCallback_;
+    }
+
+    void SetMouseMoveCallback(const std::shared_ptr<MouseMoveCallback>& mouseMoveCallback) {
+        this->mouseMoveCallback_ = mouseMoveCallback;
+    }
+
+    const std::shared_ptr<MouseScrollCallback>& GetMouseScrollCallback() const {
+        return this->mouseScrollCallback_;
+    }
+
+    std::shared_ptr<MouseScrollCallback>& GetMouseScrollCallback() {
+        return this->mouseScrollCallback_;
+    }
+
+    void SetMouseScrollCallback(const std::shared_ptr<MouseScrollCallback>& mouseScrollCallback) {
+        this->mouseScrollCallback_ = mouseScrollCallback;
+    }
+
+    const std::shared_ptr<KeyPressCallback>& GetKeyPressCallback() const {
+        return this->keyPressCallback_;
+    }
+
+    std::shared_ptr<KeyPressCallback>& GetKeyPressCallback() {
+        return this->keyPressCallback_;
+    }
+
+    void SetKeyPressCallback(const std::shared_ptr<KeyPressCallback>& keyPressCallback) {
+        this->keyPressCallback_ = keyPressCallback;
+    }
+
+    const std::shared_ptr<WindowResizeCallback>& GetWindowResizeCallback() const {
+        return this->windowResizeCallback_;
+    }
+
+    std::shared_ptr<WindowResizeCallback>& GetWindowResizeCallback() {
+        return this->windowResizeCallback_;
+    }
+
+    void SetResizeCallback(const std::shared_ptr<WindowResizeCallback>& windowResizeCallback) {
+        this->windowResizeCallback_ = windowResizeCallback;
     }
 
     void UpdateCursorPosition() {
@@ -171,16 +562,41 @@ public:
 
     void WaitEvents() const;
 
+    void TriggerMouseClick(Window& window, int button, int action, int mods, double xpos, double ypos) {
+        this->mouseClickCallback_->Call(window, button, action, mods, xpos, ypos);
+    }
+
+    void TriggerMouseMove(Window& window, double xpos, double ypos) {
+        this->mouseMoveCallback_->Call(window, xpos, ypos);
+    }
+
+    void TriggerMouseScroll(Window& window, double xpos, double ypos) {
+        this->mouseScrollCallback_->Call(window, xpos, ypos);
+    }
+
+    void TriggerKeyPress(Window& window, int key, int scancode, int action, int mods) {
+        this->keyPressCallback_->Call(window, key, scancode, action, mods);
+    }
+
+    void TriggerWindowResize(Window& window, int x, int y) {
+        window.SetWidth(x);
+        window.SetHeight(y);
+
+        this->windowResizeCallback_->Call(window, x, y);
+    }
+
 private:
     int height_{};
     int width_{};
     Mouse mouse_{};
+    Keyboard keyboard_{};
     UniqueGLFWWindowPtr windowHandle_{};
-    MouseButtonCallbackFunc mouseButtonCallbackFunction_{};
-    CursorPosCallbackFunc cursorPosCallbackFunction_{};
-    KeyCallbackFunc keyCallbackFunction_{};
-    ScrollCallbackFunc scrollCallbackFunction_{};
-    FramebufferResizeCallbackFunc framebufferResizeCallbackFunction_{};
+
+    std::shared_ptr<MouseClickCallback> mouseClickCallback_{};
+    std::shared_ptr<MouseMoveCallback> mouseMoveCallback_{};
+    std::shared_ptr<MouseScrollCallback> mouseScrollCallback_{};
+    std::shared_ptr<KeyPressCallback> keyPressCallback_{};
+    std::shared_ptr<WindowResizeCallback> windowResizeCallback_{};
 
     std::string title_{};
 

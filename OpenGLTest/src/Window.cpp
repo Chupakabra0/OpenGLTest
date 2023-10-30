@@ -1,17 +1,7 @@
 #include "Window.hpp"
 
-Window::Window(int height, int width, const std::string& title,
-    const MouseButtonCallbackFunc& mouseButtonCallbakFunction /*= nullptr*/,
-    const CursorPosCallbackFunc& cursorPosCallbackFunction /*= nullptr*/,
-    const KeyCallbackFunc& keyCallbackFunction /*= nullptr*/,
-    const ScrollCallbackFunc& scrollCallbackFunction /*= nullptr*/,
-    const FramebufferResizeCallbackFunc& framebufferResizeCallbackFunction /*= nullptr*/)
-    : height_(height), width_(width), title_(title),
-    mouseButtonCallbackFunction_(mouseButtonCallbakFunction),
-    cursorPosCallbackFunction_(cursorPosCallbackFunction),
-    keyCallbackFunction_(keyCallbackFunction),
-    scrollCallbackFunction_(scrollCallbackFunction),
-    framebufferResizeCallbackFunction_(framebufferResizeCallbackFunction) {
+Window::Window(int height, int width, const std::string& title)
+    : height_(height), width_(width), title_(title) {
     this->ConstructHelper_();
 }
 
@@ -101,54 +91,34 @@ Window* Window::GetUserWindowPtr(GLFWwindow* window) {
 void Window::MouseButtonCallbackFunction_(GLFWwindow* window, int button, int action, int mods) {
     auto* userWindowPtr = Window::GetUserWindowPtr(window);
 
-    if (userWindowPtr == nullptr || !userWindowPtr->mouseButtonCallbackFunction_) {
-        return;
-    }
-
     double xpos{}, ypos{};
     glfwGetCursorPos(window, &xpos, &ypos);
 
-    userWindowPtr->mouseButtonCallbackFunction_(*userWindowPtr, button, action, mods, xpos, ypos);
+    userWindowPtr->TriggerMouseClick(*userWindowPtr, button, action, mods, xpos, ypos);
 }
 
 void Window::CursorPosCallbackFunction_(GLFWwindow* window, double xpos, double ypos) {
     auto* userWindowPtr = Window::GetUserWindowPtr(window);
 
-    if (userWindowPtr == nullptr || !userWindowPtr->cursorPosCallbackFunction_) {
-        return;
-    }
-
-    userWindowPtr->cursorPosCallbackFunction_(*userWindowPtr, xpos, ypos);
+    userWindowPtr->TriggerMouseMove(*userWindowPtr, xpos, ypos);
 }
 
 void Window::KeyCallbackFunction_(GLFWwindow* window, int key, int scancode, int action, int mods) {
     auto* userWindowPtr = Window::GetUserWindowPtr(window);
 
-    if (userWindowPtr == nullptr || !userWindowPtr->keyCallbackFunction_) {
-        return;
-    }
-
-    userWindowPtr->keyCallbackFunction_(*userWindowPtr, key, scancode, action, mods);
+    userWindowPtr->TriggerKeyPress(*userWindowPtr, key, scancode, action, mods);
 }
 
 void Window::ScrollCallbackFunction_(GLFWwindow* window, double xoffset, double yoffset) {
     auto* userWindowPtr = Window::GetUserWindowPtr(window);
 
-    if (userWindowPtr == nullptr || !userWindowPtr->scrollCallbackFunction_) {
-        return;
-    }
-
-    userWindowPtr->scrollCallbackFunction_(*userWindowPtr, xoffset, yoffset);
+    userWindowPtr->TriggerMouseScroll(*userWindowPtr, xoffset, yoffset);
 }
 
 void Window::FramebufferResizeCallbackFunction_(GLFWwindow* window, int width, int height) {
     auto* userWindowPtr = Window::GetUserWindowPtr(window);
 
-    if (userWindowPtr == nullptr || !userWindowPtr->scrollCallbackFunction_) {
-        return;
-    }
-
-    userWindowPtr->framebufferResizeCallbackFunction_(*userWindowPtr, width, height);
+    userWindowPtr->TriggerWindowResize(*userWindowPtr, width, height);
 }
 
 void Window::ConstructHelper_() {
@@ -180,9 +150,11 @@ void Window::MoveHelper_(Window&& move) noexcept {
     std::swap(this->height_, move.height_);
     std::swap(this->width_, move.width_);
     std::swap(this->windowHandle_, move.windowHandle_);
-    std::swap(this->mouseButtonCallbackFunction_, move.mouseButtonCallbackFunction_);
-    std::swap(this->keyCallbackFunction_, move.keyCallbackFunction_);
-    std::swap(this->scrollCallbackFunction_, move.scrollCallbackFunction_);
+    std::swap(this->mouseClickCallback_, move.mouseClickCallback_);
+    std::swap(this->mouseMoveCallback_, move.mouseMoveCallback_);
+    std::swap(this->mouseScrollCallback_, move.mouseScrollCallback_);
+    std::swap(this->keyPressCallback_, move.keyPressCallback_);
+    std::swap(this->windowResizeCallback_, move.windowResizeCallback_);
 }
 
 void Window::DestroyHelper_() noexcept {
@@ -191,8 +163,4 @@ void Window::DestroyHelper_() noexcept {
 
     this->title_.clear();
     this->windowHandle_.reset();
-
-    this->mouseButtonCallbackFunction_ = nullptr;
-    this->keyCallbackFunction_ = nullptr;
-    this->scrollCallbackFunction_ = nullptr;
 }
