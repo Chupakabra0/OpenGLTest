@@ -94,7 +94,13 @@ void Window::MouseButtonCallbackFunction_(GLFWwindow* window, int button, int ac
     double xpos{}, ypos{};
     glfwGetCursorPos(window, &xpos, &ypos);
 
-    userWindowPtr->TriggerMouseClick(*userWindowPtr, button, action, mods, xpos, ypos);
+    userWindowPtr->TriggerMouseClick(
+        *userWindowPtr,
+        ConvertCodeToMouseButton(button),
+        ConvertCodeToControlAction(action),
+        ConvertCodeToControlMods(mods),
+        xpos, ypos
+    );
 }
 
 void Window::CursorPosCallbackFunction_(GLFWwindow* window, double xpos, double ypos) {
@@ -106,7 +112,7 @@ void Window::CursorPosCallbackFunction_(GLFWwindow* window, double xpos, double 
 void Window::KeyCallbackFunction_(GLFWwindow* window, int key, int scancode, int action, int mods) {
     auto* userWindowPtr = Window::GetUserWindowPtr(window);
 
-    userWindowPtr->TriggerKeyPress(*userWindowPtr, key, scancode, action, mods);
+    userWindowPtr->TriggerKeyPress(*userWindowPtr, ConvertCodeToKeyboardKey(key), scancode, action, mods);
 }
 
 void Window::ScrollCallbackFunction_(GLFWwindow* window, double xoffset, double yoffset) {

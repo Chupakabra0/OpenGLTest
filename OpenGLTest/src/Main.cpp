@@ -90,26 +90,26 @@ int main(int argc, char** argv) {
 
         // Window callbacks generate
         const auto mouseButtonCallback = std::make_shared<Window::MouseClickCallback>(
-            [&imgui](Window& window, int button, int action, int mods, double xpos, double ypos) {
+            [&imgui](Window& window, Mouse::Button button, ControlAction action, ControlMods mods, double xpos, double ypos) {
                 if (imgui.GetIO()->WantCaptureMouse) {
                     return;
                 }
 
-                if (button == GLFW_MOUSE_BUTTON_1 || button == GLFW_MOUSE_BUTTON_2) {
-                    if (action == 1) {
+                if (button == Mouse::Button::LEFT || button == Mouse::Button::RIGHT) {
+                    if (action == ControlAction::PRESS) {
                         window.UpdateCursorPosition();
                         window.SetMouseClicked(button);
                     }
                 }
             },
             std::make_shared<Window::MouseClickCallback>(
-                [&imgui](Window& window, int button, int action, int mods, double xpos, double ypos) {
+                [&imgui](Window& window, Mouse::Button button, ControlAction action, ControlMods mods, double xpos, double ypos) {
                     if (imgui.GetIO()->WantCaptureMouse) {
                         return;
                     }
 
-                    if (button == GLFW_MOUSE_BUTTON_1 || button == GLFW_MOUSE_BUTTON_2) {
-                       if (action == 0) {
+                    if (button == Mouse::Button::LEFT || button == Mouse::Button::RIGHT) {
+                       if (action == ControlAction::RELEASE) {
                             window.ResetCursorPosition();
                             window.SetMouseUnclicked(button);
                         }
@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
                     return;
                 }
 
-                if (window.IsMouseClicked(GLFW_MOUSE_BUTTON_1)) {
+                if (window.IsMouseClicked(Mouse::Button::LEFT)) {
                     window.UpdateCursorPosition();
 
                     auto [x1, y1] = window.GetPrevCursorPos();
@@ -139,7 +139,7 @@ int main(int argc, char** argv) {
                         return;
                     }
 
-                    if (window.IsMouseClicked(GLFW_MOUSE_BUTTON_2)) {
+                    if (window.IsMouseClicked(Mouse::Button::RIGHT)) {
                         window.UpdateCursorPosition();
 
                         const float RADIUS = 1.0f;
@@ -178,10 +178,13 @@ int main(int argc, char** argv) {
         );
 
         const auto keyPressCallback = std::make_shared<Window::KeyPressCallback>(
-            [](Window& window, int code, int scancode, int action, int mods) {
+            [](Window& window, Keyboard::Key key, int scancode, int action, int mods) {
                 const std::string actionStr = action == 0 ? "Release" : (action == 1 ? "Press" : "Repeat");
 
-                std::cout << std::format("Key pressed: Code: {}, Scancode: {}, Action: \"{}\", Mods: {}\n", code, scancode, actionStr, mods);
+                std::cout << std::format(
+                    "Key pressed: Code: {}, Scancode: {}, Action: \"{}\", Mods: {}\n",
+                    ConvertKeyboardKeyToCode(key), scancode, actionStr, mods
+                );
             }
         );
 

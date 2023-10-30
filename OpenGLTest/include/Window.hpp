@@ -1,5 +1,8 @@
 #pragma once
 #include "GLFW/glfw3.h"
+#include "Mouse.hpp"
+#include "Keyboard.hpp"
+#include "Control.hpp"
 
 #include <memory>
 #include <string>
@@ -11,106 +14,11 @@
 
 using UniqueGLFWWindowPtr = std::unique_ptr<GLFWwindow, decltype([](GLFWwindow* ptr) { glfwDestroyWindow(ptr); })>;
 
-class Mouse {
-public:
-    static const int MAX_BUTTONS_COUNT  = 8;
-
-    explicit Mouse() = default;
-
-    Mouse(const Mouse&) = default;
-
-    Mouse(Mouse&&) noexcept = default;
-
-    Mouse& operator=(const Mouse&) = default;
-
-    Mouse& operator=(Mouse&&) noexcept = default;
-
-    ~Mouse() = default;
-
-    void PushNewPos(double x, double y) {
-        this->mousePositionX2_ = this->mousePositionX1_;
-        this->mousePositionY2_ = this->mousePositionY1_;
-
-        this->mousePositionX1_ = x;
-        this->mousePositionY1_ = y;
-
-        std::cout << std::format("X: {} Y: {}\n Xprev: {} Yprev: {}\n", this->mousePositionX1_, this->mousePositionY1_, this->mousePositionX2_, this->mousePositionY2_);
-    }
-
-    std::pair<double, double> GetCurrPos() const {
-        return std::make_pair(this->mousePositionX1_, this->mousePositionY1_);
-    }
-
-    std::pair<double, double> GetPrevPos() const {
-        return std::make_pair(this->mousePositionX2_, this->mousePositionY2_);
-    }
-
-    void SetClicked(int index) {
-        this->isMouseClickedArr_.at(index) = true;
-    }
-
-    void SetUnclicked(int index) {
-        this->isMouseClickedArr_.at(index) = false;
-    }
-
-    bool IsClicked(int index) const {
-        return this->isMouseClickedArr_.at(index);
-    }
-
-private:
-    double mousePositionX2_{};
-    double mousePositionY2_{};
-    double mousePositionX1_{};
-    double mousePositionY1_{};
-    std::array<bool, Mouse::MAX_BUTTONS_COUNT> isMouseClickedArr_{};
-};
-
-class Keyboard {
-public:
-    static const int MAX_KEYS_COUNT = 348;
-
-    explicit Keyboard() = default;
-
-    Keyboard(const Keyboard&) = default;
-
-    Keyboard(Keyboard&&) noexcept = default;
-
-    Keyboard& operator=(const Keyboard&) = default;
-
-    Keyboard& operator=(Keyboard&&) noexcept = default;
-
-    ~Keyboard() = default;
-
-    void PressKey(int key) {
-        this->isMouseClickedArr_.at(key) = true;
-    }
-
-    void UnpressKey(int key) {
-        this->isMouseClickedArr_.at(key) = false;
-    }
-
-    bool IsPressed(int key) const {
-        return this->isMouseClickedArr_.at(key);
-    }
-
-    int GetMods() const {
-        return this->mods_;
-    }
-
-    void SetMods(int mods) {
-        this->mods_ = mods;
-    }
-
-private:
-    std::array<bool, Keyboard::MAX_KEYS_COUNT> isMouseClickedArr_{};
-    int mods_{};
-};
-
 class Window {
 public:
-    using MouseButtonCallbackFunc       = std::function<void(Window&, int, int, int, double, double)>;
+    using MouseButtonCallbackFunc       = std::function<void(Window&, Mouse::Button, ControlAction, ControlMods, double, double)>;
     using CursorPosCallbackFunc         = std::function<void(Window&, double, double)>;
-    using KeyCallbackFunc               = std::function<void(Window&, int, int, int, int)>;
+    using KeyCallbackFunc               = std::function<void(Window&, Keyboard::Key, int, int, int)>;
     using ScrollCallbackFunc            = std::function<void(Window&, double, double)>;
     using FramebufferResizeCallbackFunc = std::function<void(Window&, int, int)>;
 
@@ -138,7 +46,7 @@ public:
 
         ~MouseClickCallback() = default;
 
-        void Call(Window& window, int button, int action, int mods, double xpos, double ypos) {
+        void Call(Window& window, Mouse::Button button, ControlAction action, ControlMods mods, double xpos, double ypos) {
             if (this->func_ != nullptr) {
                 this->func_(window, button, action, mods, xpos, ypos);
             }
@@ -327,7 +235,7 @@ public:
 
         ~KeyPressCallback() = default;
 
-        void Call(Window& window, int key, int scancode, int action, int mods) {
+        void Call(Window& window, Keyboard::Key key, int scancode, int action, int mods) {
             if (this->func_ != nullptr) {
                 this->func_(window, key, scancode, action, mods);
             }
@@ -534,16 +442,16 @@ public:
         this->mouse_.PushNewPos(0.0, 0.0);
     }
 
-    bool IsMouseClicked(int index) const {
-        return this->mouse_.IsClicked(index);
+    bool IsMouseClicked(Mouse::Button button) const {
+        return this->mouse_.IsClicked(button);
     }
 
-    void SetMouseClicked(int index) {
-        this->mouse_.SetClicked(index);
+    void SetMouseClicked(Mouse::Button button) {
+        this->mouse_.SetClicked(button);
     }
 
-    void SetMouseUnclicked(int index) {
-        this->mouse_.SetUnclicked(index);
+    void SetMouseUnclicked(Mouse::Button button) {
+        this->mouse_.SetUnclicked(button);
     }
 
     std::pair<double, double> GetCurrCursorPos() const {
@@ -562,7 +470,7 @@ public:
 
     void WaitEvents() const;
 
-    void TriggerMouseClick(Window& window, int button, int action, int mods, double xpos, double ypos) {
+    void TriggerMouseClick(Window& window, Mouse::Button button, ControlAction action, ControlMods mods, double xpos, double ypos) {
         this->mouseClickCallback_->Call(window, button, action, mods, xpos, ypos);
     }
 
@@ -574,7 +482,7 @@ public:
         this->mouseScrollCallback_->Call(window, xpos, ypos);
     }
 
-    void TriggerKeyPress(Window& window, int key, int scancode, int action, int mods) {
+    void TriggerKeyPress(Window& window, Keyboard::Key key, int scancode, int action, int mods) {
         this->keyPressCallback_->Call(window, key, scancode, action, mods);
     }
 
