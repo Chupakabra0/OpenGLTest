@@ -147,7 +147,12 @@ int main(int argc, char** argv) {
                         auto [x1, y1] = window.GetPrevCursorPos();
                         auto [x2, y2] = window.GetCurrCursorPos();
 
-                        camera.Arcball(static_cast<float>(x1), static_cast<float>(y1), static_cast<float>(x2), static_cast<float>(y2));
+                        camera.Arcball(
+                            static_cast<float>(x2 - x1),
+                            static_cast<float>(y2 - y1),
+                            static_cast<float>(window.GetHeight()),
+                            static_cast<float>(window.GetWidth())
+                        );
                     }
                 }
             )
