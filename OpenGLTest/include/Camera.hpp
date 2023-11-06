@@ -126,7 +126,21 @@ public:
     }
 
     void MoveCamera(const glm::vec3& delta) {
-        this->origin_ += delta;
+        this->origin_ += glm::vec3(glm::mat4(
+            glm::vec4(this->x_, 0.0f),
+            glm::vec4(this->y_, 0.0f),
+            glm::vec4(this->z_, 0.0f),
+            glm::vec4(0.0, 0.0, 0.0, 1.0f)
+        ) * glm::vec4(delta, 1.0f));
+    }
+
+    void MoveTarget(const glm::vec3& delta) {
+        this->target_ += glm::vec3(glm::mat4(
+            glm::vec4(this->x_, 0.0f),
+            glm::vec4(this->y_, 0.0f),
+            glm::vec4(this->z_, 0.0f),
+            glm::vec4(0.0, 0.0, 0.0, 1.0f)
+        ) * glm::vec4(delta, 1.0f));
     }
 
     void Pan(float u, float v, float sensivity) {

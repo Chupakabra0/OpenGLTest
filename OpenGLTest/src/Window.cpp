@@ -112,7 +112,7 @@ void Window::CursorPosCallbackFunction_(GLFWwindow* window, double xpos, double 
 void Window::KeyCallbackFunction_(GLFWwindow* window, int key, int scancode, int action, int mods) {
     auto* userWindowPtr = Window::GetUserWindowPtr(window);
 
-    userWindowPtr->TriggerKeyPress(*userWindowPtr, ConvertCodeToKeyboardKey(key), scancode, action, mods);
+    userWindowPtr->TriggerKeyPress(*userWindowPtr, ConvertCodeToKeyboardKey(key), scancode, ConvertCodeToControlAction(action), mods);
 }
 
 void Window::ScrollCallbackFunction_(GLFWwindow* window, double xoffset, double yoffset) {

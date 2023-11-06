@@ -18,7 +18,7 @@ class Window {
 public:
     using MouseButtonCallbackFunc       = std::function<void(Window&, Mouse::Button, ControlAction, ControlMods, double, double)>;
     using CursorPosCallbackFunc         = std::function<void(Window&, double, double)>;
-    using KeyCallbackFunc               = std::function<void(Window&, Keyboard::Key, int, int, int)>;
+    using KeyCallbackFunc               = std::function<void(Window&, Keyboard::Key, int, ControlAction, int)>;
     using ScrollCallbackFunc            = std::function<void(Window&, double, double)>;
     using FramebufferResizeCallbackFunc = std::function<void(Window&, int, int)>;
 
@@ -235,7 +235,7 @@ public:
 
         ~KeyPressCallback() = default;
 
-        void Call(Window& window, Keyboard::Key key, int scancode, int action, int mods) {
+        void Call(Window& window, Keyboard::Key key, int scancode, ControlAction action, int mods) {
             if (this->func_ != nullptr) {
                 this->func_(window, key, scancode, action, mods);
             }
@@ -482,7 +482,7 @@ public:
         this->mouseScrollCallback_->Call(window, xpos, ypos);
     }
 
-    void TriggerKeyPress(Window& window, Keyboard::Key key, int scancode, int action, int mods) {
+    void TriggerKeyPress(Window& window, Keyboard::Key key, int scancode, ControlAction action, int mods) {
         this->keyPressCallback_->Call(window, key, scancode, action, mods);
     }
 
