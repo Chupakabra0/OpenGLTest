@@ -42,18 +42,18 @@ public:
         return std::make_pair(this->mousePositionX2_, this->mousePositionY2_);
     }
 
-    void SetClicked(Button button) {
-        this->isMouseClickedArr_[button] = true;
+    void SetClicked(Mouse::Button button) {
+        this->isMouseClicked_[button] = true;
     }
 
-    void SetUnclicked(Button button) {
-        this->isMouseClickedArr_[button] = false;
+    void SetUnclicked(Mouse::Button button) {
+        this->isMouseClicked_[button] = false;
     }
 
-    bool IsClicked(Button button) const {
-        const auto find = this->isMouseClickedArr_.find(button);
+    bool IsClicked(Mouse::Button button) const {
+        const auto find = this->isMouseClicked_.find(button);
 
-        return find != this->isMouseClickedArr_.end() ?
+        return find != this->isMouseClicked_.end() ?
             find->second :
             false;
     }
@@ -63,7 +63,7 @@ private:
     double mousePositionY2_{};
     double mousePositionX1_{};
     double mousePositionY1_{};
-    std::unordered_map<Button, bool> isMouseClickedArr_{};
+    std::unordered_map<Mouse::Button, bool> isMouseClicked_{};
 };
 
 inline int ConvertMouseButtonToCode(Mouse::Button button);

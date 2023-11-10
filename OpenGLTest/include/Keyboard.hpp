@@ -1,4 +1,6 @@
 #pragma once
+#include "Control.hpp"
+
 #include <array>
 
 class Keyboard {
@@ -62,31 +64,34 @@ public:
 
     ~Keyboard() = default;
 
-    void PressKey(int key) {
-        this->isMouseClickedArr_.at(key) = true;
+    void SetPressed(Keyboard::Key key) {
+        this->isKeyPressed_[key] = true;
     }
 
-    void UnpressKey(int key) {
-        this->isMouseClickedArr_.at(key) = false;
+    void SetUnpressed(Keyboard::Key key) {
+        this->isKeyPressed_[key] = false;
     }
 
-    bool IsPressed(int key) const {
-        return this->isMouseClickedArr_.at(key);
+    bool IsPressed(Keyboard::Key key) const {
+        const auto find = this->isKeyPressed_.find(key);
+
+        return find != this->isKeyPressed_.end() ?
+            find->second :
+            false;
     }
 
-    int GetMods() const {
+    ControlMods GetMods() const {
         return this->mods_;
     }
 
-    void SetMods(int mods) {
+    void SetMods(ControlMods mods) {
         this->mods_ = mods;
     }
 
 private:
-    std::array<bool, Keyboard::MAX_KEYS_COUNT> isMouseClickedArr_{};
-    int mods_{};
+    std::unordered_map<Keyboard::Key, bool> isKeyPressed_{};
+    ControlMods mods_{};
 };
-
 
 inline int ConvertKeyboardKeyToCode(Keyboard::Key key);
 inline Keyboard::Key ConvertCodeToKeyboardKey(int keyCode);

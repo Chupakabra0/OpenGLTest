@@ -70,12 +70,14 @@ void Window::SwapBuffers() const {
     glfwSwapBuffers(this->windowHandle_.get());
 }
 
-void Window::PollEvents() const {
+void Window::PollEvents() {
     glfwPollEvents();
+    this->TriggerLoop(*this);
 }
 
-void Window::WaitEvents() const {
+void Window::WaitEvents() {
     glfwWaitEvents();
+    this->TriggerLoop(*this);
 }
 
 Window* Window::GetUserWindowPtr(GLFWwindow* window) {
@@ -112,7 +114,13 @@ void Window::CursorPosCallbackFunction_(GLFWwindow* window, double xpos, double 
 void Window::KeyCallbackFunction_(GLFWwindow* window, int key, int scancode, int action, int mods) {
     auto* userWindowPtr = Window::GetUserWindowPtr(window);
 
-    userWindowPtr->TriggerKeyPress(*userWindowPtr, ConvertCodeToKeyboardKey(key), scancode, ConvertCodeToControlAction(action), mods);
+    userWindowPtr->TriggerKeyPress(
+        *userWindowPtr,
+        ConvertCodeToKeyboardKey(key),
+        scancode,
+        ConvertCodeToControlAction(action),
+        ConvertCodeToControlMods(mods)
+    );
 }
 
 void Window::ScrollCallbackFunction_(GLFWwindow* window, double xoffset, double yoffset) {
@@ -125,6 +133,12 @@ void Window::FramebufferResizeCallbackFunction_(GLFWwindow* window, int width, i
     auto* userWindowPtr = Window::GetUserWindowPtr(window);
 
     userWindowPtr->TriggerWindowResize(*userWindowPtr, width, height);
+}
+
+void Window::FrameRefreshCallbackFunction_(GLFWwindow* window) {
+    auto* userWindowPtr = Window::GetUserWindowPtr(window);
+
+    userWindowPtr->TriggerWindowRefresh(*userWindowPtr);
 }
 
 void Window::ConstructHelper_() {
@@ -150,6 +164,7 @@ void Window::ConstructHelper_() {
     glfwSetKeyCallback(this->windowHandle_.get(), Window::KeyCallbackFunction_);
     glfwSetScrollCallback(this->windowHandle_.get(), Window::ScrollCallbackFunction_);
     glfwSetFramebufferSizeCallback(this->windowHandle_.get(), Window::FramebufferResizeCallbackFunction_);
+    glfwSetWindowRefreshCallback(this->windowHandle_.get(), Window::FrameRefreshCallbackFunction_);
 }
 
 void Window::MoveHelper_(Window&& move) noexcept {

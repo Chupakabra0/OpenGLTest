@@ -183,46 +183,46 @@ int main(int argc, char** argv) {
         );
 
         const auto keyPressCallback = std::make_shared<Window::KeyPressCallback>(
-            [&camera](Window& window, Keyboard::Key key, int scancode, ControlAction action, int mods) {
-                const float speed = 1.0f;
-
+            [&camera](Window& window, Keyboard::Key key, int scancode, ControlAction action, ControlMods mods) {
                 if (key == Keyboard::Key::W) {
-                    if (action == ControlAction::PRESS || action == ControlAction::REPEAT) {
-                        camera.MoveCamera(glm::vec3(0.0f, -speed, 0.0f));
-                        camera.MoveTarget(glm::vec3(0.0f, -speed, 0.0f));
+                    if (action == ControlAction::PRESS) {
+                        window.SetKeyPressed(key);
+                    }
+                    else if (action == ControlAction::RELEASE) {
+                        window.SetKeyUnpressed(key);
                     }
                 }
             },
             std::make_shared<Window::KeyPressCallback>(
-                [&camera](Window& window, Keyboard::Key key, int scancode, ControlAction action, int mods) {
-                    const float speed = 1.0f;
-
+                [&camera](Window& window, Keyboard::Key key, int scancode, ControlAction action, ControlMods mods) {
                     if (key == Keyboard::Key::S) {
-                        if (action == ControlAction::PRESS || action == ControlAction::REPEAT) {
-                            camera.MoveCamera(glm::vec3(0.0f, speed, 0.0f));
-                            camera.MoveTarget(glm::vec3(0.0f, speed, 0.0f));
+                        if (action == ControlAction::PRESS) {
+                            window.SetKeyPressed(key);
+                        }
+                        else if (action == ControlAction::RELEASE) {
+                            window.SetKeyUnpressed(key);
                         }
                     }
                 },
                 std::make_shared<Window::KeyPressCallback>(
-                    [&camera](Window& window, Keyboard::Key key, int scancode, ControlAction action, int mods) {
-                        const float speed = 1.0f;
-
+                    [&camera](Window& window, Keyboard::Key key, int scancode, ControlAction action, ControlMods mods) {
                         if (key == Keyboard::Key::D) {
-                            if (action == ControlAction::PRESS || action == ControlAction::REPEAT) {
-                                camera.MoveCamera(glm::vec3(-speed, 0.0f, 0.0f));
-                                camera.MoveTarget(glm::vec3(-speed, 0.0f, 0.0f));
+                            if (action == ControlAction::PRESS) {
+                                window.SetKeyPressed(key);
+                            }
+                            else if (action == ControlAction::RELEASE) {
+                                window.SetKeyUnpressed(key);
                             }
                         }
                     },
                     std::make_shared<Window::KeyPressCallback>(
-                        [&camera](Window& window, Keyboard::Key key, int scancode, ControlAction action, int mods) {
-                            const float speed = 1.0f;
-
+                        [&camera](Window& window, Keyboard::Key key, int scancode, ControlAction action, ControlMods mods) {
                             if (key == Keyboard::Key::A) {
-                                if (action == ControlAction::PRESS || action == ControlAction::REPEAT) {
-                                    camera.MoveCamera(glm::vec3(speed, 0.0f, 0.0f));
-                                    camera.MoveTarget(glm::vec3(speed, 0.0f, 0.0f));
+                                if (action == ControlAction::PRESS) {
+                                    window.SetKeyPressed(key);
+                                }
+                                else if (action == ControlAction::RELEASE) {
+                                    window.SetKeyUnpressed(key);
                                 }
                             }
                         }
@@ -231,12 +231,57 @@ int main(int argc, char** argv) {
             )
         );
 
+        const auto loopCallback = std::make_shared<Window::LoopCallback>(
+            [&camera](Window& window) {
+                if (window.IsKeyPressed(Keyboard::Key::W)) {
+                    const float speed = 1.0f;
+
+                    camera.MoveCamera(glm::vec3(0.0f, -speed, 0.0f));
+                    camera.MoveTarget(glm::vec3(0.0f, -speed, 0.0f));
+                }
+            },
+            std::make_shared<Window::LoopCallback>(
+                [&camera](Window& window) {
+                    if (window.IsKeyPressed(Keyboard::Key::S)) {
+                        const float speed = 1.0f;
+
+                        camera.MoveCamera(glm::vec3(0.0f, speed, 0.0f));
+                        camera.MoveTarget(glm::vec3(0.0f, speed, 0.0f));
+                    }
+                },
+                std::make_shared<Window::LoopCallback>(
+                    [&camera](Window& window) {
+                        if (window.IsKeyPressed(Keyboard::Key::D)) {
+                            const float speed = 1.0f;
+
+                            camera.MoveCamera(glm::vec3(-speed, 0.0f, 0.0f));
+                            camera.MoveTarget(glm::vec3(-speed, 0.0f, 0.0f));
+                        }
+                    },
+                    std::make_shared<Window::LoopCallback>(
+                        [&camera](Window& window) {
+                            if (window.IsKeyPressed(Keyboard::Key::A)) {
+                                const float speed = 1.0f;
+
+                                camera.MoveCamera(glm::vec3(speed, 0.0f, 0.0f));
+                                camera.MoveTarget(glm::vec3(speed, 0.0f, 0.0f));
+                            }
+                        }
+                    )
+                )
+            )
+        );
+
+        const auto refreshCallback = std::make_shared<Window::WindowRefreshCallback>();
+
         // Window callbacks settings
         window.SetMouseClickCallback(mouseButtonCallback);
         window.SetMouseMoveCallback(mouseMoveCallback);
         window.SetMouseScrollCallback(mouseScrollCallback);
         window.SetResizeCallback(windowResizeCallback);
         window.SetKeyPressCallback(keyPressCallback);
+        window.SetLoopCallback(loopCallback);
+        window.SetRefreshCallback(refreshCallback);
 
         // Creating shaders
         Shader basicVertexShader{"shaders\\BasicShader.vert", ShaderType::VERTEX_SHADER};
