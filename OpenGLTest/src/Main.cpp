@@ -32,24 +32,7 @@ int main(int argc, char** argv) {
         constexpr int windowWidth{1280};
 
         // Init window & GLFW
-        Window window {
-            windowHeight, windowWidth, "OpenGL Test",
-            [](Window& window, int button, int action, int mods, double xpos, double ypos) {
-
-            },
-            [](Window&, double, double) {
-
-            },
-            [](Window& window, int key, int scancode, int action, int mods) {
-                std::cout << std::format("Pressed! Key = {}, Scancode = {}, Action = {}, Mods = {}\n", key, scancode, action, mods);
-            },
-            [](Window& window, double xoffset, double yoffset) {
-
-            },
-            [](Window& window, int width, int height) {
-
-            }
-        };
+        Window window{windowHeight, windowWidth, "OpenGL Test"};
 
         // Init imgui
         ImguiWrapper& imgui = ImguiWrapper::GetInstance(window);
@@ -65,31 +48,23 @@ int main(int argc, char** argv) {
         const glm::vec4 backgroundColor{125.0f, 0.0f, 255.0f, 255.0f};
         const glm::vec4 foregroundColor{175.0f, 60.0f, 75.0f, 255.0f};
 
-        //const glm::vec3 origin{static_cast<float>(window.GetWidth()) / 2.0f, static_cast<float>(window.GetHeight()) / 2.0f, 0.0f};
+        // Mesh generate
         const glm::vec3 origin{0.0f, 0.0f, 0.0f};
         const float size{150.0f};
         const int segments{10};
         const int slices{10};
-
-        //ParallelepipedGenerator gener(
-        //    size, size, size,
-        //    origin, glm::vec3(0.0, 0.0, 0.0)
-        //);
-        //IcosahedronGenerator gener(100.0f, origin, glm::vec3(0.0));
         UVSphereGenerator gener(size, segments, slices, origin, glm::vec3(0.0));
-        //ConeGenerator gener(300.0f, 100.0f, 100, 1, origin - glm::vec3(0.0f, 150.0f, 0.0f), glm::zero<glm::vec3>());
-
         MeshClass mesh{gener.GenerateMesh()};
 
-        // Ibo init
+        // Ibo/vao init
         IndexBufferObject* ibo = new IndexBufferObject(mesh.GenerateIBO());
         VertexArrayObject vao  = mesh.GenerateVAO(ibo);
 
         // Create texture
-        std::shared_ptr<ITextureLoader> textureLoader = std::make_shared<TextureLoaderSTB>();
-        const int textureSlot{0};
-        Texture texture{"resources\\textures\\paper-sheet.png", textureSlot, textureLoader};
-        DataObjectGuard textureGuard{texture};
+        //std::shared_ptr<ITextureLoader> textureLoader = std::make_shared<TextureLoaderSTB>();
+        //const int textureSlot{0};
+        //Texture texture{"resources\\textures\\paper-sheet.png", textureSlot, textureLoader};
+        //DataObjectGuard textureGuard{texture};
 
         // MVP matrix
         glm::mat4 modelMatrix{glm::identity<glm::mat4>()};
@@ -109,74 +84,206 @@ int main(int argc, char** argv) {
         const float fieldOfViewStep    = 3.0f;
         const float fieldOfViewDegrees = 90.0f;
         Viewport viewport(
-            0.0f, 0.0f, window.GetWidth(), window.GetHeight(),
+            0, 0, window.GetWidth(), window.GetHeight(),
             glm::radians(fieldOfViewDegrees), 0.1f, 500.0f
         );
 
-        // Window callbacks
-        window.SetMouseButtonCallback([&camera, &imgui](Window& window, int button, int action, int mods, double xpos, double ypos) {
-            if (imgui.GetIO()->WantCaptureMouse) {
-                return;
-            }
-            
-            if (button == GLFW_MOUSE_BUTTON_1 || button == GLFW_MOUSE_BUTTON_2) {
-                if (action == 1) {
+        // Window callbacks generate
+        const auto mouseButtonCallback = std::make_shared<Window::MouseClickCallback>(
+            [&imgui](Window& window, Mouse::Button button, ControlAction action, ControlMods mods, double xpos, double ypos) {
+                if (imgui.GetIO()->WantCaptureMouse) {
+                    return;
+                }
+
+                if (button == Mouse::Button::LEFT || button == Mouse::Button::RIGHT) {
+                    if (action == ControlAction::PRESS) {
+                        window.UpdateCursorPosition();
+                        window.SetMouseClicked(button);
+                    }
+                }
+            },
+            std::make_shared<Window::MouseClickCallback>(
+                [&imgui](Window& window, Mouse::Button button, ControlAction action, ControlMods mods, double xpos, double ypos) {
+                    if (imgui.GetIO()->WantCaptureMouse) {
+                        return;
+                    }
+
+                    if (button == Mouse::Button::LEFT || button == Mouse::Button::RIGHT) {
+                       if (action == ControlAction::RELEASE) {
+                            window.ResetCursorPosition();
+                            window.SetMouseUnclicked(button);
+                        }
+                    }
+                }
+            )
+        );
+
+        const auto mouseMoveCallback = std::make_shared<Window::MouseMoveCallback>(
+            [&camera, &imgui](Window& window, double xpos, double ypos) {
+                if (imgui.GetIO()->WantCaptureMouse) {
+                    return;
+                }
+
+                if (window.IsMouseClicked(Mouse::Button::LEFT)) {
                     window.UpdateCursorPosition();
-                    window.SetMouseClicked(button);
+
+                    auto [x1, y1] = window.GetPrevCursorPos();
+                    auto [x2, y2] = window.GetCurrCursorPos();
+
+                    camera.Pan(static_cast<float>(x2 - x1), static_cast<float>(y2 - y1), 1.0f);
                 }
-                else if (action == 0) {
-                    window.ResetCursorPosition();
-                    window.SetMouseUnclicked(button);
+            },
+            std::make_shared<Window::MouseMoveCallback>(
+                [&camera, &imgui](Window& window, double xpos, double ypos) {
+                    if (imgui.GetIO()->WantCaptureMouse) {
+                        return;
+                    }
+
+                    if (window.IsMouseClicked(Mouse::Button::RIGHT)) {
+                        window.UpdateCursorPosition();
+
+                        const float RADIUS = 1.0f;
+
+                        auto [x1, y1] = window.GetPrevCursorPos();
+                        auto [x2, y2] = window.GetCurrCursorPos();
+
+                        camera.Arcball(
+                            static_cast<float>(x2 - x1),
+                            static_cast<float>(y2 - y1),
+                            static_cast<float>(window.GetHeight()),
+                            static_cast<float>(window.GetWidth())
+                        );
+                    }
                 }
+            )
+        );
+
+        const auto mouseScrollCallback = std::make_shared<Window::MouseScrollCallback>(
+            [&viewport, &imgui, &fieldOfViewStep](Window& window, double xpos, double ypos) {
+                if (imgui.GetIO()->WantCaptureMouse) {
+                    return;
+                }
+
+                viewport.SetFieldOfView(
+                    glm::radians(
+                        glm::degrees(viewport.GetFieldOfView()) + (ypos > 0 ? -fieldOfViewStep : fieldOfViewStep)
+                    )
+                );
             }
-        });
-        window.SetCursorPosCallback([&camera, &imgui](Window& window, double xpos, double ypos) {
-            if (imgui.GetIO()->WantCaptureMouse) {
-                return;
+        );
+
+        const auto windowResizeCallback = std::make_shared<Window::WindowResizeCallback>(
+            [&viewport](Window& window, int width, int height) {
+                viewport.SetBottomX(width);
+                viewport.SetBottomY(height);
+                viewport.UpdateViewport();
+
+                std::cout << std::format("Window resized to {} x {}\n", width, height);
             }
+        );
 
-            if (window.IsMouseClicked(GLFW_MOUSE_BUTTON_1)) {
-                window.UpdateCursorPosition();
-
-                auto [x1, y1] = window.GetPrevCursorPos();
-                auto [x2, y2] = window.GetCurrCursorPos();
-
-                camera.Pan(static_cast<float>(x2 - x1), static_cast<float>(y2 - y1), 1.0f);
-            }
-            else if (window.IsMouseClicked(GLFW_MOUSE_BUTTON_2)) {
-                window.UpdateCursorPosition();
-
-                const float RADIUS = 1.0f;
-
-                auto [x1, y1] = window.GetPrevCursorPos();
-                auto [x2, y2] = window.GetCurrCursorPos();
-
-                camera.Arcball(static_cast<float>(x1), static_cast<float>(y1), static_cast<float>(x2), static_cast<float>(y2));
-            }
-        });
-        window.SetScrollCallbackFunc([&viewport, &imgui, &fieldOfViewStep](Window& window, double xpos, double ypos) {
-            if (imgui.GetIO()->WantCaptureMouse) {
-                return;
-            }
-
-            viewport.SetFieldOfView(
-                glm::radians(
-                    glm::degrees(viewport.GetFieldOfView()) + (ypos > 0 ? -fieldOfViewStep : fieldOfViewStep)
+        const auto keyPressCallback = std::make_shared<Window::KeyPressCallback>(
+            [&camera](Window& window, Keyboard::Key key, int scancode, ControlAction action, ControlMods mods) {
+                if (key == Keyboard::Key::W) {
+                    if (action == ControlAction::PRESS) {
+                        window.SetKeyPressed(key);
+                    }
+                    else if (action == ControlAction::RELEASE) {
+                        window.SetKeyUnpressed(key);
+                    }
+                }
+            },
+            std::make_shared<Window::KeyPressCallback>(
+                [&camera](Window& window, Keyboard::Key key, int scancode, ControlAction action, ControlMods mods) {
+                    if (key == Keyboard::Key::S) {
+                        if (action == ControlAction::PRESS) {
+                            window.SetKeyPressed(key);
+                        }
+                        else if (action == ControlAction::RELEASE) {
+                            window.SetKeyUnpressed(key);
+                        }
+                    }
+                },
+                std::make_shared<Window::KeyPressCallback>(
+                    [&camera](Window& window, Keyboard::Key key, int scancode, ControlAction action, ControlMods mods) {
+                        if (key == Keyboard::Key::D) {
+                            if (action == ControlAction::PRESS) {
+                                window.SetKeyPressed(key);
+                            }
+                            else if (action == ControlAction::RELEASE) {
+                                window.SetKeyUnpressed(key);
+                            }
+                        }
+                    },
+                    std::make_shared<Window::KeyPressCallback>(
+                        [&camera](Window& window, Keyboard::Key key, int scancode, ControlAction action, ControlMods mods) {
+                            if (key == Keyboard::Key::A) {
+                                if (action == ControlAction::PRESS) {
+                                    window.SetKeyPressed(key);
+                                }
+                                else if (action == ControlAction::RELEASE) {
+                                    window.SetKeyUnpressed(key);
+                                }
+                            }
+                        }
+                    )
                 )
-            );
-        });
-        window.SetFramebufferResizeCallback([&viewport](Window& window, int width, int height) {
-            window.SetWidth(width);
-            window.SetHeight(height);
+            )
+        );
 
-            viewport.SetBottomX(width);
-            viewport.SetBottomY(height);
-            viewport.UpdateViewport();
+        const auto loopCallback = std::make_shared<Window::LoopCallback>(
+            [&camera](Window& window) {
+                if (window.IsKeyPressed(Keyboard::Key::W)) {
+                    const float speed = 1.0f;
 
-            std::cout << std::format("Window resized to {} x {}\n", width, height);
-        });
+                    camera.MoveCamera(glm::vec3(0.0f, -speed, 0.0f));
+                    camera.MoveTarget(glm::vec3(0.0f, -speed, 0.0f));
+                }
+            },
+            std::make_shared<Window::LoopCallback>(
+                [&camera](Window& window) {
+                    if (window.IsKeyPressed(Keyboard::Key::S)) {
+                        const float speed = 1.0f;
 
-        // Creating shader program
+                        camera.MoveCamera(glm::vec3(0.0f, speed, 0.0f));
+                        camera.MoveTarget(glm::vec3(0.0f, speed, 0.0f));
+                    }
+                },
+                std::make_shared<Window::LoopCallback>(
+                    [&camera](Window& window) {
+                        if (window.IsKeyPressed(Keyboard::Key::D)) {
+                            const float speed = 1.0f;
+
+                            camera.MoveCamera(glm::vec3(-speed, 0.0f, 0.0f));
+                            camera.MoveTarget(glm::vec3(-speed, 0.0f, 0.0f));
+                        }
+                    },
+                    std::make_shared<Window::LoopCallback>(
+                        [&camera](Window& window) {
+                            if (window.IsKeyPressed(Keyboard::Key::A)) {
+                                const float speed = 1.0f;
+
+                                camera.MoveCamera(glm::vec3(speed, 0.0f, 0.0f));
+                                camera.MoveTarget(glm::vec3(speed, 0.0f, 0.0f));
+                            }
+                        }
+                    )
+                )
+            )
+        );
+
+        const auto refreshCallback = std::make_shared<Window::WindowRefreshCallback>();
+
+        // Window callbacks settings
+        window.SetMouseClickCallback(mouseButtonCallback);
+        window.SetMouseMoveCallback(mouseMoveCallback);
+        window.SetMouseScrollCallback(mouseScrollCallback);
+        window.SetResizeCallback(windowResizeCallback);
+        window.SetKeyPressCallback(keyPressCallback);
+        window.SetLoopCallback(loopCallback);
+        window.SetRefreshCallback(refreshCallback);
+
+        // Creating shaders
         Shader basicVertexShader{"shaders\\BasicShader.vert", ShaderType::VERTEX_SHADER};
         Shader basicFragmentShader{"shaders\\BasicShader.frag", ShaderType::FRAGMENT_SHADER};
         Shader normalVisualizationFragmentShader{"shaders\\NormalVisualization.frag", ShaderType::FRAGMENT_SHADER};
@@ -185,9 +292,9 @@ int main(int argc, char** argv) {
         Shader redFragmentShader{"shaders\\RedShader.frag", ShaderType::FRAGMENT_SHADER};
         Shader basicGeometryShader{"shaders\\BasicShader.geom", ShaderType::GEOMETRY_SHADER};
 
+        // Creating shader programs
         ShaderProgram normalsShaderProgram{basicVertexShader, redFragmentShader, basicGeometryShader};
         ShaderProgram meshShaderProgram{basicVertexShader, normalVisualizationFragmentShader};
-        meshShaderProgram.SetUniformInt("u_texture", textureSlot);
 
         // Main loop
         while (!window.ShouldWindowClose()) {
@@ -265,20 +372,6 @@ int main(int argc, char** argv) {
             ImGui::Begin("Hello, world!");
             ImGui::Text("Background color:");
             ImGui::ColorEdit3("Clear color", reinterpret_cast<float*>(&clear_color));
-            //ImGui::SliderFloat3("Camera pos", viewPos, -1000.0f, 1000.0f);
-            //ImGui::SliderFloat3("Camera rotate:", viewRotate, -360.0f, 360.0f);
-            //ImGui::SliderFloat("FOV Y", &fieldOfViewDegrees, 0.1f, 90.0f);
-            //if (ImGui::Button("Reset", ImVec2(50, 25))) {
-            //    viewPos[0] = origin.x;
-            //    viewPos[1] = origin.y;
-            //    viewPos[2] = 400.0f;
-
-            //    viewRotate[0] = 0.0f;
-            //    viewRotate[1] = 0.0f;
-            //    viewRotate[2] = 0.0f;
-
-            //    fieldOfViewDegrees = 90.0f;
-            //}
             ImGui::Text("Display settings:");
             ImGui::Checkbox("Flat shading", &isFlatShading);
             ImGui::SameLine();

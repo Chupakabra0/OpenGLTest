@@ -78,15 +78,15 @@ public:
         this->origin_ = this->target_ - d * this->z_;
     }
 
-    void Arcball(float x1, float y1, float x2, float y2) {
+    void Arcball(float u, float v, float viewportHeight, float viewportWidth) {
         const glm::vec4 position(this->origin_, 1);
         const glm::vec4 pivot(this->target_, 1);
 
-        constexpr float deltaAngleX = glm::two_pi<float>() / 1280.0f;
-        float deltaAngleY           = glm::pi<float>() / 720.0f;
+        const float deltaAngleX = glm::two_pi<float>() / viewportHeight;
+        float deltaAngleY       = glm::pi<float>() / viewportWidth;
 
-        float xAngle = (x1 - x2) * deltaAngleX;
-        float yAngle = (y1 - y2) * deltaAngleY;
+        float xAngle = -u * deltaAngleX;
+        float yAngle = -v * deltaAngleY;
 
         float cosAngle = glm::dot(this->target_ - this->origin_, this->y_);
         if (cosAngle * glm::sign(deltaAngleY) > 0.99f) {
@@ -126,11 +126,25 @@ public:
     }
 
     void MoveCamera(const glm::vec3& delta) {
-        this->origin_ += delta;
+        this->origin_ += glm::vec3(glm::mat4(
+            glm::vec4(this->x_, 0.0f),
+            glm::vec4(this->y_, 0.0f),
+            glm::vec4(this->z_, 0.0f),
+            glm::vec4(0.0, 0.0, 0.0, 1.0f)
+        ) * glm::vec4(delta, 1.0f));
+    }
+
+    void MoveTarget(const glm::vec3& delta) {
+        this->target_ += glm::vec3(glm::mat4(
+            glm::vec4(this->x_, 0.0f),
+            glm::vec4(this->y_, 0.0f),
+            glm::vec4(this->z_, 0.0f),
+            glm::vec4(0.0, 0.0, 0.0, 1.0f)
+        ) * glm::vec4(delta, 1.0f));
     }
 
     void Pan(float u, float v, float sensivity) {
-        this->pan_ *= glm::translate(-sensivity * glm::vec3(-u, v, 0.0f));
+        this->pan_ *= glm::translate(sensivity * glm::vec3(u, -v, 0.0f));
     }
 
     glm::mat4 CalcViewMatrix() const {
