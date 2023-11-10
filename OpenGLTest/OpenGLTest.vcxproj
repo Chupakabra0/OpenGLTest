@@ -146,6 +146,7 @@ copy /Y /D "$(ProjectDir)imgui.ini" "$(TargetDir)imgui.ini"</Command>
     <ClCompile Include="src\VertexBufferObject.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Application.hpp" />
     <ClInclude Include="include\Control.hpp" />
     <ClInclude Include="include\ImguiWrapper.hpp" />
     <ClInclude Include="include\DataObject.hpp" />

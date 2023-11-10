@@ -11,11 +11,11 @@ public:
 
     Renderer(const Renderer&) = delete;
 
-    Renderer(Renderer&&) = delete;
+    Renderer(Renderer&&) noexcept = default;
 
     Renderer& operator=(const Renderer&) = delete;
 
-    Renderer& operator=(Renderer&&) = delete;
+    Renderer& operator=(Renderer&&) noexcept = default;
 
     ~Renderer() noexcept;
 
