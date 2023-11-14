@@ -2,6 +2,11 @@
 #include <iostream>
 #include <format>
 
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
+
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/stdout_sinks.h"
+
 #include "VertexBufferObject.hpp"
 #include "VertexArrayObject.hpp"
 #include "ShaderProgram.hpp"
@@ -46,20 +51,48 @@ public:
 
     explicit Application(const ApplicationConfig& applicationConfig, const std::shared_ptr<MeshGenerator>& meshGenerator)
         : meshGenerator_(meshGenerator) {
+        SPDLOG_INFO("Window initialization started");
+
         this->InitWindow_(applicationConfig.WINDOW_HEIGHT, applicationConfig.WINDOW_WIDTH, applicationConfig.WINDOW_NAME);
+
+        SPDLOG_INFO("Window initialization ended");
+        SPDLOG_INFO("Renderer initialization started");
+
         this->InitRenderer_();
+
+        SPDLOG_INFO("Renderer initialization ended");
+        SPDLOG_INFO("ImGUI context initialization started");
+
         this->InitImgui_();
+
+        SPDLOG_INFO("ImGUI context initialization ended");
+        SPDLOG_INFO("Camera initialization started");
+
         this->InitCamera_(
             applicationConfig.CAMERA_POSITION, applicationConfig.CAMERA_TARGET,
             applicationConfig.CAMERA_AXIS_X, applicationConfig.CAMERA_AXIS_Y,
             applicationConfig.CAMERA_AXIS_Z
         );
+
+        SPDLOG_INFO("Camera initialization ended");
+        SPDLOG_INFO("Viewport initialization started");
+
         this->InitViewport_(
             applicationConfig.VIEWPORT_TOP_LEFT, applicationConfig.VIEWPORT_BOTTOM_RIGHT,
             applicationConfig.VIEWPORT_FOV, applicationConfig.VIEWPORT_NEAR_Z, applicationConfig.VIEWPORT_FAR_Z
         );
+        
+        SPDLOG_INFO("Viewport initialization ended");
+        SPDLOG_INFO("Callbacks initialization started");
+
         this->InitCallbacks_();
+
+        SPDLOG_INFO("Callbacks initialization ended");
+        SPDLOG_INFO("Shaders initialization started");
+
         this->InitShaders_();
+
+        SPDLOG_INFO("Shaders initialization ended");
     }
 
     Application(const Application&) = delete;
@@ -75,21 +108,25 @@ public:
     void Run() {
         const glm::vec4 backgroundColor = glm::vec4(125.0f, 0.0f, 255.0f, 255.0f);
 
-        MeshClass mesh         = this->meshGenerator_->GenerateMesh();
+        SPDLOG_INFO("Mesh generation started");
+
+        MeshClass mesh = this->meshGenerator_->GenerateMesh();
+
+        SPDLOG_INFO("Mesh generation ended");
+        SPDLOG_INFO("IBO & VBO generation started");
+
         IndexBufferObject* ibo = new IndexBufferObject(mesh.GenerateIBO());
         VertexArrayObject vao  = mesh.GenerateVAO(ibo);
 
-        glm::mat4 modelMatrix      = glm::identity<glm::mat4>();
-        glm::mat4 viewMatrix       = glm::identity<glm::mat4>();
-        glm::mat4 projectionMatrix = glm::identity<glm::mat4>();
+        SPDLOG_INFO("IBO & VBO generation ended");
+        SPDLOG_INFO("Render loop started");
 
         while (!this->window_->ShouldWindowClose()) {
             const float timeInSeconds = static_cast<float>(glfwGetTime());
-
-            const int hours        = static_cast<int>(timeInSeconds) / 3600;
-            const int minutes      = (static_cast<int>(timeInSeconds) % 3600) / 60;
-            const int seconds      = static_cast<int>(timeInSeconds) % 60;
-            const int milliseconds = static_cast<int>(timeInSeconds * 1000) % 1000;
+            const int hours           = static_cast<int>(timeInSeconds) / 3600;
+            const int minutes         = (static_cast<int>(timeInSeconds) % 3600) / 60;
+            const int seconds         = static_cast<int>(timeInSeconds) % 60;
+            const int milliseconds    = static_cast<int>(timeInSeconds * 1000) % 1000;
 
             static ImVec4 clear_color {
                 backgroundColor.r / 255.0f,
@@ -108,8 +145,9 @@ public:
 
             this->renderer_->ClearScreen(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 
-            viewMatrix       = this->camera_->CalcViewMatrix();
-            projectionMatrix = this->viewport_->CalcPerspectiveMatrix();
+            const glm::mat4 modelMatrix      = glm::identity<glm::mat4>();
+            const glm::mat4 viewMatrix       = this->camera_->CalcViewMatrix();
+            const glm::mat4 projectionMatrix = this->viewport_->CalcPerspectiveMatrix();
 
             this->shaderPrograms_[Application::NORMALS_SHADER_STR]->SetUniformMatrix("u_proj", projectionMatrix);
             this->shaderPrograms_[Application::NORMALS_SHADER_STR]->SetUniformMatrix("u_view", viewMatrix);
@@ -153,6 +191,8 @@ public:
             this->window_->PollEvents();
             this->window_->SwapBuffers();
         }
+
+        SPDLOG_INFO("Render loop ended");
     }
 
 private:
@@ -193,6 +233,11 @@ private:
                     if (action == ControlAction::PRESS) {
                         window.UpdateCursorPosition();
                         window.SetMouseClicked(button);
+                        SPDLOG_DEBUG(
+                            "{} mouse pressed at ({}, {})",
+                            button == Mouse::Button::LEFT ? "Left" : button == Mouse::Button::RIGHT ? "Right" : "",
+                            window.GetCurrCursorPos().first, window.GetCurrCursorPos().second
+                        );
                     }
                 }
             },
@@ -205,7 +250,13 @@ private:
                     if (button == Mouse::Button::LEFT || button == Mouse::Button::RIGHT) {
                         if (action == ControlAction::RELEASE) {
                             window.ResetCursorPosition();
+                            window.UpdateCursorPosition();
                             window.SetMouseUnclicked(button);
+                            SPDLOG_DEBUG(
+                                "{} mouse released at ({}, {})",
+                                button == Mouse::Button::LEFT ? "Left" : button == Mouse::Button::RIGHT ? "Right" : "",
+                                window.GetCurrCursorPos().first, window.GetCurrCursorPos().second
+                            );
                         }
                     }
                 }
@@ -228,7 +279,17 @@ private:
                     auto [x1, y1] = window.GetPrevCursorPos();
                     auto [x2, y2] = window.GetCurrCursorPos();
 
+                    SPDLOG_DEBUG(
+                        "Left mouse moved at ({}, {})",
+                        window.GetCurrCursorPos().first, window.GetCurrCursorPos().second
+                    );
+
                     this->camera_->Pan(static_cast<float>(x2 - x1), static_cast<float>(y2 - y1), 1.0f);
+
+                    SPDLOG_DEBUG(
+                        "Camera panning with u = {}, v = {}, s = {})",
+                        static_cast<float>(x2 - x1), static_cast<float>(y2 - y1), 1.0f
+                    );
                 }
             },
             std::make_shared<Window::MouseMoveCallback>(
@@ -245,11 +306,22 @@ private:
                         auto [x1, y1] = window.GetPrevCursorPos();
                         auto [x2, y2] = window.GetCurrCursorPos();
 
+                        SPDLOG_DEBUG(
+                            "Right mouse moved at ({}, {})",
+                            window.GetCurrCursorPos().first, window.GetCurrCursorPos().second
+                        );
+
                         this->camera_->Arcball(
                             static_cast<float>(x2 - x1),
                             static_cast<float>(y2 - y1),
                             static_cast<float>(window.GetHeight()),
                             static_cast<float>(window.GetWidth())
+                        );
+
+                        SPDLOG_DEBUG(
+                            "Camera arcball with u = {}, v = {}, viewportH = {}, viewportW = {})",
+                            static_cast<float>(x2 - x1), static_cast<float>(y2 - y1),
+                            static_cast<float>(window.GetHeight()), static_cast<float>(window.GetWidth())
                         );
                     }
                 }
@@ -267,11 +339,15 @@ private:
                     return;
                 }
 
+                SPDLOG_DEBUG("Mouse scrolled ({}, {})", xpos, ypos);
+
                 this->viewport_->SetFieldOfView(
                     glm::radians(
                         glm::degrees(this->viewport_->GetFieldOfView()) + (ypos > 0 ? -fieldOfViewStep : fieldOfViewStep)
                     )
                 );
+
+                SPDLOG_DEBUG("Set camera FOV; {}", glm::radians(glm::degrees(this->viewport_->GetFieldOfView()) + (ypos > 0 ? -fieldOfViewStep : fieldOfViewStep)));
             }
         );
 
@@ -284,9 +360,11 @@ private:
                 if (key == Keyboard::Key::W) {
                     if (action == ControlAction::PRESS) {
                         window.SetKeyPressed(key);
+                        SPDLOG_DEBUG("Key W pressed");
                     }
                     else if (action == ControlAction::RELEASE) {
                         window.SetKeyUnpressed(key);
+                        SPDLOG_DEBUG("Key W released");
                     }
                 }
             },
@@ -295,9 +373,11 @@ private:
                     if (key == Keyboard::Key::S) {
                         if (action == ControlAction::PRESS) {
                             window.SetKeyPressed(key);
+                            SPDLOG_DEBUG("Key S pressed");
                         }
                         else if (action == ControlAction::RELEASE) {
                             window.SetKeyUnpressed(key);
+                            SPDLOG_DEBUG("Key S released");
                         }
                     }
                 },
@@ -306,9 +386,11 @@ private:
                         if (key == Keyboard::Key::D) {
                             if (action == ControlAction::PRESS) {
                                 window.SetKeyPressed(key);
+                                SPDLOG_DEBUG("Key D pressed");
                             }
                             else if (action == ControlAction::RELEASE) {
                                 window.SetKeyUnpressed(key);
+                                SPDLOG_DEBUG("Key D released");
                             }
                         }
                     },
@@ -317,9 +399,11 @@ private:
                             if (key == Keyboard::Key::A) {
                                 if (action == ControlAction::PRESS) {
                                     window.SetKeyPressed(key);
+                                    SPDLOG_DEBUG("Key A pressed");
                                 }
                                 else if (action == ControlAction::RELEASE) {
                                     window.SetKeyUnpressed(key);
+                                    SPDLOG_DEBUG("Key A released");
                                 }
                             }
                         }
@@ -337,6 +421,7 @@ private:
                 this->viewport_->SetBottomX(width);
                 this->viewport_->SetBottomY(height);
                 this->viewport_->UpdateViewport();
+                SPDLOG_DEBUG("Window resized {} x {}", width, height);
             }
         );
 
@@ -344,7 +429,11 @@ private:
     }
 
     void InitWindowRefreshCallbacks_() {
-        const auto refreshCallback = std::make_shared<Window::WindowRefreshCallback>();
+        const auto refreshCallback = std::make_shared<Window::WindowRefreshCallback>(
+            [](Window&) {
+                SPDLOG_DEBUG("Window refreshed");
+            }
+        );
 
         this->window_->SetRefreshCallback(refreshCallback);
     }
@@ -353,37 +442,57 @@ private:
         const auto loopCallback = std::make_shared<Window::LoopCallback>(
             [this](Window& window) {
                 if (window.IsKeyPressed(Keyboard::Key::W)) {
+                    SPDLOG_DEBUG("Key W repeated");
+
                     const float speed = 1.0f;
 
                     this->camera_->MoveCamera(glm::vec3(0.0f, -speed, 0.0f));
+                    SPDLOG_DEBUG("Camera origin moved ({}, {}, {})", 0.0f, -speed, 0.0f);
+
                     this->camera_->MoveTarget(glm::vec3(0.0f, -speed, 0.0f));
+                    SPDLOG_DEBUG("Camera target moved ({}, {}, {})", 0.0f, -speed, 0.0f);
                 }
             },
             std::make_shared<Window::LoopCallback>(
                 [this](Window& window) {
                     if (window.IsKeyPressed(Keyboard::Key::S)) {
+                        SPDLOG_DEBUG("Key S repeated");
+
                         const float speed = 1.0f;
 
                         this->camera_->MoveCamera(glm::vec3(0.0f, speed, 0.0f));
+                        SPDLOG_DEBUG("Camera origin moved ({}, {}, {})", 0.0f, speed, 0.0f);
+
                         this->camera_->MoveTarget(glm::vec3(0.0f, speed, 0.0f));
+                        SPDLOG_DEBUG("Camera target moved ({}, {}, {})", 0.0f, speed, 0.0f);
                     }
                 },
                 std::make_shared<Window::LoopCallback>(
                     [this](Window& window) {
                         if (window.IsKeyPressed(Keyboard::Key::D)) {
+                            SPDLOG_DEBUG("Key D repeated");
+
                             const float speed = 1.0f;
 
                             this->camera_->MoveCamera(glm::vec3(-speed, 0.0f, 0.0f));
+                            SPDLOG_DEBUG("Camera origin moved ({}, {}, {})", -speed, 0.0f, 0.0f);
+
                             this->camera_->MoveTarget(glm::vec3(-speed, 0.0f, 0.0f));
+                            SPDLOG_DEBUG("Camera target moved ({}, {}, {})", -speed, 0.0f, 0.0f);
                         }
                     },
                     std::make_shared<Window::LoopCallback>(
                         [this](Window& window) {
                             if (window.IsKeyPressed(Keyboard::Key::A)) {
+                                SPDLOG_DEBUG("Key A repeated");
+
                                 const float speed = 1.0f;
 
                                 this->camera_->MoveCamera(glm::vec3(speed, 0.0f, 0.0f));
+                                SPDLOG_DEBUG("Camera origin moved ({}, {}, {})", speed, 0.0f, 0.0f);
+
                                 this->camera_->MoveTarget(glm::vec3(speed, 0.0f, 0.0f));
+                                SPDLOG_DEBUG("Camera target moved ({}, {}, {})", speed, 0.0f, 0.0f);
                             }
                         }
                     )
@@ -395,28 +504,70 @@ private:
     }
 
     void InitCallbacks_() {
+        SPDLOG_INFO("Mouse button callbacks initialization started");
+
         this->InitMouseButtonCallbacks_();
+
+        SPDLOG_INFO("Mouse button callbacks initialization ended");
+        SPDLOG_INFO("Mouse move callbacks initialization started");
+
         this->InitMouseMoveCallbacks_();
+        
+        SPDLOG_INFO("Mouse move callbacks initialization ended");
+        SPDLOG_INFO("Mouse scroll callbacks initialization started");
+
         this->InitMouseScrollCallbacks_();
+
+        SPDLOG_INFO("Mouse scroll callbacks initialization ended");
+        SPDLOG_INFO("Key press callbacks initialization started");
+
         this->InitKeyPressCallbacks_();
+
+        SPDLOG_INFO("Key press callbacks initialization ended");
+        SPDLOG_INFO("Window resize callbacks initialization started");
+
         this->InitWindowResizeCallbacks_();
+
+        SPDLOG_INFO("Window resize callbacks initialization ended");
+        SPDLOG_INFO("Window refresh callbacks initialization started");
+
         this->InitWindowRefreshCallbacks_();
+
+        SPDLOG_INFO("Window refresh callbacks initialization ended");
+        SPDLOG_INFO("Loop callbacks initialization started");
+
         this->InitLoopCallbacks_();
+        
+        SPDLOG_INFO("Loop callbacks initialization ended");
     }
 
     void InitShaders_() {
         // Creating shaders
-        Shader basicVertexShader{ "shaders\\BasicShader.vert", ShaderType::VERTEX_SHADER };
-        Shader basicFragmentShader{ "shaders\\BasicShader.frag", ShaderType::FRAGMENT_SHADER };
-        Shader normalVisualizationFragmentShader{ "shaders\\NormalVisualization.frag", ShaderType::FRAGMENT_SHADER };
-        Shader redBlueGreenFragmentShader{ "shaders\\RedBlueGreen.frag", ShaderType::FRAGMENT_SHADER };
-        Shader magicFragmentShader{ "shaders\\MagicShader.frag", ShaderType::FRAGMENT_SHADER };
-        Shader redFragmentShader{ "shaders\\RedShader.frag", ShaderType::FRAGMENT_SHADER };
-        Shader basicGeometryShader{ "shaders\\BasicShader.geom", ShaderType::GEOMETRY_SHADER };
+        const static std::vector<std::pair<std::string, ShaderType>> shadersData {
+            std::make_pair("shaders\\BasicShader.vert", ShaderType::VERTEX_SHADER),             // 0
+            std::make_pair("shaders\\BasicShader.frag", ShaderType::FRAGMENT_SHADER),           // 1
+            std::make_pair("shaders\\NormalVisualization.frag", ShaderType::FRAGMENT_SHADER),   // 2
+            std::make_pair("shaders\\RedBlueGreen.frag", ShaderType::FRAGMENT_SHADER),          // 3
+            std::make_pair("shaders\\MagicShader.frag", ShaderType::FRAGMENT_SHADER),           // 4
+            std::make_pair("shaders\\RedShader.frag", ShaderType::FRAGMENT_SHADER),             // 5
+            std::make_pair("shaders\\BasicShader.geom", ShaderType::GEOMETRY_SHADER)            // 6
+        };
+
+        ///// REWORK THIS !!!!
+        
+        std::vector<Shader> shaders{};
+
+        for (const auto& [path, type] : shadersData) {
+            SPDLOG_DEBUG("Shader {} compilation started", path); 
+            shaders.emplace_back(path, type);
+            SPDLOG_DEBUG("Shader {} compilation succeed", path);
+        }
 
         // Creating shader programs
-        this->shaderPrograms_.emplace(Application::NORMALS_SHADER_STR, std::make_unique<ShaderProgram>(basicVertexShader, redFragmentShader, basicGeometryShader));
-        this->shaderPrograms_.emplace(Application::MESH_SHADER_STR, std::make_unique<ShaderProgram>(basicVertexShader, normalVisualizationFragmentShader));
+        this->shaderPrograms_.emplace(Application::NORMALS_SHADER_STR, std::make_unique<ShaderProgram>(shaders[0], shaders[5], shaders[6]));
+        this->shaderPrograms_.emplace(Application::MESH_SHADER_STR, std::make_unique<ShaderProgram>(shaders[0], shaders[2]));
+        
+        /////
     }
 
     Renderer* renderer_{};
