@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
             .VIEWPORT_BOTTOM_RIGHT = glm::vec2(config.WINDOW_WIDTH, config.WINDOW_HEIGHT),
             .VIEWPORT_FOV          = 45.0f,
             .VIEWPORT_NEAR_Z       = 0.1f,
-            .VIEWPORT_FAR_Z        = 500.0f
+            .VIEWPORT_FAR_Z        = 1000.0f
         };
 
         SPDLOG_INFO("Application configuration loaded");
@@ -28,10 +28,10 @@ int main(int argc, char** argv) {
 
         const glm::vec3 origin = glm::zero<glm::vec3>();
         const float size       = 150.0f;
-        const int segments     = 10;
-        const int slices       = 10;
-        const std::shared_ptr<MeshGenerator> meshGenerator = std::make_shared<UVSphereGenerator>(
-            size, segments, slices, origin, glm::zero<glm::vec3>()
+        const int segments     = 100;
+        const int slices       = 100;
+        const std::shared_ptr<MeshGenerator> meshGenerator = std::make_shared<CylinderGenerator>(
+            size, size / 10.0f, segments, slices, origin, glm::zero<glm::vec3>()
         );
 
         SPDLOG_INFO("Mesh generator created");

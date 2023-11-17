@@ -130,8 +130,8 @@ private:
     int slices_{};
 
     void ConstructHelper_(int slices) {
-        if (slices < 0) {
-            throw std::runtime_error("Error: slices < 0");
+        if (slices < 1) {
+            throw std::runtime_error("Error: slices < 1");
         }
 
         this->slices_ = slices;

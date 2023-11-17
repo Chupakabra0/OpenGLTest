@@ -24,6 +24,7 @@
 #include "MeshGenerators/UVSphereGenerator.hpp"
 #include "MeshGenerators/IcosahedronGenerator.hpp"
 #include "MeshGenerators/ConeGenerator.hpp"
+#include "MeshGenerators/CylinderGenerator.hpp"
 
 enum class LogLevel : short {
     TRACE,
