@@ -106,10 +106,16 @@ public:
     }
 
     void UpdateViewport() {
-        glViewport(0, 0, this->GetWidth(), this->GetHeight());
+        if (this->GetWidth() != 0 && this->GetHeight() != 0) {
+            glViewport(0, 0, this->GetWidth(), this->GetHeight());
+        }
     }
 
     glm::mat4 CalcPerspectiveMatrix() const {
+        if (this->GetHeight() == 0 || this->GetWidth() == 0) {
+            return glm::identity<glm::mat4>();
+        }
+
         return glm::perspective(this->radiansFieldOfView_,
             static_cast<float>(this->GetWidth()) / static_cast<float>(this->GetHeight()),
             this->zNear_,
@@ -138,6 +144,6 @@ private:
     }
 
     bool ValidateSize_(int topX, int topY, int bottomX, int bottomY) {
-        return bottomX - topX > 0 && bottomY - topY > 0;
+        return bottomX - topX >= 0 && bottomY - topY >= 0;
     }
 };
