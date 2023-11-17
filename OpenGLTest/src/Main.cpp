@@ -2,7 +2,7 @@
 
 int main(int argc, char** argv) {
     try {
-        spdlog::set_level(spdlog::level::debug);
+        spdlog::set_level(LogLevelToSpdlog(IsDebug() ? LogLevel::DEBUG : LogLevel::INFO));
 
         SPDLOG_INFO("Logger initialized");
         SPDLOG_INFO("Application configuration is loading");
