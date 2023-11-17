@@ -37,7 +37,7 @@ public:
         LEFT_BRACKET, RIGHT_BRACKET, BACKSLASH,
         GRAVE_ACCENT, WORLD_1, WORLD_2,
         ENTER, TAB, BACKSPACE,
-        INSERT, DELETE, ARROW_RIGHT,
+        INSERT, DEL, ARROW_RIGHT,
         ARROW_LEFT, ARROW_DOWN, ARROW_UP,
         PAGE_UP, PAGE_DOWN, HOME,
         END, CAPS_LOCK, SCROLL_LOCK,
@@ -104,7 +104,7 @@ inline Keyboard::Key ConvertCodeToKeyboardKey(int keyCode);
             case Keyboard::Key::TAB:                return GLFW_KEY_TAB;
             case Keyboard::Key::BACKSPACE:          return GLFW_KEY_BACKSPACE;
             case Keyboard::Key::INSERT:             return GLFW_KEY_INSERT;
-            case Keyboard::Key::DELETE:             return GLFW_KEY_DELETE;
+            case Keyboard::Key::DEL:                return GLFW_KEY_DELETE;
             case Keyboard::Key::ARROW_RIGHT:        return GLFW_KEY_RIGHT;
             case Keyboard::Key::ARROW_LEFT:         return GLFW_KEY_LEFT;
             case Keyboard::Key::ARROW_DOWN:         return GLFW_KEY_DOWN;
@@ -230,7 +230,7 @@ inline Keyboard::Key ConvertCodeToKeyboardKey(int keyCode);
             case GLFW_KEY_TAB:                      return Keyboard::Key::TAB;
             case GLFW_KEY_BACKSPACE:                return Keyboard::Key::BACKSPACE;
             case GLFW_KEY_INSERT:                   return Keyboard::Key::INSERT;
-            case GLFW_KEY_DELETE:                   return Keyboard::Key::DELETE;
+            case GLFW_KEY_DELETE:                   return Keyboard::Key::DEL;
             case GLFW_KEY_RIGHT:                    return Keyboard::Key::ARROW_RIGHT;
             case GLFW_KEY_LEFT:                     return Keyboard::Key::ARROW_LEFT;
             case GLFW_KEY_DOWN:                     return Keyboard::Key::ARROW_DOWN;
