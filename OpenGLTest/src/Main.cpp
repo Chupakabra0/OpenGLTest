@@ -27,11 +27,19 @@ int main(int argc, char** argv) {
         SPDLOG_INFO("Mesh generator is creating");
 
         const glm::vec3 origin = glm::zero<glm::vec3>();
-        const float size       = 150.0f;
-        const int segments     = 100;
-        const int slices       = 100;
-        const std::shared_ptr<MeshGenerator> meshGenerator = std::make_shared<CylinderGenerator>(
-            size, size / 10.0f, segments, slices, origin, glm::zero<glm::vec3>()
+        //const float size       = 150.0f;
+        //const int segments     = 100;
+        //const int slices       = 100;
+        //const std::shared_ptr<MeshGenerator> meshGenerator = std::make_shared<CylinderGenerator>(
+        //    size, size / 10.0f, segments, slices, origin, glm::zero<glm::vec3>()
+        //);
+
+        const float innerRadius = 100.0f;
+        const float outerRadius = 200.0f;
+        const int   divWidth    = 4;
+        const int   divHeight   = 5;
+        const std::shared_ptr<MeshGenerator> meshGenerator = std::make_shared<TorusGenerator>(
+            innerRadius, outerRadius, divWidth, divHeight, origin, glm::zero<glm::vec3>()
         );
 
         SPDLOG_INFO("Mesh generator created");
