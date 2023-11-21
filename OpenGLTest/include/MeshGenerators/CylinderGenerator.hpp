@@ -23,12 +23,12 @@ public:
         std::vector<glm::vec3> positions{};
         std::vector<unsigned> indecies{};
 
-        positions.push_back(this->origin_);
+        positions.push_back(this->origin_ - glm::vec3(0.0f, this->height_ / 2.0f, 0.0f));
 
         for (int i = 0; i < this->segments_; ++i) {
             const float phi = static_cast<float>(i) * glm::two_pi<float>() / this->segments_;
 
-            const glm::vec3 circlePointBottom = this->origin_ + this->radius_ * glm::vec3(glm::cos(phi), 0.0f, glm::sin(phi));
+            const glm::vec3 circlePointBottom = positions.front() + this->radius_ * glm::vec3(glm::cos(phi), 0.0f, glm::sin(phi));
             const glm::vec3 circlePointTop    = circlePointBottom + glm::vec3(0.0f, this->height_, 0.0f);
 
             const float step          = 1.0f / this->slices_;
@@ -45,7 +45,7 @@ public:
             positions.push_back(circlePointTop);
         }
 
-        positions.push_back(this->origin_ + glm::vec3(0.0f, this->height_, 0.0f));
+        positions.push_back(positions.front() + glm::vec3(0.0f, this->height_, 0.0f));
 
         std::vector vertexNormals(positions.size(), glm::vec3(0.0f, 0.0f, 0.0f));
         vertexNormals.front() = glm::vec3(0.0f, -1.0f, 0.0f);
