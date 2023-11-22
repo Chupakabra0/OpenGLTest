@@ -19,13 +19,8 @@ void main() {
     if (!gl_FrontFacing) {
         flatNormal = -flatNormal;
     }
-
+    
     vec4 nrml = u_isFlat ? flatNormal : smoothNormal;
-
-    gl_FragColor = vec4(
-        normalizeValue(nrml.x, vec2(-1.0, 1.0), vec2(1.0, 0.0)),
-        normalizeValue(nrml.y, vec2(-1.0, 1.0), vec2(1.0, 0.0)),
-        normalizeValue(nrml.z, vec2(-1.0, 1.0), vec2(1.0, 0.0)),
-        1.0
-    );
+    
+    gl_FragColor = vec4(nrml.xyz * 0.5 + 0.5, 1.0);
 }
