@@ -4,9 +4,10 @@
 
 class TorusGenerator : public MeshGenerator {
 public:
-    explicit TorusGenerator(float innerRadius, float outerRadius, int divWidth, int divHeight, const glm::vec3& origin, const glm::vec3& color)
-        : MeshGenerator(origin, color), innerRadius_(innerRadius), outerRadius_(outerRadius), divWidth_(divWidth), divHeight_(divHeight) {
-        this->ConstructorHelper_();
+    explicit TorusGenerator(float innerRadius, float outerRadius, int divSlices, int divLoops,
+        const glm::vec3& origin, const glm::vec3& color)
+        : MeshGenerator(origin, color), innerRadius_(innerRadius), outerRadius_(outerRadius), divSlices_(divSlices), divLoops_(divLoops) {
+        this->ConstructorHelper_(divSlices, divLoops);
     }
 
     TorusGenerator(const TorusGenerator&) = default;
@@ -24,38 +25,40 @@ public:
         std::vector<glm::vec3> normals{};
         std::vector<unsigned> indecies{};
 
-        for (int i = 0; i < this->divWidth_; ++i) {
-            const auto v           = static_cast<float>(i) / this->divWidth_;
-            const auto slice_angle = v * glm::two_pi<float>();
-            const auto cos_slices  = glm::cos(slice_angle);
-            const auto sin_slices  = glm::sin(slice_angle);
-            const auto slice_rad   = this->outerRadius_ + this->innerRadius_ * cos_slices;
+        for (int i = 0; i < this->divSlices_; ++i) {
+            const float v         = static_cast<float>(i) / this->divSlices_ * glm::two_pi<float>();
+            const float cosSlices = glm::cos(v);
+            const float sinSlices = glm::sin(v);
+            const float sliceRad  = this->outerRadius_ + this->innerRadius_ * cosSlices;
             
-            for (int j = 0; j < this->divHeight_; ++j) {
-                const auto u          = static_cast<float>(j) / this->divHeight_;
-                const auto loop_angle = u * glm::two_pi<float>();
-                const auto cos_loops  = glm::cos(loop_angle);
-                const auto sin_loops  = glm::sin(loop_angle);
+            for (int j = 0; j < this->divLoops_; ++j) {
+                const float u         = static_cast<float>(j) / this->divLoops_ * glm::two_pi<float>();
+                const float cosLoops  = glm::cos(u);
+                const float sinLoops  = glm::sin(u);
 
-                const auto x = slice_rad * cos_loops;
-                const auto y = slice_rad * sin_loops;
-                const auto z = this->innerRadius_ * sin_slices;
+                const float x = sliceRad * cosLoops;
+                const float y = sliceRad * sinLoops;
+                const float z = this->innerRadius_ * sinSlices;
 
                 const glm::vec3 temp = glm::vec3(x, y, z);
 
                 positions.push_back(this->origin_ + temp);
-                normals.push_back(glm::normalize(temp));
+                normals.emplace_back(
+                    cosSlices * cosLoops,
+                    cosSlices * sinLoops,
+                    sinSlices
+                );
             }
         }
 
-        for (int i = 0; i < this->divWidth_; i++) {
-            auto i_next = (i + 1) % this->divWidth_;
-            for (int j = 0; j < this->divHeight_; j++) {
-                const unsigned j_next = (j + 1) % this->divHeight_;
-                const unsigned i0 = i * this->divHeight_ + j;
-                const unsigned i1 = i * this->divHeight_ + j_next;
-                const unsigned i2 = i_next * this->divHeight_ + j_next;
-                const unsigned i3 = i_next * this->divHeight_ + j;
+        for (int i = 0; i < this->divSlices_; i++) {
+            const unsigned iNext = (i + 1) % this->divSlices_;
+            for (int j = 0; j < this->divLoops_; j++) {
+                const unsigned jNext = (j + 1) % this->divLoops_;
+                const unsigned i0    = i * this->divLoops_ + j;
+                const unsigned i1    = i * this->divLoops_ + jNext;
+                const unsigned i2    = iNext * this->divLoops_ + jNext;
+                const unsigned i3    = iNext * this->divLoops_ + j;
 
                 indecies.insert(indecies.end(), {i1, i3, i0});
                 indecies.insert(indecies.end(), {i1, i2, i3});
@@ -74,10 +77,19 @@ public:
 private:
     float innerRadius_{};
     float outerRadius_{};
-    int divWidth_{};
-    int divHeight_{};
+    int divSlices_{};
+    int divLoops_{};
 
-    void ConstructorHelper_() {
+    void ConstructorHelper_(int divSlices, int divLoops) {
+        if (divSlices < 3) {
+            throw std::runtime_error("Torus creating error: divSlices < 3");
+        }
 
+        if (divLoops < 3) {
+            throw std::runtime_error("Torus creating error: divLoops < 3");
+        }
+
+        this->divSlices_ = divSlices;
+        this->divLoops_  = divLoops;
     }
 };
