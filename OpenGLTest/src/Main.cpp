@@ -38,9 +38,9 @@ int main(int argc, char** argv) {
         const float outerRadius = 100.0f;
         const int   divWidth    = 3;
         const int   divHeight   = 3;
-        const std::shared_ptr<MeshGenerator> meshGenerator = std::make_shared<TorusGenerator>(
-            innerRadius, outerRadius, divWidth, divHeight, origin, glm::zero<glm::vec3>()
-        );
+        //const std::shared_ptr<MeshGenerator> meshGenerator = std::make_shared<TorusGenerator>(
+        //    innerRadius, outerRadius, divWidth, divHeight, origin, glm::zero<glm::vec3>()
+        //);
         //const std::shared_ptr<MeshGenerator> meshGenerator = std::make_shared<UVSphereGenerator>(
         //    innerRadius, divWidth, divHeight, origin, glm::zero<glm::vec3>()
         //);
@@ -50,6 +50,9 @@ int main(int argc, char** argv) {
         //const std::shared_ptr<MeshGenerator> meshGenerator = std::make_shared<ParallelepipedGenerator>(
         //    outerRadius, innerRadius, outerRadius + innerRadius, origin, glm::zero<glm::vec3>()
         //);
+        const std::shared_ptr<MeshGenerator> meshGenerator = std::make_shared<IcosphereGenerator>(
+            100.0f, 5, origin, glm::zero<glm::vec3>()
+        );
 
         SPDLOG_INFO("Mesh generator created");
         SPDLOG_INFO("Application initialization started");
