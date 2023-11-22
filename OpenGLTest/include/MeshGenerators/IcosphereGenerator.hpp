@@ -31,107 +31,22 @@ public:
         const float minusGoldenRatio = glm::sqrt((5.0f - glm::sqrt(5.0f)) / 10.0f);
 
         // FIRST GOLDEN RECTANGLE OxOy
-        positions.push_back(
-            glm::vec3(
-                minusGoldenRatio,
-                plusGoldenRatio,
-                0.0f
-            )
-        ); // 0
-        positions.push_back(
-            glm::vec3(
-                -minusGoldenRatio,
-                plusGoldenRatio,
-                0.0f
-            )
-        ); // 1
-        positions.push_back(
-            glm::vec3(
-                -minusGoldenRatio,
-                -plusGoldenRatio,
-                0.0f
-            )
-        ); // 2
-        positions.push_back(
-            glm::vec3(
-                minusGoldenRatio,
-                -plusGoldenRatio,
-                0.0f
-            )
-        ); // 3
+        positions.emplace_back(minusGoldenRatio, plusGoldenRatio, 0.0f);   // 0
+        positions.emplace_back(-minusGoldenRatio, plusGoldenRatio, 0.0f);  // 1
+        positions.emplace_back(-minusGoldenRatio, -plusGoldenRatio, 0.0f); // 2
+        positions.emplace_back(minusGoldenRatio, -plusGoldenRatio, 0.0f);  // 3
 
         // SECOND GOLDEN RECTANGLE OxOz
-        positions.push_back(
-            glm::vec3(
-                plusGoldenRatio,
-                0.0f,
-                minusGoldenRatio
-            )
-        ); // 4
-        positions.push_back(
-            glm::vec3(
-                -plusGoldenRatio,
-                0.0f,
-                minusGoldenRatio
-            )
-        ); // 5
-        positions.push_back(
-            glm::vec3(
-                -plusGoldenRatio,
-                0.0f,
-                -minusGoldenRatio
-            )
-        ); // 6
-        positions.push_back(
-            glm::vec3(
-                plusGoldenRatio,
-                0.0f,
-                -minusGoldenRatio
-            )
-        ); // 7
+        positions.emplace_back(plusGoldenRatio, 0.0f, minusGoldenRatio);   // 4
+        positions.emplace_back(-plusGoldenRatio, 0.0f, minusGoldenRatio);  // 5
+        positions.emplace_back(-plusGoldenRatio, 0.0f, -minusGoldenRatio); // 6
+        positions.emplace_back(plusGoldenRatio, 0.0f, -minusGoldenRatio);  // 7
 
         // THIRD GOLDEN RECTANGLE OyOz
-        positions.push_back(
-            glm::vec3(
-                0.0f,
-                minusGoldenRatio,
-                plusGoldenRatio
-            )
-        ); // 8
-        positions.push_back(
-            glm::vec3(
-                0.0f,
-                -minusGoldenRatio,
-                plusGoldenRatio
-            )
-        ); // 9
-        positions.push_back(
-            glm::vec3(
-                0.0f,
-                -minusGoldenRatio,
-                -plusGoldenRatio
-            )
-        ); // 10
-        positions.push_back(
-            glm::vec3(
-                0.0f,
-                minusGoldenRatio,
-                -plusGoldenRatio
-            )
-        ); // 11
-
-        // Duplicate positions (to attach different face normals)
-        //positions.push_back(positions[0]);  // 12
-        //positions.push_back(positions[2]);  // 13
-        //positions.push_back(positions[4]);  // 14
-        //positions.push_back(positions[6]);  // 15
-        //positions.push_back(positions[7]);  // 16
-        //positions.push_back(positions[9]);  // 17
-        //positions.push_back(positions[10]); // 18
-        //positions.push_back(positions[11]); // 19
-
-        // 0  1  2  3  4  5  6  7  8  9  10 11
-        // 12 __ 13 __ 14 __ 15 16 __ 17 18 19
+        positions.emplace_back(0.0f, minusGoldenRatio, plusGoldenRatio);   // 8
+        positions.emplace_back(0.0f, -minusGoldenRatio, plusGoldenRatio);  // 9
+        positions.emplace_back(0.0f, -minusGoldenRatio, -plusGoldenRatio); // 10
+        positions.emplace_back(0.0f, minusGoldenRatio, -plusGoldenRatio);  // 11
 
         // 5 faces around 1st point
         indecies.insert(indecies.end(), {1u, 5u, 8u});
@@ -150,28 +65,16 @@ public:
         // 5 faces adjacent to 1st
         indecies.insert(indecies.end(), {4u, 0u, 8u});
         indecies.insert(indecies.end(), {5u, 9u, 8u});
-        //// Start of duplication vertices usage
-        //indecies.insert(indecies.end(), {15u, 2u, 5u});   //
-        //indecies.insert(indecies.end(), {19u, 10u, 6u});  //
-        //indecies.insert(indecies.end(), {12u, 7u, 11u});  //
-
-        //// 5 faces adjacent to 3rd
-        //indecies.insert(indecies.end(), {17u, 4u, 8u});   //
-        //indecies.insert(indecies.end(), {13u, 9u, 5u});   //
-        //indecies.insert(indecies.end(), {18u, 2u, 6u});   //
-        //indecies.insert(indecies.end(), {16u, 10u, 11u}); //
-        //indecies.insert(indecies.end(), {14u, 7u, 0u});   //
-
-        indecies.insert(indecies.end(), {6u, 2u, 5u});   //
-        indecies.insert(indecies.end(), {11u, 10u, 6u}); //
-        indecies.insert(indecies.end(), {0u, 7u, 11u});  //
+        indecies.insert(indecies.end(), {6u, 2u, 5u});
+        indecies.insert(indecies.end(), {11u, 10u, 6u});
+        indecies.insert(indecies.end(), {0u, 7u, 11u});
 
         // 5 faces adjacent to 3rd
-        indecies.insert(indecies.end(), {9u, 4u, 8u});   //
-        indecies.insert(indecies.end(), {2u, 9u, 5u});   //
-        indecies.insert(indecies.end(), {10u, 2u, 6u});  //
-        indecies.insert(indecies.end(), {7u, 10u, 11u}); //
-        indecies.insert(indecies.end(), {4u, 7u, 0u});   //
+        indecies.insert(indecies.end(), {9u, 4u, 8u});
+        indecies.insert(indecies.end(), {2u, 9u, 5u});
+        indecies.insert(indecies.end(), {10u, 2u, 6u});
+        indecies.insert(indecies.end(), {7u, 10u, 11u});
+        indecies.insert(indecies.end(), {4u, 7u, 0u});
 
         for (int i = 0; i < this->iterations_ - 1; ++i) {
             std::unordered_map<glm::vec3, unsigned> positionsToIndecies{};

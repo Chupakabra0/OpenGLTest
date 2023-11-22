@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
         //    outerRadius, innerRadius, outerRadius + innerRadius, origin, glm::zero<glm::vec3>()
         //);
         const std::shared_ptr<MeshGenerator> meshGenerator = std::make_shared<IcosphereGenerator>(
-            100.0f, 5, origin, glm::zero<glm::vec3>()
+            100.0f, 3, origin, glm::zero<glm::vec3>()
         );
 
         SPDLOG_INFO("Mesh generator created");
