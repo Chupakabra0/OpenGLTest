@@ -26,6 +26,7 @@
 #include "MeshGenerators/ConeGenerator.hpp"
 #include "MeshGenerators/CylinderGenerator.hpp"
 #include "MeshGenerators/TorusGenerator.hpp"
+#include "MeshGenerators/IcosphereGenerator.hpp"
 
 enum class LogLevel : short {
     TRACE,
@@ -251,7 +252,7 @@ private:
         this->viewport_ = std::make_unique<Viewport>(
             static_cast<int>(viewportTopLeft.x), static_cast<int>(viewportTopLeft.y),
             static_cast<int>(viewportBottomRight.x), static_cast<int>(viewportBottomRight.y),
-            viewportFOV, viewportNearZ, viewportFarZ
+            glm::radians(viewportFOV), viewportNearZ, viewportFarZ
         );
     }
 
