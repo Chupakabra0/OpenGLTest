@@ -169,6 +169,7 @@ copy /Y /D "$(ProjectDir)imgui.ini" "$(TargetDir)imgui.ini"</Command>
     <ClInclude Include="include\MeshGenerators\IcosahedronGenerator.hpp" />
     <ClInclude Include="include\MeshGenerators\MeshGenerator.hpp" />
     <ClInclude Include="include\MeshGenerators\RectangleGenerator.hpp" />
+    <ClInclude Include="include\MeshGenerators\TorusGenerator.hpp" />
     <ClInclude Include="include\MeshGenerators\UVSphereGenerator.hpp" />
     <ClInclude Include="include\Mouse.hpp" />
     <ClInclude Include="include\TextureLoader\ITextureLoader.hpp" />

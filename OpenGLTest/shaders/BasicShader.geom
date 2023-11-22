@@ -15,9 +15,9 @@ void GenerateNormal(int index) {
 }
 
 void GenerateFaceNormal() {
-    gl_Position = gl_in[0].gl_Position + gl_in[1].gl_Position + gl_in[2].gl_Position;
+    gl_Position = (gl_in[0].gl_Position + gl_in[1].gl_Position + gl_in[2].gl_Position) / 3.0;
     EmitVertex();
-    gl_Position += vec4((clippedNormals[0].xyz + clippedNormals[1].xyz + clippedNormals[2].xyz) / 3.0, 0.0) * MAGNITUDE;
+    gl_Position += vec4(normalize(clippedNormals[0].xyz + clippedNormals[1].xyz + clippedNormals[2].xyz), 0.0) * MAGNITUDE;
     EmitVertex();
     EndPrimitive();
 }
