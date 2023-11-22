@@ -34,13 +34,22 @@ int main(int argc, char** argv) {
         //    size, size / 10.0f, segments, slices, origin, glm::zero<glm::vec3>()
         //);
 
-        const float innerRadius = 100.0f;
-        const float outerRadius = 200.0f;
-        const int   divWidth    = 4;
-        const int   divHeight   = 5;
-        const std::shared_ptr<MeshGenerator> meshGenerator = std::make_shared<TorusGenerator>(
-            innerRadius, outerRadius, divWidth, divHeight, origin, glm::zero<glm::vec3>()
-        );
+        const float innerRadius = 50.0f;
+        const float outerRadius = 100.0f;
+        const int   divWidth    = 5;
+        const int   divHeight   = 4;
+        //const std::shared_ptr<MeshGenerator> meshGenerator = std::make_shared<TorusGenerator>(
+        //    innerRadius, outerRadius, divWidth, divHeight, origin, glm::zero<glm::vec3>()
+        //);
+        //const std::shared_ptr<MeshGenerator> meshGenerator = std::make_shared<UVSphereGenerator>(
+        //    innerRadius, divWidth, divHeight, origin, glm::zero<glm::vec3>()
+        //);
+        //const std::shared_ptr<MeshGenerator> meshGenerator = std::make_shared<CylinderGenerator>(
+        //    innerRadius, outerRadius, divWidth, divHeight, origin, glm::zero<glm::vec3>()
+        //);
+        //const std::shared_ptr<MeshGenerator> meshGenerator = std::make_shared<ParallelepipedGenerator>(
+        //    outerRadius, innerRadius, outerRadius + innerRadius, origin, glm::zero<glm::vec3>()
+        //);
 
         SPDLOG_INFO("Mesh generator created");
         SPDLOG_INFO("Application initialization started");

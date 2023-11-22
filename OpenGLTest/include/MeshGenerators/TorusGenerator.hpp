@@ -57,8 +57,8 @@ public:
                 const unsigned i2 = i_next * this->divHeight_ + j_next;
                 const unsigned i3 = i_next * this->divHeight_ + j;
 
-                indecies.insert(indecies.end(), {i3, i1, i0});
-                indecies.insert(indecies.end(), {i3, i1, i2});
+                indecies.insert(indecies.end(), {i1, i3, i0});
+                indecies.insert(indecies.end(), {i1, i2, i3});
             }
         }
 
