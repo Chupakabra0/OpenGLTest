@@ -375,13 +375,23 @@ private:
 
                 SPDLOG_DEBUG("Mouse scrolled ({}, {})", xpos, ypos);
 
-                this->viewport_->SetFieldOfView(
+                float newFov = glm::radians(glm::degrees(this->viewport_->GetFieldOfView()) + (ypos > 0 ? -fieldOfViewStep : fieldOfViewStep));
+
+                if (isFloatGreater(newFov, 0.0f) && isFloatLess(newFov, glm::pi<float>())) {
+                    this->viewport_->SetFieldOfView(newFov);
+
+                    SPDLOG_DEBUG("Set camera FOV: {}", newFov);
+                }
+                else {
+                    SPDLOG_DEBUG("Camera FOV didn't change: {}", this->viewport_->GetFieldOfView());
+                }
+
+                /*this->viewport_->SetFieldOfView(
                     glm::radians(
                         glm::degrees(this->viewport_->GetFieldOfView()) + (ypos > 0 ? -fieldOfViewStep : fieldOfViewStep)
                     )
                 );
-
-                SPDLOG_DEBUG("Set camera FOV; {}", glm::radians(glm::degrees(this->viewport_->GetFieldOfView()) + (ypos > 0 ? -fieldOfViewStep : fieldOfViewStep)));
+                */
             }
         );
 

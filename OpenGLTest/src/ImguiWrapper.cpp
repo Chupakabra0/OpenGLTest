@@ -74,7 +74,7 @@ void ImguiWrapper::CorrectImguiIni_() {
             str = "Collapsed=1";
         }
         else if (std::regex_match(str, sizeRegex)) {
-            str = "Size=380,175";
+            str = "Size=400,200";
         }
 
         out << str << '\n';
