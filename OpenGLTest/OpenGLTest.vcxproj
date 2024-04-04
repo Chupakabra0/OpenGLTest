@@ -130,6 +130,7 @@ copy /Y /D "$(ProjectDir)imgui.ini" "$(TargetDir)imgui.ini"</Command>
     <ClCompile Include="include\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="include\imgui\imgui_tables.cpp" />
     <ClCompile Include="include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\ArgParseWrapper.cpp" />
     <ClCompile Include="src\ImguiWrapper.cpp" />
     <ClCompile Include="src\DataObject.cpp" />
     <ClCompile Include="src\DataObjectGuard.cpp" />
@@ -147,6 +148,8 @@ copy /Y /D "$(ProjectDir)imgui.ini" "$(TargetDir)imgui.ini"</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.hpp" />
+    <ClInclude Include="include\ApplicationConfig.hpp" />
+    <ClInclude Include="include\ArgParseWrapper.hpp" />
     <ClInclude Include="include\Control.hpp" />
     <ClInclude Include="include\ImguiWrapper.hpp" />
     <ClInclude Include="include\DataObject.hpp" />
@@ -162,6 +165,7 @@ copy /Y /D "$(ProjectDir)imgui.ini" "$(TargetDir)imgui.ini"</Command>
     <ClInclude Include="include\imgui\imstb_textedit.h" />
     <ClInclude Include="include\imgui\imstb_truetype.h" />
     <ClInclude Include="include\Keyboard.hpp" />
+    <ClInclude Include="include\LogLevel.hpp" />
     <ClInclude Include="include\MeshGenerators\CircleGenerator.hpp" />
     <ClInclude Include="include\MeshGenerators\ConeGenerator.hpp" />
     <ClInclude Include="include\MeshGenerators\CylinderGenerator.hpp" />
