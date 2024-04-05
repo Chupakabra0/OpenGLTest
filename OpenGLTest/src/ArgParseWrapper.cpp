@@ -9,65 +9,91 @@
 #include "MeshGenerators/TorusGenerator.hpp"
 #include "MeshGenerators/UVSphereGenerator.hpp"
 
-// TODO: replace all literals with static consts
+const std::vector<const char* const*> ArgParseWrapper::COMMAND_ARRAY = {
+    &ArgParseWrapper::CIRCLE_COMMAND,
+    &ArgParseWrapper::CYLINDER_COMMAND,
+    &ArgParseWrapper::ELLIPSE_COMMAND,
+    &ArgParseWrapper::ICOSAHEDRON_COMMAND,
+    &ArgParseWrapper::ICOSPHERE_COMMAND,
+    &ArgParseWrapper::PARALLELEPIPED_COMMAND,
+    &ArgParseWrapper::RECTANGLE_COMMAND,
+    &ArgParseWrapper::TORUS_COMMAND,
+    &ArgParseWrapper::UV_SPHERE_COMMAND
+};
+
+const std::string ArgParseWrapper::DEFAULT_WINDOW_NAME_VALUE                  = "Test OpenGL";
+const std::vector<float> ArgParseWrapper::DEFAULT_CAMERA_POSITION_VALUE       = std::vector<float>{0.0f, 0.0f, 500.0f};
+const std::vector<float> ArgParseWrapper::DEFAULT_CAMERA_TARET_VALUE          = std::vector<float>{0.0f, 0.0f, 0.0f};
+const std::vector<float> ArgParseWrapper::DEFAULT_CAMERA_AXIS_X_VALUE         = std::vector<float>{1.0f, 0.0f, 0.0f};
+const std::vector<float> ArgParseWrapper::DEFAULT_CAMERA_AXIS_Y_VALUE         = std::vector<float>{0.0f, 1.0f, 0.0f};
+const std::vector<float> ArgParseWrapper::DEFAULT_CAMERA_AXIS_Z_VALUE         = std::vector<float>{0.0f, 0.0f, -1.0f};
+const std::vector<float> ArgParseWrapper::DEFAULT_VIEWPORT_TOP_LEFT_VALUE     = std::vector<float>{0.0f, 0.0f};
+const std::vector<float> ArgParseWrapper::DEFAULT_VIEWPORT_BOTTOM_RIGHT_VALUE = std::vector<float>{ArgParseWrapper::DEFAULT_WINDOW_WIDTH_VALUE, ArgParseWrapper::DEFAULT_WINDOW_HEIGHT_VALUE};
+
+glm::vec3 VectorToVec3(const std::vector<float>& vec) {
+    if (vec.size() < 3) {
+        throw std::runtime_error("Convert to glm::vec3 error");
+    }
+
+    return glm::vec3(vec[0], vec[1], vec[2]);
+}
+
+glm::vec2 VectorToVec2(const std::vector<float>& vec) {
+    if (vec.size() < 2) {
+        throw std::runtime_error("Convert to glm::vec2 error");
+    }
+
+    return glm::vec2(vec[0], vec[1]);
+}
 
 bool ArgParseWrapper::ParseAllArgs() {
     try {
         this->argumentParser_->parse_args(this->argv_);
+    
+        for (auto& command : ArgParseWrapper::COMMAND_ARRAY) {
+            if (command != nullptr && this->argumentParser_->is_subcommand_used(*command)) {
+                return true;
+            }
+        }
     }
     catch (const std::exception& exception) {
-        if (this->argumentParser_->is_subcommand_used("circle")) {
-            std::cout << this->argumentParser_->at<argparse::ArgumentParser>("circle");
+        for (auto& command : ArgParseWrapper::COMMAND_ARRAY) {
+            if (command != nullptr && this->argumentParser_->is_subcommand_used(*command)) {
+                std::cout << this->argumentParser_->at<argparse::ArgumentParser>(*command);
+                
+                return false;
+            }
         }
-        else if (this->argumentParser_->is_subcommand_used("cylinder")) {
-            std::cout << this->argumentParser_->at<argparse::ArgumentParser>("cylinder");
-        }
-        else if (this->argumentParser_->is_subcommand_used("ellipse")) {
-            std::cout << this->argumentParser_->at<argparse::ArgumentParser>("ellipse");
-        }
-        else if (this->argumentParser_->is_subcommand_used("icosahedron")) {
-            std::cout << this->argumentParser_->at<argparse::ArgumentParser>("icosahedron");
-        }
-        else if (this->argumentParser_->is_subcommand_used("icosphere")) {
-            std::cout << this->argumentParser_->at<argparse::ArgumentParser>("icosphere");
-        }
-        else if (this->argumentParser_->is_subcommand_used("parallelepiped")) {
-            std::cout << this->argumentParser_->at<argparse::ArgumentParser>("parallelepiped");
-        }
-        else if (this->argumentParser_->is_subcommand_used("rectangle")) {
-            std::cout << this->argumentParser_->at<argparse::ArgumentParser>("rectangle");
-        }
-        else if (this->argumentParser_->is_subcommand_used("torus")) {
-            std::cout << this->argumentParser_->at<argparse::ArgumentParser>("torus");
-        }
-        else if (this->argumentParser_->is_subcommand_used("uv-sphere")) {
-            std::cout << this->argumentParser_->at<argparse::ArgumentParser>("uv-sphere");
-        }
-        else {
-            std::cout << *this->argumentParser_;
-        }
-
-        return false;
     }
 
-    return true;
+    std::cout << *this->argumentParser_;
+
+    return false;
 }
 
 ApplicationConfig ArgParseWrapper::GetAppConfig() {
-    ApplicationConfig config {
-        .WINDOW_HEIGHT         = this->argumentParser_->get<int>("-wh"),
-        .WINDOW_WIDTH          = this->argumentParser_->get<int>("-ww"),
-        .WINDOW_NAME           = this->argumentParser_->get<std::string>("-wn"),
-        .CAMERA_POSITION       = this->argumentParser_->get<glm::vec3>("-cp"),
-        .CAMERA_TARGET         = this->argumentParser_->get<glm::vec3>("-ct"),
-        .CAMERA_AXIS_X         = this->argumentParser_->get<glm::vec3>("-cx"),
-        .CAMERA_AXIS_Y         = this->argumentParser_->get<glm::vec3>("-cy"),
-        .CAMERA_AXIS_Z         = this->argumentParser_->get<glm::vec3>("-cz"),
-        .VIEWPORT_TOP_LEFT     = this->argumentParser_->get<glm::vec2>("-vtl"),
-        .VIEWPORT_BOTTOM_RIGHT = this->argumentParser_->get<glm::vec2>("-vbr"),
-        .VIEWPORT_FOV          = this->argumentParser_->get<float>("-f"),
-        .VIEWPORT_NEAR_Z       = this->argumentParser_->get<float>("-vn"),
-        .VIEWPORT_FAR_Z        = this->argumentParser_->get<float>("-vf"),
+    const auto cameraPositionTemp  = this->argumentParser_->get<std::vector<float>>(ArgParseWrapper::SHORT_CAMERA_POSITION_ARGUMENT);
+    const auto cameraTargetTemp    = this->argumentParser_->get<std::vector<float>>(ArgParseWrapper::SHORT_CAMERA_TARET_ARGUMENT);
+    const auto cameraAxisX         = this->argumentParser_->get<std::vector<float>>(ArgParseWrapper::SHORT_CAMERA_AXIS_X_ARGUMENT);
+    const auto cameraAxisY         = this->argumentParser_->get<std::vector<float>>(ArgParseWrapper::SHORT_CAMERA_AXIS_Y_ARGUMENT);
+    const auto cameraAxisZ         = this->argumentParser_->get<std::vector<float>>(ArgParseWrapper::SHORT_CAMERA_AXIS_Z_ARGUMENT);
+    const auto viewportTopLeftTemp = this->argumentParser_->get<std::vector<float>>(ArgParseWrapper::SHORT_VIEWPORT_TOP_LEFT_ARGUMENT);
+    const auto viewportBottomRight = this->argumentParser_->get<std::vector<float>>(ArgParseWrapper::SHORT_VIEWPORT_BOTTOM_RIGHT_ARGUMENT);
+
+    const ApplicationConfig config {
+        .WINDOW_HEIGHT         = this->argumentParser_->get<int>(ArgParseWrapper::SHORT_WINDOW_HEIGHT_ARGUMENT),
+        .WINDOW_WIDTH          = this->argumentParser_->get<int>(ArgParseWrapper::SHORT_WINDOW_WIDTH_ARGUMENT),
+        .WINDOW_NAME           = this->argumentParser_->get<std::string>(ArgParseWrapper::SHORT_WINDOW_NAME_ARGUMENT),
+        .CAMERA_POSITION       = VectorToVec3(cameraPositionTemp),
+        .CAMERA_TARGET         = VectorToVec3(cameraTargetTemp),
+        .CAMERA_AXIS_X         = VectorToVec3(cameraAxisX),
+        .CAMERA_AXIS_Y         = VectorToVec3(cameraAxisY),
+        .CAMERA_AXIS_Z         = VectorToVec3(cameraAxisZ),
+        .VIEWPORT_TOP_LEFT     = VectorToVec2(viewportTopLeftTemp),
+        .VIEWPORT_BOTTOM_RIGHT = VectorToVec2(viewportBottomRight),
+        .VIEWPORT_FOV          = this->argumentParser_->get<float>(ArgParseWrapper::SHORT_VIEWPORT_FOV_ARGUMENT),
+        .VIEWPORT_NEAR_Z       = this->argumentParser_->get<float>(ArgParseWrapper::SHORT_VIEWPORT_NEAR_Z_ARGUMENT),
+        .VIEWPORT_FAR_Z        = this->argumentParser_->get<float>(ArgParseWrapper::SHORT_VIEWPORT_FAR_Z_ARGUMENT),
         .MESH_GENERATOR        = this->GetMeshGenerator_()
     };
 
@@ -77,122 +103,123 @@ ApplicationConfig ArgParseWrapper::GetAppConfig() {
 std::shared_ptr<MeshGenerator> ArgParseWrapper::GetMeshGenerator_() {
     std::shared_ptr<MeshGenerator> result{};
     
-    if (this->argumentParser_->is_subcommand_used("circle")) {
-        result = this->GetCircleGenerator_();
+    // TODO: change this if-nightmare just like in ParseAllArgs was done
+    if (this->argumentParser_->is_subcommand_used(ArgParseWrapper::CIRCLE_COMMAND)) {
+        result = this->GetCircleGenerator_(this->argumentParser_->at<argparse::ArgumentParser>(ArgParseWrapper::CIRCLE_COMMAND));
     }
-    else if (this->argumentParser_->is_subcommand_used("cylinder")) {
-        result = this->GetCylinderGenerator_();
+    else if (this->argumentParser_->is_subcommand_used(ArgParseWrapper::CYLINDER_COMMAND)) {
+        result = this->GetCylinderGenerator_(this->argumentParser_->at<argparse::ArgumentParser>(ArgParseWrapper::CYLINDER_COMMAND));
     }
-    else if (this->argumentParser_->is_subcommand_used("ellipse")) {
-        result = this->GetEllipseGenerator_();
+    else if (this->argumentParser_->is_subcommand_used(ArgParseWrapper::ELLIPSE_COMMAND)) {
+        result = this->GetEllipseGenerator_(this->argumentParser_->at<argparse::ArgumentParser>(ArgParseWrapper::ELLIPSE_COMMAND));
     }
-    else if (this->argumentParser_->is_subcommand_used("icosahedron")) {
-        result = this->GetIcosahedronGenerator_();
+    else if (this->argumentParser_->is_subcommand_used(ArgParseWrapper::ICOSAHEDRON_COMMAND)) {
+        result = this->GetIcosahedronGenerator_(this->argumentParser_->at<argparse::ArgumentParser>(ArgParseWrapper::ICOSAHEDRON_COMMAND));
     }
-    else if (this->argumentParser_->is_subcommand_used("icosphere")) {
-        result = this->GetIcosphereGenerator_();
+    else if (this->argumentParser_->is_subcommand_used(ArgParseWrapper::ICOSPHERE_COMMAND)) {
+        result = this->GetIcosphereGenerator_(this->argumentParser_->at<argparse::ArgumentParser>(ArgParseWrapper::ICOSPHERE_COMMAND));
     }
-    else if (this->argumentParser_->is_subcommand_used("parallelepiped")) {
-        result = this->GetParallelepipedGenerator_();
+    else if (this->argumentParser_->is_subcommand_used(ArgParseWrapper::PARALLELEPIPED_COMMAND)) {
+        result = this->GetParallelepipedGenerator_(this->argumentParser_->at<argparse::ArgumentParser>(ArgParseWrapper::PARALLELEPIPED_COMMAND));
     }
-    else if (this->argumentParser_->is_subcommand_used("rectangle")) {
-        result = this->GetRectangleGenerator_();
+    else if (this->argumentParser_->is_subcommand_used(ArgParseWrapper::RECTANGLE_COMMAND)) {
+        result = this->GetRectangleGenerator_(this->argumentParser_->at<argparse::ArgumentParser>(ArgParseWrapper::RECTANGLE_COMMAND));
     }
-    else if (this->argumentParser_->is_subcommand_used("torus")) {
-        result = this->GetTorusGenerator_();
+    else if (this->argumentParser_->is_subcommand_used(ArgParseWrapper::TORUS_COMMAND)) {
+        result = this->GetTorusGenerator_(this->argumentParser_->at<argparse::ArgumentParser>(ArgParseWrapper::TORUS_COMMAND));
     }
-    else if (this->argumentParser_->is_subcommand_used("uv-sphere")) {
-        result = this->GetUvSphereGenerator_();
+    else if (this->argumentParser_->is_subcommand_used(ArgParseWrapper::UV_SPHERE_COMMAND)) {
+        result = this->GetUvSphereGenerator_(this->argumentParser_->at<argparse::ArgumentParser>(ArgParseWrapper::UV_SPHERE_COMMAND));
     }
 
     return result;
 }
 
-std::shared_ptr<MeshGenerator> ArgParseWrapper::GetCircleGenerator_() {
-    const glm::vec3 origin = this->argumentParser_->at<glm::vec3>("-o");
-    const glm::vec3 color  = this->argumentParser_->at<glm::vec3>("-c");
-    const float radius     = this->argumentParser_->at<float>("-r");
-    const int segments     = this->argumentParser_->at<int>("-se");
+std::shared_ptr<MeshGenerator> ArgParseWrapper::GetCircleGenerator_(argparse::ArgumentParser& parser) {
+    const auto origin   = parser.get<std::vector<float>>(ArgParseWrapper::SHORT_ORIGIN_ARGUMENT);
+    const auto color    = parser.get<std::vector<float>>(ArgParseWrapper::SHORT_COLOR_ARGUMENT);
+    const auto radius   = parser.get<float>(ArgParseWrapper::SHORT_RADIUS_ARGUMENT);
+    const auto segments = parser.get<int>(ArgParseWrapper::SHORT_SEGMENTS_ARGUMENT);
 
-    return std::make_shared<CircleGenerator>(radius, segments, origin, color);
+    return std::make_shared<CircleGenerator>(radius, segments, VectorToVec3(origin), VectorToVec3(color));
 }
 
-std::shared_ptr<MeshGenerator> ArgParseWrapper::GetCylinderGenerator_() {
-    const glm::vec3 origin = this->argumentParser_->at<glm::vec3>("-o");
-    const glm::vec3 color  = this->argumentParser_->at<glm::vec3>("-c");
-    const float height     = this->argumentParser_->at<float>("-h");
-    const float radius     = this->argumentParser_->at<float>("-r");
-    const int segments     = this->argumentParser_->at<int>("-se");
-    const int slices       = this->argumentParser_->at<int>("-sl");
+std::shared_ptr<MeshGenerator> ArgParseWrapper::GetCylinderGenerator_(argparse::ArgumentParser& parser) {
+    const auto origin   = parser.get<std::vector<float>>(ArgParseWrapper::SHORT_ORIGIN_ARGUMENT);
+    const auto color    = parser.get<std::vector<float>>(ArgParseWrapper::SHORT_COLOR_ARGUMENT);
+    const auto height   = parser.get<float>(ArgParseWrapper::SHORT_HEIGHT_ARGUMENT);
+    const auto radius   = parser.get<float>(ArgParseWrapper::SHORT_RADIUS_ARGUMENT);
+    const auto segments = parser.get<int>(ArgParseWrapper::SHORT_SEGMENTS_ARGUMENT);
+    const auto slices   = parser.get<int>(ArgParseWrapper::SHORT_SLICES_ARGUMENT);
 
-    return std::make_shared<CylinderGenerator>(height, radius, segments, slices, origin, color);
+    return std::make_shared<CylinderGenerator>(height, radius, segments, slices, VectorToVec3(origin), VectorToVec3(color));
 }
 
-std::shared_ptr<MeshGenerator> ArgParseWrapper::GetEllipseGenerator_() {
-    const glm::vec3 origin = this->argumentParser_->at<glm::vec3>("-o");
-    const glm::vec3 color  = this->argumentParser_->at<glm::vec3>("-c");
-    const float a          = this->argumentParser_->at<float>("-a");
-    const float b          = this->argumentParser_->at<float>("-b");
-    const int segments     = this->argumentParser_->at<int>("-se");
+std::shared_ptr<MeshGenerator> ArgParseWrapper::GetEllipseGenerator_(argparse::ArgumentParser& parser) {
+    const auto origin   = parser.get<std::vector<float>>(ArgParseWrapper::SHORT_ORIGIN_ARGUMENT);
+    const auto color    = parser.get<std::vector<float>>(ArgParseWrapper::SHORT_COLOR_ARGUMENT);
+    const auto a        = parser.get<float>(ArgParseWrapper::SHORT_A_PARAMETER_ARGUMENT);
+    const auto b        = parser.get<float>(ArgParseWrapper::SHORT_B_PARAMETER_ARGUMENT);
+    const auto segments = parser.get<int>(ArgParseWrapper::SHORT_SEGMENTS_ARGUMENT);
 
-    return std::make_shared<EllipseGenerator>(a, b, segments, origin, color);
+    return std::make_shared<EllipseGenerator>(a, b, segments, VectorToVec3(origin), VectorToVec3(color));
 }
 
-std::shared_ptr<MeshGenerator> ArgParseWrapper::GetIcosahedronGenerator_() {
-    const glm::vec3 origin = this->argumentParser_->at<glm::vec3>("-o");
-    const glm::vec3 color  = this->argumentParser_->at<glm::vec3>("-c");
-    const float radius     = this->argumentParser_->at<float>("-r");
+std::shared_ptr<MeshGenerator> ArgParseWrapper::GetIcosahedronGenerator_(argparse::ArgumentParser& parser) {
+    const auto origin = parser.get<std::vector<float>>(ArgParseWrapper::SHORT_ORIGIN_ARGUMENT);
+    const auto color  = parser.get<std::vector<float>>(ArgParseWrapper::SHORT_COLOR_ARGUMENT);
+    const auto radius = parser.get<float>(ArgParseWrapper::SHORT_RADIUS_ARGUMENT);
 
-    return std::make_shared<IcosahedronGenerator>(radius, origin, color);
+    return std::make_shared<IcosahedronGenerator>(radius, VectorToVec3(origin), VectorToVec3(color));
 }
 
-std::shared_ptr<MeshGenerator> ArgParseWrapper::GetIcosphereGenerator_() {
-    const glm::vec3 origin = this->argumentParser_->at<glm::vec3>("-o");
-    const glm::vec3 color  = this->argumentParser_->at<glm::vec3>("-c");
-    const float radius     = this->argumentParser_->at<float>("-r");
-    const int iterations   = this->argumentParser_->at<float>("-i");
+std::shared_ptr<MeshGenerator> ArgParseWrapper::GetIcosphereGenerator_(argparse::ArgumentParser& parser) {
+    const auto origin     = parser.get<std::vector<float>>(ArgParseWrapper::SHORT_ORIGIN_ARGUMENT);
+    const auto color      = parser.get<std::vector<float>>(ArgParseWrapper::SHORT_COLOR_ARGUMENT);
+    const auto radius     = parser.get<float>(ArgParseWrapper::SHORT_RADIUS_ARGUMENT);
+    const auto iterations = parser.get<int>(ArgParseWrapper::SHORT_ITERATIONS_ARGUMENT);
 
-    return std::make_shared<IcosphereGenerator>(radius, iterations, origin, color);
+    return std::make_shared<IcosphereGenerator>(radius, iterations, VectorToVec3(origin), VectorToVec3(color));
 }
 
-std::shared_ptr<MeshGenerator> ArgParseWrapper::GetParallelepipedGenerator_() {
-    const glm::vec3 origin = this->argumentParser_->at<glm::vec3>("-o");
-    const glm::vec3 color  = this->argumentParser_->at<glm::vec3>("-c");
-    const float height     = this->argumentParser_->at<float>("-h");
-    const float width      = this->argumentParser_->at<float>("-w");
-    const float depth      = this->argumentParser_->at<float>("-d");
+std::shared_ptr<MeshGenerator> ArgParseWrapper::GetParallelepipedGenerator_(argparse::ArgumentParser& parser) {
+    const auto origin = parser.get<std::vector<float>>(ArgParseWrapper::SHORT_ORIGIN_ARGUMENT);
+    const auto color  = parser.get<std::vector<float>>(ArgParseWrapper::SHORT_COLOR_ARGUMENT);
+    const auto height = parser.get<float>(ArgParseWrapper::SHORT_HEIGHT_ARGUMENT);
+    const auto width  = parser.get<float>(ArgParseWrapper::SHORT_WIDTH_ARGUMENT);
+    const auto depth  = parser.get<float>(ArgParseWrapper::SHORT_DEPTH_ARGUMENT);
 
-    return std::make_shared<ParallelepipedGenerator>(height, width, depth, origin, color);
+    return std::make_shared<ParallelepipedGenerator>(height, width, depth, VectorToVec3(origin), VectorToVec3(color));
 }
 
-std::shared_ptr<MeshGenerator> ArgParseWrapper::GetRectangleGenerator_() {
-    const glm::vec3 origin = this->argumentParser_->at<glm::vec3>("-o");
-    const glm::vec3 color  = this->argumentParser_->at<glm::vec3>("-c");
-    const float height     = this->argumentParser_->at<float>("-h");
-    const float width      = this->argumentParser_->at<float>("-w");
+std::shared_ptr<MeshGenerator> ArgParseWrapper::GetRectangleGenerator_(argparse::ArgumentParser& parser) {
+    const auto origin = parser.get<std::vector<float>>(ArgParseWrapper::SHORT_ORIGIN_ARGUMENT);
+    const auto color  = parser.get<std::vector<float>>(ArgParseWrapper::SHORT_COLOR_ARGUMENT);
+    const auto height = parser.get<float>(ArgParseWrapper::SHORT_HEIGHT_ARGUMENT);
+    const auto width  = parser.get<float>(ArgParseWrapper::SHORT_WIDTH_ARGUMENT);
 
-    return std::make_shared<RectangleGenerator>(height, width, origin, color);
+    return std::make_shared<RectangleGenerator>(height, width, VectorToVec3(origin), VectorToVec3(color));
 }
 
-std::shared_ptr<MeshGenerator> ArgParseWrapper::GetTorusGenerator_() {
-    const glm::vec3 origin  = this->argumentParser_->at<glm::vec3>("-o");
-    const glm::vec3 color   = this->argumentParser_->at<glm::vec3>("-c");
-    const float innerRadius = this->argumentParser_->at<float>("-ir");
-    const float outerRadius = this->argumentParser_->at<float>("-or");
-    const int slices        = this->argumentParser_->at<float>("-sl");
-    const int segments      = this->argumentParser_->at<float>("-se");
+std::shared_ptr<MeshGenerator> ArgParseWrapper::GetTorusGenerator_(argparse::ArgumentParser& parser) {
+    const auto origin      = parser.get<std::vector<float>>(ArgParseWrapper::SHORT_ORIGIN_ARGUMENT);
+    const auto color       = parser.get<std::vector<float>>(ArgParseWrapper::SHORT_COLOR_ARGUMENT);
+    const auto innerRadius = parser.get<float>(ArgParseWrapper::SHORT_INNER_RADIUS_ARGUMENT);
+    const auto outerRadius = parser.get<float>(ArgParseWrapper::SHORT_OUTER_RADIUS_ARGUMENT);
+    const auto slices      = parser.get<int>(ArgParseWrapper::SHORT_SLICES_ARGUMENT);
+    const auto segments    = parser.get<int>(ArgParseWrapper::SHORT_SEGMENTS_ARGUMENT);
 
-    return std::make_shared<TorusGenerator>(innerRadius, outerRadius, slices, segments, origin, color);
+    return std::make_shared<TorusGenerator>(innerRadius, outerRadius, slices, segments, VectorToVec3(origin), VectorToVec3(color));
 }
 
-std::shared_ptr<MeshGenerator> ArgParseWrapper::GetTorusGenerator_() {
-    const glm::vec3 origin = this->argumentParser_->at<glm::vec3>("-o");
-    const glm::vec3 color  = this->argumentParser_->at<glm::vec3>("-c");
-    const float radius     = this->argumentParser_->at<float>("-r");
-    const int slices       = this->argumentParser_->at<float>("-sl");
-    const int segments     = this->argumentParser_->at<float>("-se");
+std::shared_ptr<MeshGenerator> ArgParseWrapper::GetUvSphereGenerator_(argparse::ArgumentParser& parser) {
+    const auto origin   = parser.get<std::vector<float>>(ArgParseWrapper::SHORT_ORIGIN_ARGUMENT);
+    const auto color    = parser.get<std::vector<float>>(ArgParseWrapper::SHORT_COLOR_ARGUMENT);
+    const auto radius   = parser.get<float>(ArgParseWrapper::SHORT_RADIUS_ARGUMENT);
+    const auto slices   = parser.get<int>(ArgParseWrapper::SHORT_SLICES_ARGUMENT);
+    const auto segments = parser.get<int>(ArgParseWrapper::SHORT_SEGMENTS_ARGUMENT);
 
-    return std::make_shared<UVSphereGenerator>(radius, slices, segments, origin, color);
+    return std::make_shared<UVSphereGenerator>(radius, slices, segments, VectorToVec3(origin), VectorToVec3(color));
 }
 
 void ArgParseWrapper::ConstructHelper_(char** argv, int argc) {
@@ -219,79 +246,99 @@ void ArgParseWrapper::ConstructHelper_(char** argv, int argc) {
         this->argumentParser_->add_subparser(*subparser);
     }
 
-    this->argumentParser_->add_argument("-wh", "--window-height")
+    this->argumentParser_->add_argument(
+        ArgParseWrapper::SHORT_WINDOW_HEIGHT_ARGUMENT,
+        ArgParseWrapper::LONG_WINDOW_HEIGHT_ARGUMENT)
         .help("Height of application window")
         .nargs(1).scan<'i', int>()
-        .default_value(1080);
+        .default_value(ArgParseWrapper::DEFAULT_WINDOW_HEIGHT_VALUE);
 
-    this->argumentParser_->add_argument("-ww", "--window-width")
+    this->argumentParser_->add_argument(
+        ArgParseWrapper::SHORT_WINDOW_WIDTH_ARGUMENT,
+        ArgParseWrapper::LONG_WINDOW_WIDTH_ARGUMENT)
         .help("Width of application window")
         .nargs(1).scan<'i', int>()
-        .default_value(1920);
+        .default_value(ArgParseWrapper::DEFAULT_WINDOW_WIDTH_VALUE);
 
-    this->argumentParser_->add_argument("-wn", "--window-name")
+    this->argumentParser_->add_argument(
+        ArgParseWrapper::SHORT_WINDOW_NAME_ARGUMENT,
+        ArgParseWrapper::LONG_WINDOW_NAME_ARGUMENT)
         .help("Title of application window")
-        .nargs(1)
-        .default_value("OpenGL Test");
+        .default_value(ArgParseWrapper::DEFAULT_WINDOW_NAME_VALUE);
 
-    this->argumentParser_->add_argument("-cp", "--camera-position")
+    this->argumentParser_->add_argument(
+        ArgParseWrapper::SHORT_CAMERA_POSITION_ARGUMENT,
+        ArgParseWrapper::LONG_CAMERA_POSITION_ARGUMENT)
         .help("Initial camera position")
         .nargs(3).scan<'f', float>()
-        .default_value(glm::vec3{ 0.0f, 0.0f, 500.0f });
+        .default_value(ArgParseWrapper::DEFAULT_CAMERA_POSITION_VALUE);
 
-    this->argumentParser_->add_argument("-ct", "--camera-target")
+    this->argumentParser_->add_argument(
+        ArgParseWrapper::SHORT_CAMERA_TARET_ARGUMENT,
+        ArgParseWrapper::LONG_CAMERA_TARET_ARGUMENT)
         .help("Initial camera target")
         .nargs(3).scan<'f', float>()
-        .default_value(glm::vec3{ 0.0f, 0.0f, 0.0f });
+        .default_value(ArgParseWrapper::DEFAULT_CAMERA_TARET_VALUE);
 
-    this->argumentParser_->add_argument("-cx", "--camera-axis-x")
+    this->argumentParser_->add_argument(
+        ArgParseWrapper::SHORT_CAMERA_AXIS_X_ARGUMENT,
+        ArgParseWrapper::LONG_CAMERA_AXIS_X_ARGUMENT)
         .help("Initial basis Ox vector of camera")
         .nargs(3).scan<'f', float>()
-        .default_value(glm::vec3{ 1.0f, 0.0f, 0.0f });
+        .default_value(ArgParseWrapper::DEFAULT_CAMERA_AXIS_X_VALUE);
 
-    this->argumentParser_->add_argument("-cy", "--camera-axis-y")
+    this->argumentParser_->add_argument(
+        ArgParseWrapper::SHORT_CAMERA_AXIS_Y_ARGUMENT,
+        ArgParseWrapper::LONG_CAMERA_AXIS_Y_ARGUMENT)
         .help("Initial basis Oy vector of camera")
         .nargs(3).scan<'f', float>()
-        .default_value(glm::vec3{ 0.0f, 1.0f, 0.0f });
+        .default_value(ArgParseWrapper::DEFAULT_CAMERA_AXIS_Y_VALUE);
 
-    this->argumentParser_->add_argument("-cz", "--camera-axis-z")
+    this->argumentParser_->add_argument(
+        ArgParseWrapper::SHORT_CAMERA_AXIS_Z_ARGUMENT,
+        ArgParseWrapper::LONG_CAMERA_AXIS_Z_ARGUMENT)
         .help("Initial basis Oz vector of camera")
         .nargs(3).scan<'f', float>()
-        .default_value(glm::vec3{ 0.0f, 0.0f, -1.0f });
+        .default_value(ArgParseWrapper::DEFAULT_CAMERA_AXIS_Z_VALUE);
 
-    this->argumentParser_->add_argument("-vn", "--viewport-near")
+    this->argumentParser_->add_argument(
+        ArgParseWrapper::SHORT_VIEWPORT_NEAR_Z_ARGUMENT,
+        ArgParseWrapper::LONG_VIEWPORT_NEAR_Z_ARGUMENT)
         .help("Distance to the nearest viewport plane")
         .nargs(1).scan<'f', float>()
-        .default_value(0.1f);
+        .default_value(ArgParseWrapper::DEFAULT_VIEWPORT_NEAR_Z_VALUE);
 
-    this->argumentParser_->add_argument("-vf", "--viewport-far")
+    this->argumentParser_->add_argument(
+        ArgParseWrapper::SHORT_VIEWPORT_FAR_Z_ARGUMENT,
+        ArgParseWrapper::LONG_VIEWPORT_FAR_Z_ARGUMENT)
         .help("Distance to the farthest viewport plane")
         .nargs(1).scan<'f', float>()
-        .default_value(1000.0f);
+        .default_value(ArgParseWrapper::DEFAULT_VIEWPORT_FAR_Z_VALUE);
 
-    this->argumentParser_->add_argument("-vtl", "--viewport-tl")
+    this->argumentParser_->add_argument(
+        ArgParseWrapper::SHORT_VIEWPORT_TOP_LEFT_ARGUMENT,
+        ArgParseWrapper::LONG_VIEWPORT_TOP_LEFT_ARGUMENT)
         .help("Viewport top left point")
         .nargs(2).scan<'f', float>()
-        .default_value(glm::zero<glm::vec2>());
+        .default_value(ArgParseWrapper::DEFAULT_VIEWPORT_TOP_LEFT_VALUE);
 
-    this->argumentParser_->add_argument("-vbr", "--viewport-br")
+    this->argumentParser_->add_argument(
+        ArgParseWrapper::SHORT_VIEWPORT_BOTTOM_RIGHT_ARGUMENT,
+        ArgParseWrapper::LONG_VIEWPORT_BOTTOM_RIGHT_ARGUMENT)
         .help("Viewport bottom right point")
         .nargs(2).scan<'f', float>()
-        .default_value(
-            glm::vec2{
-                this->argumentParser_->get<float>("-ww"),
-                this->argumentParser_->get<float>("-wh")
-            }
-        );
+        .default_value(ArgParseWrapper::DEFAULT_VIEWPORT_BOTTOM_RIGHT_VALUE);
 
-    this->argumentParser_->add_argument("-f", "--fov")
+    this->argumentParser_->add_argument(
+        ArgParseWrapper::SHORT_VIEWPORT_FOV_ARGUMENT,
+        ArgParseWrapper::LONG_VIEWPORT_FOV_ARGUMENT)
         .help("Angle of observable field camera view in degrees")
         .nargs(1).scan<'f', float>()
-        .default_value(45.0f);
+        .default_value(ArgParseWrapper::DEFAULT_VIEWPORT_FOV_VALUE);
 }
 
 std::unique_ptr<argparse::ArgumentParser> ArgParseWrapper::CreateCircleParser_() {
-    auto parser = std::make_unique<argparse::ArgumentParser>("circle");
+    auto parser = std::make_unique<argparse::ArgumentParser>(ArgParseWrapper::CIRCLE_COMMAND);
 
     parser->add_description("Generate circle mesh");
 
@@ -304,7 +351,7 @@ std::unique_ptr<argparse::ArgumentParser> ArgParseWrapper::CreateCircleParser_()
 }
 
 std::unique_ptr<argparse::ArgumentParser> ArgParseWrapper::CreateCylinderParser_() {
-    auto parser = std::make_unique<argparse::ArgumentParser>("cylinder");
+    auto parser = std::make_unique<argparse::ArgumentParser>(ArgParseWrapper::CYLINDER_COMMAND);
 
     parser->add_description("Generate cylinder mesh");
 
@@ -319,7 +366,7 @@ std::unique_ptr<argparse::ArgumentParser> ArgParseWrapper::CreateCylinderParser_
 }
 
 std::unique_ptr<argparse::ArgumentParser> ArgParseWrapper::CreateEllipseParser_() {
-    auto parser = std::make_unique<argparse::ArgumentParser>("ellipse");
+    auto parser = std::make_unique<argparse::ArgumentParser>(ArgParseWrapper::ELLIPSE_COMMAND);
 
     parser->add_description("Generate ellipse mesh");
 
@@ -333,7 +380,7 @@ std::unique_ptr<argparse::ArgumentParser> ArgParseWrapper::CreateEllipseParser_(
 }
 
 std::unique_ptr<argparse::ArgumentParser> ArgParseWrapper::CreateIcosahedronParser_() {
-    auto parser = std::make_unique<argparse::ArgumentParser>("icosahedron");
+    auto parser = std::make_unique<argparse::ArgumentParser>(ArgParseWrapper::ICOSAHEDRON_COMMAND);
 
     parser->add_description("Generate icosahedron mesh");
 
@@ -345,7 +392,7 @@ std::unique_ptr<argparse::ArgumentParser> ArgParseWrapper::CreateIcosahedronPars
 }
 
 std::unique_ptr<argparse::ArgumentParser> ArgParseWrapper::CreateIcosphereParser_() {
-    auto parser = std::make_unique<argparse::ArgumentParser>("icosphere");
+    auto parser = std::make_unique<argparse::ArgumentParser>(ArgParseWrapper::ICOSPHERE_COMMAND);
 
     parser->add_description("Generate icosphere mesh");
 
@@ -358,7 +405,7 @@ std::unique_ptr<argparse::ArgumentParser> ArgParseWrapper::CreateIcosphereParser
 }
 
 std::unique_ptr<argparse::ArgumentParser> ArgParseWrapper::CreateParallelepipedParser_() {
-    auto parser = std::make_unique<argparse::ArgumentParser>("parallelepiped");
+    auto parser = std::make_unique<argparse::ArgumentParser>(ArgParseWrapper::PARALLELEPIPED_COMMAND);
 
     parser->add_description("Generate parallelepiped mesh");
 
@@ -372,7 +419,7 @@ std::unique_ptr<argparse::ArgumentParser> ArgParseWrapper::CreateParallelepipedP
 }
 
 std::unique_ptr<argparse::ArgumentParser> ArgParseWrapper::CreateRectangleParser_() {
-    auto parser = std::make_unique<argparse::ArgumentParser>("rectangle");
+    auto parser = std::make_unique<argparse::ArgumentParser>(ArgParseWrapper::RECTANGLE_COMMAND);
 
     parser->add_description("Generate rectangle mesh");
 
@@ -385,7 +432,7 @@ std::unique_ptr<argparse::ArgumentParser> ArgParseWrapper::CreateRectangleParser
 }
 
 std::unique_ptr<argparse::ArgumentParser> ArgParseWrapper::CreateTorusParser_() {
-    auto parser = std::make_unique<argparse::ArgumentParser>("torus");
+    auto parser = std::make_unique<argparse::ArgumentParser>(ArgParseWrapper::TORUS_COMMAND);
 
     parser->add_description("Generate torus mesh");
 
@@ -400,7 +447,7 @@ std::unique_ptr<argparse::ArgumentParser> ArgParseWrapper::CreateTorusParser_() 
 }
 
 std::unique_ptr<argparse::ArgumentParser> ArgParseWrapper::CreateUVSphereParser_() {
-    auto parser = std::make_unique<argparse::ArgumentParser>("uv-sphere");
+    auto parser = std::make_unique<argparse::ArgumentParser>(ArgParseWrapper::UV_SPHERE_COMMAND);
 
     parser->add_description("Generate uv-sphere mesh");
 

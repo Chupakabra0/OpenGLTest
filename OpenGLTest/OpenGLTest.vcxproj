@@ -209,6 +209,9 @@ copy /Y /D "$(ProjectDir)imgui.ini" "$(TargetDir)imgui.ini"</Command>
   <ItemGroup>
     <Image Include="resources\textures\paper-sheet.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="test\launch.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

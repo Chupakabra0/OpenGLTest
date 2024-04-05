@@ -45,8 +45,12 @@ public:
 
     Application() = delete;
 
-    explicit Application(const ApplicationConfig& applicationConfig, const std::shared_ptr<MeshGenerator>& meshGenerator)
-        : meshGenerator_(meshGenerator) {
+    explicit Application(const ApplicationConfig& applicationConfig) {
+        SPDLOG_INFO("Mesh generator initialization started");
+        
+        this->InitMeshGenerator_(applicationConfig.MESH_GENERATOR);
+
+        SPDLOG_INFO("Mesh generator initialization started");
         SPDLOG_INFO("Window initialization started");
 
         this->InitWindow_(applicationConfig.WINDOW_HEIGHT, applicationConfig.WINDOW_WIDTH, applicationConfig.WINDOW_NAME);
@@ -192,6 +196,14 @@ public:
     }
 
 private:
+    void InitMeshGenerator_(const std::shared_ptr<MeshGenerator>& generator) {
+        if (generator == nullptr) {
+            throw std::runtime_error("Mesh generator is null");
+        }
+
+        this->meshGenerator_ = generator;
+    }
+
     void InitWindow_(int windowHeight, int windowWidth, const std::string& windowName) {
         this->window_ = std::make_unique<Window>(windowHeight, windowWidth, windowName);
     }

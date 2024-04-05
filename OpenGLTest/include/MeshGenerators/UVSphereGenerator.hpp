@@ -100,7 +100,6 @@ public:
             positions,
             std::vector(positions.size(), this->color_),
             vertexNormals,
-            //faceNormals,
             std::vector(positions.size(), glm::zero<glm::vec3>()),
             indecies
         );
