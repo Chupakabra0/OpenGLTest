@@ -26,12 +26,12 @@ public:
 protected:
     void AddOriginArgument_() {
         this->argumentParser_->add_argument(ArgParseWrapper::SHORT_ORIGIN_ARGUMENT, ArgParseWrapper::LONG_ORIGIN_ARGUMENT)
-            .help("Origin of the mesh").nargs(3).scan<'f', float>().required();
+            .help("Coordinate of mesh's origin in Cartesian XYZ system").nargs(3).scan<'f', float>().required();
     }
 
     void AddColorArgument_() {
         this->argumentParser_->add_argument(ArgParseWrapper::SHORT_COLOR_ARGUMENT, ArgParseWrapper::LONG_COLOR_ARGUMENT)
-            .help("Color of the mesh").nargs(3).scan<'f', float>().required();
+            .help("Color of the mesh in normalized RGB format (0.0 min — color, 1.0 — max color)").nargs(3).scan<'f', float>().required();
     }
 
     void AddSlicesArgument_() {
