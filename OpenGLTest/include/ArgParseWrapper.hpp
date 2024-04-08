@@ -4,8 +4,10 @@
 
 #include <glm/gtx/string_cast.hpp>
 
+class BaseMeshParseBuilder;
+
 class ArgParseWrapper {
-private:
+public:
     static const std::vector<const char* const*> COMMAND_ARRAY;
 
     static constexpr const char* CIRCLE_COMMAND                       = "circle";
@@ -86,12 +88,9 @@ private:
     static constexpr float DEFAULT_VIEWPORT_NEAR_Z_VALUE              = 0.1f;
     static constexpr float DEFAULT_VIEWPORT_FAR_Z_VALUE               = 1000.0f;
 
-public:
     ArgParseWrapper() = delete;
 
-    explicit ArgParseWrapper(char** argv, int argc) {
-        this->ConstructHelper_(argv, argc);
-    }
+    explicit ArgParseWrapper(char** argv, int argc);
 
     ArgParseWrapper(const ArgParseWrapper&) = delete;
 
@@ -101,120 +100,40 @@ public:
 
     ArgParseWrapper& operator=(ArgParseWrapper&&) noexcept = default;
 
-    ~ArgParseWrapper() = default;
+    ~ArgParseWrapper();
 
     bool ParseAllArgs();
 
     ApplicationConfig GetAppConfig();
 
 private:
-    std::vector<std::string> argv_{};
     std::unique_ptr<argparse::ArgumentParser> argumentParser_{};
+    std::vector<std::string> argv_{};
+    std::vector<std::unique_ptr<argparse::ArgumentParser>> subcomands_{};
+    std::vector<BaseMeshParseBuilder*> meshParseBuilders_{};
+
+    void InitMeshParseBuilders_();
 
     void ConstructHelper_(char** argv, int argc);
-
-    std::unique_ptr<argparse::ArgumentParser> CreateIcosphereParser_();
-
-    std::unique_ptr<argparse::ArgumentParser> CreateParallelepipedParser_();
-
-    std::unique_ptr<argparse::ArgumentParser> CreateRectangleParser_();
-
-    std::unique_ptr<argparse::ArgumentParser> CreateTorusParser_();
-
-    std::unique_ptr<argparse::ArgumentParser> CreateUVSphereParser_();
-
-    std::unique_ptr<argparse::ArgumentParser> CreateCircleParser_();
-
-    std::unique_ptr<argparse::ArgumentParser> CreateCylinderParser_();
-
-    std::unique_ptr<argparse::ArgumentParser> CreateEllipseParser_();
-
-    std::unique_ptr<argparse::ArgumentParser> CreateIcosahedronParser_();
 
     // TODO remake it into factories
     std::shared_ptr<MeshGenerator> GetMeshGenerator_();
 
-    std::shared_ptr<MeshGenerator> GetCircleGenerator_(argparse::ArgumentParser& parser);
+    std::shared_ptr<MeshGenerator> GetCircleGenerator_();
 
-    std::shared_ptr<MeshGenerator> GetCylinderGenerator_(argparse::ArgumentParser& parser);
+    std::shared_ptr<MeshGenerator> GetCylinderGenerator_();
 
-    std::shared_ptr<MeshGenerator> GetEllipseGenerator_(argparse::ArgumentParser& parser);
+    std::shared_ptr<MeshGenerator> GetEllipseGenerator_();
 
-    std::shared_ptr<MeshGenerator> GetIcosahedronGenerator_(argparse::ArgumentParser& parser);
+    std::shared_ptr<MeshGenerator> GetIcosahedronGenerator_();
 
-    std::shared_ptr<MeshGenerator> GetIcosphereGenerator_(argparse::ArgumentParser& parser);
+    std::shared_ptr<MeshGenerator> GetIcosphereGenerator_();
 
-    std::shared_ptr<MeshGenerator> GetParallelepipedGenerator_(argparse::ArgumentParser& parser);
+    std::shared_ptr<MeshGenerator> GetParallelepipedGenerator_();
 
-    std::shared_ptr<MeshGenerator> GetRectangleGenerator_(argparse::ArgumentParser& parser);
+    std::shared_ptr<MeshGenerator> GetRectangleGenerator_();
 
-    std::shared_ptr<MeshGenerator> GetTorusGenerator_(argparse::ArgumentParser& parser);
+    std::shared_ptr<MeshGenerator> GetTorusGenerator_();
 
-    std::shared_ptr<MeshGenerator> GetUvSphereGenerator_(argparse::ArgumentParser& parser);
-
-
-    void AddOriginArgument_(std::unique_ptr<argparse::ArgumentParser>& parser) {
-        parser->add_argument(ArgParseWrapper::SHORT_ORIGIN_ARGUMENT, ArgParseWrapper::LONG_ORIGIN_ARGUMENT)
-            .help("Origin of the mesh").nargs(3).scan<'f', float>().required();
-    }
-
-    void AddColorArgument_(std::unique_ptr<argparse::ArgumentParser>& parser) {
-        parser->add_argument(ArgParseWrapper::SHORT_COLOR_ARGUMENT, ArgParseWrapper::LONG_COLOR_ARGUMENT)
-            .help("Color of the mesh").nargs(3).scan<'f', float>().required();
-    }
-
-    void AddIterationsArgument_(std::unique_ptr<argparse::ArgumentParser>& parser) {
-        parser->add_argument(ArgParseWrapper::SHORT_ITERATIONS_ARGUMENT,ArgParseWrapper::LONG_ITERATIONS_ARGUMENT)
-            .help("Iterations of the mesh").nargs(1).scan<'i', int>().required();
-    }
-
-    void AddSlicesArgument_(std::unique_ptr<argparse::ArgumentParser>& parser) {
-        parser->add_argument(ArgParseWrapper::SHORT_SLICES_ARGUMENT, ArgParseWrapper::LONG_SLICES_ARGUMENT)
-            .help("Slices of the mesh").nargs(1).scan<'i', int>().required();
-    }
-
-    void AddSegmentsArgument_(std::unique_ptr<argparse::ArgumentParser>& parser) {
-        parser->add_argument(ArgParseWrapper::SHORT_SEGMENTS_ARGUMENT, ArgParseWrapper::LONG_SEGMENTS_ARGUMENT)
-            .help("Segments of the mesh").nargs(1).scan<'i', int>().required();
-    }
-
-    void AddRadiusArgument_(std::unique_ptr<argparse::ArgumentParser>& parser) {
-        parser->add_argument(ArgParseWrapper::SHORT_RADIUS_ARGUMENT, ArgParseWrapper::LONG_RADIUS_ARGUMENT)
-            .help("Radius of the mesh").nargs(1).scan<'f', float>().required();
-    }
-
-    void AddInnerRadiusArgument_(std::unique_ptr<argparse::ArgumentParser>& parser) {
-        parser->add_argument(ArgParseWrapper::SHORT_INNER_RADIUS_ARGUMENT, ArgParseWrapper::LONG_INNER_RADIUS_ARGUMENT)
-            .help("Inner radius of the mesh").nargs(1).scan<'f', float>().required();
-    }
-
-    void AddOuterRadiusArgument_(std::unique_ptr<argparse::ArgumentParser>& parser) {
-        parser->add_argument(ArgParseWrapper::SHORT_OUTER_RADIUS_ARGUMENT, ArgParseWrapper::LONG_OUTER_RADIUS_ARGUMENT)
-            .help("Outer radius of the mesh").nargs(1).scan<'f', float>().required();
-    }
-
-    void AddHeightArgument_(std::unique_ptr<argparse::ArgumentParser>& parser) {
-        parser->add_argument(ArgParseWrapper::SHORT_HEIGHT_ARGUMENT, ArgParseWrapper::LONG_HEIGHT_ARGUMENT)
-            .help("Height of the mesh").nargs(1).scan<'f', float>().required();
-    }
-
-    void AddWidthArgument_(std::unique_ptr<argparse::ArgumentParser>& parser) {
-        parser->add_argument(ArgParseWrapper::SHORT_WIDTH_ARGUMENT, ArgParseWrapper::LONG_WIDTH_ARGUMENT)
-            .help("Height of the mesh").nargs(1).scan<'f', float>().required();
-    }
-
-    void AddDepthArgument_(std::unique_ptr<argparse::ArgumentParser>& parser) {
-        parser->add_argument(ArgParseWrapper::SHORT_DEPTH_ARGUMENT, ArgParseWrapper::LONG_DEPTH_ARGUMENT)
-            .help("Depth of the mesh").nargs(1).scan<'f', float>().required();
-    }
-
-    void AddAArgument_(std::unique_ptr<argparse::ArgumentParser>& parser) {
-        parser->add_argument(ArgParseWrapper::SHORT_A_PARAMETER_ARGUMENT, ArgParseWrapper::LONG_A_PARAMETER_ARGUMENT)
-            .help("A parameter of the mesh").nargs(1).scan<'f', float>().required();
-    }
-
-    void AddBArgument_(std::unique_ptr<argparse::ArgumentParser>& parser) {
-        parser->add_argument(ArgParseWrapper::SHORT_B_PARAMETER_ARGUMENT, ArgParseWrapper::LONG_B_PARAMETER_ARGUMENT)
-            .help("B parameter of the mesh").nargs(1).scan<'f', float>().required();
-    }
+    std::shared_ptr<MeshGenerator> GetUvSphereGenerator_();
 };

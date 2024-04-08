@@ -124,6 +124,8 @@ copy /Y /D "$(ProjectDir)imgui.ini" "$(TargetDir)imgui.ini"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="include\ArgParseBuilder.hpp" />
+    <ClCompile Include="include\BaseMeshParseBuilder.hpp" />
     <ClCompile Include="include\imgui\imgui.cpp" />
     <ClCompile Include="include\imgui\imgui_draw.cpp" />
     <ClCompile Include="include\imgui\imgui_impl_glfw.cpp" />
@@ -150,7 +152,12 @@ copy /Y /D "$(ProjectDir)imgui.ini" "$(TargetDir)imgui.ini"</Command>
     <ClInclude Include="include\Application.hpp" />
     <ClInclude Include="include\ApplicationConfig.hpp" />
     <ClInclude Include="include\ArgParseWrapper.hpp" />
+    <ClInclude Include="include\CircleMeshParseBuilder.hpp" />
     <ClInclude Include="include\Control.hpp" />
+    <ClInclude Include="include\CylinderMeshParseBuilder.hpp" />
+    <ClInclude Include="include\EllipseMeshParseBuilder.hpp" />
+    <ClInclude Include="include\IcosahedronMeshParseBuilder.hpp" />
+    <ClInclude Include="include\IcosphereMeshParseBuilder.hpp" />
     <ClInclude Include="include\ImguiWrapper.hpp" />
     <ClInclude Include="include\DataObject.hpp" />
     <ClInclude Include="include\DataObjectGuard.hpp" />
@@ -166,6 +173,7 @@ copy /Y /D "$(ProjectDir)imgui.ini" "$(TargetDir)imgui.ini"</Command>
     <ClInclude Include="include\imgui\imstb_truetype.h" />
     <ClInclude Include="include\Keyboard.hpp" />
     <ClInclude Include="include\LogLevel.hpp" />
+    <ClInclude Include="include\MainParseBuilder.hpp" />
     <ClInclude Include="include\MeshGenerators\CircleGenerator.hpp" />
     <ClInclude Include="include\MeshGenerators\ConeGenerator.hpp" />
     <ClInclude Include="include\MeshGenerators\CylinderGenerator.hpp" />
@@ -177,6 +185,8 @@ copy /Y /D "$(ProjectDir)imgui.ini" "$(TargetDir)imgui.ini"</Command>
     <ClInclude Include="include\MeshGenerators\TorusGenerator.hpp" />
     <ClInclude Include="include\MeshGenerators\UVSphereGenerator.hpp" />
     <ClInclude Include="include\Mouse.hpp" />
+    <ClInclude Include="include\ParallelepipedMeshParseBuilder.hpp" />
+    <ClInclude Include="include\RectangleMeshParseBuilder.hpp" />
     <ClInclude Include="include\TextureLoader\ITextureLoader.hpp" />
     <ClInclude Include="include\KHR\khrplatform.h" />
     <ClInclude Include="include\Renderer.hpp" />
@@ -186,8 +196,10 @@ copy /Y /D "$(ProjectDir)imgui.ini" "$(TargetDir)imgui.ini"</Command>
     <ClInclude Include="include\Texture.hpp" />
     <ClInclude Include="include\TextureLoader\TextureLoaderCV.hpp" />
     <ClInclude Include="include\TextureLoader\TextureLoaderSTB.hpp" />
+    <ClInclude Include="include\TorusMeshParseBuilder.hpp" />
     <ClInclude Include="include\Utils.hpp" />
     <ClInclude Include="include\MeshGenerators\ParallelepipedGenerator.hpp" />
+    <ClInclude Include="include\UvSphereMeshParseBuilder.hpp" />
     <ClInclude Include="include\VertexArrayObject.hpp" />
     <ClInclude Include="include\VertexBufferAttributes.hpp" />
     <ClInclude Include="include\Camera.hpp" />

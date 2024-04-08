@@ -78,6 +78,12 @@
     <ClCompile Include="src\ArgParseWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="include\ArgParseBuilder.hpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\BaseMeshParseBuilder.hpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Window.hpp">
@@ -222,6 +228,36 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ArgParseWrapper.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CircleMeshParseBuilder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CylinderMeshParseBuilder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EllipseMeshParseBuilder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IcosahedronMeshParseBuilder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IcosphereMeshParseBuilder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParallelepipedMeshParseBuilder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RectangleMeshParseBuilder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TorusMeshParseBuilder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UvSphereMeshParseBuilder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MainParseBuilder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
