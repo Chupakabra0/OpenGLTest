@@ -15,6 +15,8 @@
 #include "Texture.hpp"
 #include "Camera.hpp"
 #include "Viewport.hpp"
+#include "LogLevel.hpp"
+#include "ApplicationConfig.hpp"
 
 #include "TextureLoader/TextureLoaderSTB.hpp"
 
@@ -28,29 +30,6 @@
 #include "MeshGenerators/TorusGenerator.hpp"
 #include "MeshGenerators/IcosphereGenerator.hpp"
 
-enum class LogLevel : short {
-    TRACE,
-    DEBUG,
-    INFO,
-    WARNING,
-    ERR,
-    CRITCAL,
-    OFF
-};
-
-inline spdlog::level::level_enum LogLevelToSpdlog(LogLevel logLevel) {
-    switch (logLevel) {
-        case LogLevel::TRACE:   return spdlog::level::trace;
-        case LogLevel::DEBUG:   return spdlog::level::debug;
-        case LogLevel::INFO:    return spdlog::level::info;
-        case LogLevel::WARNING: return spdlog::level::warn;
-        case LogLevel::ERR:     return spdlog::level::err;
-        case LogLevel::CRITCAL: return spdlog::level::critical;
-        case LogLevel::OFF:     return spdlog::level::off;
-        default:                throw std::runtime_error("Log level convert error");
-    }
-}
-
 inline constexpr bool IsDebug() {
     #if defined(_DEBUG)
         return true;
@@ -59,23 +38,6 @@ inline constexpr bool IsDebug() {
     #endif
 }
 
-struct ApplicationConfig {
-public:
-    int         WINDOW_HEIGHT         = 1920;
-    int         WINDOW_WIDTH          = 1080;
-    std::string WINDOW_NAME           = "Default";
-    glm::vec3   CAMERA_POSITION       = glm::zero<glm::vec3>();
-    glm::vec3   CAMERA_TARGET         = glm::one<glm::vec3>();
-    glm::vec3   CAMERA_AXIS_X         = glm::vec3(1.0f, 0.0f, 0.0f);
-    glm::vec3   CAMERA_AXIS_Y         = glm::vec3(0.0f, 1.0f, 0.0f);
-    glm::vec3   CAMERA_AXIS_Z         = glm::vec3(0.0f, 0.0f, -1.0f);
-    glm::vec2   VIEWPORT_TOP_LEFT     = glm::zero<glm::vec2>();
-    glm::vec2   VIEWPORT_BOTTOM_RIGHT = glm::vec2(1080.0f, 1920.0f);
-    float       VIEWPORT_FOV          = 90.0f;
-    float       VIEWPORT_NEAR_Z       = 0.1f;
-    float       VIEWPORT_FAR_Z        = 1.0f;
-};
-
 class Application {
 public:
     static constexpr const char* NORMALS_SHADER_STR = "NORMALS_SHADER_PROGRAM";
@@ -83,8 +45,12 @@ public:
 
     Application() = delete;
 
-    explicit Application(const ApplicationConfig& applicationConfig, const std::shared_ptr<MeshGenerator>& meshGenerator)
-        : meshGenerator_(meshGenerator) {
+    explicit Application(const ApplicationConfig& applicationConfig) {
+        SPDLOG_INFO("Mesh generator initialization started");
+        
+        this->InitMeshGenerator_(applicationConfig.MESH_GENERATOR);
+
+        SPDLOG_INFO("Mesh generator initialization started");
         SPDLOG_INFO("Window initialization started");
 
         this->InitWindow_(applicationConfig.WINDOW_HEIGHT, applicationConfig.WINDOW_WIDTH, applicationConfig.WINDOW_NAME);
@@ -230,6 +196,14 @@ public:
     }
 
 private:
+    void InitMeshGenerator_(const std::shared_ptr<MeshGenerator>& generator) {
+        if (generator == nullptr) {
+            throw std::runtime_error("Mesh generator is null");
+        }
+
+        this->meshGenerator_ = generator;
+    }
+
     void InitWindow_(int windowHeight, int windowWidth, const std::string& windowName) {
         this->window_ = std::make_unique<Window>(windowHeight, windowWidth, windowName);
     }
@@ -385,13 +359,6 @@ private:
                 else {
                     SPDLOG_DEBUG("Camera FOV didn't change: {}", this->viewport_->GetFieldOfView());
                 }
-
-                /*this->viewport_->SetFieldOfView(
-                    glm::radians(
-                        glm::degrees(this->viewport_->GetFieldOfView()) + (ypos > 0 ? -fieldOfViewStep : fieldOfViewStep)
-                    )
-                );
-                */
             }
         );
 

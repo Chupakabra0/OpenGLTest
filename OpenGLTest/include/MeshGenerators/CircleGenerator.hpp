@@ -54,7 +54,6 @@ public:
             positions,
             std::vector(positions.size(), this->color_),
             std::vector(positions.size(), glm::vec3(0.0f, 0.0f, 1.0f)),
-            std::vector(positions.size(), glm::vec3(0.0f, 0.0f, 1.0f)),
             std::vector(positions.size(), glm::zero<glm::vec3>()),      // TODO: texture coords
             indecies
         );
