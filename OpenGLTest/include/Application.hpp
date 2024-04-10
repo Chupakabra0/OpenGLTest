@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <format>
+#include <regex>
 
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
 
@@ -40,8 +41,11 @@ inline constexpr bool IsDebug() {
 
 class Application {
 public:
-    static constexpr const char* NORMALS_SHADER_STR = "NORMALS_SHADER_PROGRAM";
-    static constexpr const char* MESH_SHADER_STR    = "MESH_SHADER_PROGRAM";
+    static constexpr const char* NORMALS_SHADER_STR    = "NORMALS SHADER PROGRAM";
+    static constexpr const char* BASIC_MESH_SHADER_STR = "BASIC MESH SHADER";
+    static constexpr const char* RED_SHADER_STR        = "RED SHADER";
+    static constexpr const char* RGB_SHADER_STR        = "RGB SHADER";
+    static constexpr const char* MAGIC_SHADER_STR      = "MAGIC SHADER";
 
     Application() = delete;
 
@@ -153,16 +157,17 @@ public:
             this->shaderPrograms_[Application::NORMALS_SHADER_STR]->SetUniformMatrix("u_view", viewMatrix);
             this->shaderPrograms_[Application::NORMALS_SHADER_STR]->SetUniformMatrix("u_model", modelMatrix);
 
-            this->shaderPrograms_[Application::MESH_SHADER_STR]->SetUniformPairFloat("u_resolution",
+            this->shaderPrograms_[this->selectedShaderKey_]->SetUniformPairFloat(
+                "u_resolution",
                 static_cast<float>(this->window_->GetWidth()), static_cast<float>(this->window_->GetHeight())
             );
-            this->shaderPrograms_[Application::MESH_SHADER_STR]->SetUniformMatrix("u_proj", projectionMatrix);
-            this->shaderPrograms_[Application::MESH_SHADER_STR]->SetUniformMatrix("u_view", viewMatrix);
-            this->shaderPrograms_[Application::MESH_SHADER_STR]->SetUniformMatrix("u_model", modelMatrix);
-            this->shaderPrograms_[Application::MESH_SHADER_STR]->SetUniformInt("u_isFlat", isFlatShading);
-            this->shaderPrograms_[Application::MESH_SHADER_STR]->SetUniformFloat("u_time", timeInSeconds);
+            this->shaderPrograms_[this->selectedShaderKey_]->SetUniformMatrix("u_proj", projectionMatrix);
+            this->shaderPrograms_[this->selectedShaderKey_]->SetUniformMatrix("u_view", viewMatrix);
+            this->shaderPrograms_[this->selectedShaderKey_]->SetUniformMatrix("u_model", modelMatrix);
+            this->shaderPrograms_[this->selectedShaderKey_]->SetUniformInt("u_isFlat", isFlatShading);
+            this->shaderPrograms_[this->selectedShaderKey_]->SetUniformFloat("u_time", timeInSeconds);
 
-            this->renderer_->DrawIndecies(vao, *this->shaderPrograms_[Application::MESH_SHADER_STR]);
+            this->renderer_->DrawIndecies(vao, *this->shaderPrograms_[this->selectedShaderKey_]);
             if (isDrawNormals) {
                 this->renderer_->DrawIndecies(vao, *this->shaderPrograms_[Application::NORMALS_SHADER_STR]);
             }
@@ -179,6 +184,21 @@ public:
             ImGui::Checkbox("Flat shading", &isFlatShading);
             ImGui::SameLine();
             ImGui::Checkbox("Draw normals", &isDrawNormals);
+            if (ImGui::BeginCombo("Shaders", this->selectedShaderKey_.c_str())) {
+                for (int i = 0; i < this->shaderKeys_.size(); ++i) {
+                    const bool isSelected = (this->selectedShaderKey_ == this->shaderKeys_[i]);
+
+                    if (ImGui::Selectable(this->shaderKeys_[i].c_str(), isSelected)) {
+                        this->selectedShaderKey_ = this->shaderKeys_[i];
+                    }
+
+                    if (isSelected) {
+                        ImGui::SetItemDefaultFocus();
+                    }
+                }
+
+                ImGui::EndCombo();
+            }
             ImGui::Text("Display info:");
             ImGui::Text(std::format("Field of view: {:.2f} degrees", glm::degrees(this->viewport_->GetFieldOfView())).c_str());
             ImGui::Text("Application data:");
@@ -553,36 +573,69 @@ private:
     }
 
     void InitShaders_() {
-        // Creating shaders
-        const static std::vector<std::pair<std::string, ShaderType>> shadersData {
-            std::make_pair("shaders\\BasicShader.vert", ShaderType::VERTEX_SHADER),             // 0
-            std::make_pair("shaders\\BasicShader.frag", ShaderType::FRAGMENT_SHADER),           // 1
-            std::make_pair("shaders\\NormalVisualization.frag", ShaderType::FRAGMENT_SHADER),   // 2
-            std::make_pair("shaders\\RedBlueGreen.frag", ShaderType::FRAGMENT_SHADER),          // 3
-            std::make_pair("shaders\\MagicShader.frag", ShaderType::FRAGMENT_SHADER),           // 4
-            std::make_pair("shaders\\RedShader.frag", ShaderType::FRAGMENT_SHADER),             // 5
-            std::make_pair("shaders\\BasicShader.geom", ShaderType::GEOMETRY_SHADER)            // 6
+        const static std::vector<std::string> vertexShaderData {
+            "shaders\\BasicShader.vert"
         };
 
-        ///// REWORK THIS !!!!
-        
-        std::vector<Shader> shaders{};
+        const static std::vector<std::string> fragmentShaderData {
+            "shaders\\BasicShader.frag",
+            "shaders\\NormalVisualization.frag",
+            "shaders\\RedBlueGreen.frag",
+            "shaders\\MagicShader.frag",
+            "shaders\\RedShader.frag"
+        };
 
-        for (const auto& [path, type] : shadersData) {
-            SPDLOG_DEBUG("Shader {} compilation started", path); 
-            shaders.emplace_back(path, type);
-            SPDLOG_DEBUG("Shader {} compilation succeed", path);
-        }
+        const static std::vector<std::string> geomeryShaderData {
+            "shaders\\BasicShader.geom"
+        };
+
+        auto vertexShaders   = this->CompileShaders_(vertexShaderData, ShaderType::VERTEX_SHADER);
+        auto fragmentShaders = this->CompileShaders_(fragmentShaderData, ShaderType::FRAGMENT_SHADER);
+        auto geomeryShaders  = this->CompileShaders_(geomeryShaderData, ShaderType::GEOMETRY_SHADER);
 
         // Creating shader programs
-        this->shaderPrograms_.emplace(Application::NORMALS_SHADER_STR, std::make_unique<ShaderProgram>(shaders[0], shaders[5], shaders[6]));
-        this->shaderPrograms_.emplace(Application::MESH_SHADER_STR, std::make_unique<ShaderProgram>(shaders[0], shaders[2]));
-        
-        /////
+        this->shaderPrograms_.emplace(Application::BASIC_MESH_SHADER_STR, std::make_unique<ShaderProgram>(vertexShaders.at("BasicShader"), fragmentShaders.at("NormalVisualization")));
+        this->shaderPrograms_.emplace(Application::RED_SHADER_STR, std::make_unique<ShaderProgram>(vertexShaders.at("BasicShader"), fragmentShaders.at("RedShader")));
+        this->shaderPrograms_.emplace(Application::RGB_SHADER_STR, std::make_unique<ShaderProgram>(vertexShaders.at("BasicShader"), fragmentShaders.at("RedBlueGreen")));
+        this->shaderPrograms_.emplace(Application::MAGIC_SHADER_STR, std::make_unique<ShaderProgram>(vertexShaders.at("BasicShader"), fragmentShaders.at("MagicShader")));
+        this->shaderPrograms_.emplace(Application::NORMALS_SHADER_STR, std::make_unique<ShaderProgram>(vertexShaders.at("BasicShader"), fragmentShaders.at("RedShader"), geomeryShaders.at("BasicShader")));
+
+        for (auto& [key, _] : this->shaderPrograms_) {
+            if (key == Application::NORMALS_SHADER_STR) {
+                continue;
+            }
+
+            this->shaderKeys_.emplace_back(key);
+        }
+
+        this->selectedShaderKey_ = this->shaderKeys_.front();
+    }
+
+    std::unordered_map<std::string, Shader> CompileShaders_(const std::vector<std::string>& shaderFilepath, ShaderType shaderType) {
+        std::unordered_map<std::string, Shader> shaders{};
+
+        const auto getShaderName = [](const std::string& filepath) {
+            static const std::regex pattern("(\\\\|/)(.+)\\.(frag|geom|vert)");
+            static std::smatch match{};
+            std::regex_search(filepath, match, pattern);
+
+            // 2 is for filename position
+            return match[2].str();
+        };
+
+        for (const auto& filepath : shaderFilepath) {
+            SPDLOG_DEBUG("Shader {} compilation started", filepath);
+            shaders.emplace(getShaderName(filepath), std::move(Shader(filepath, shaderType)));
+            SPDLOG_DEBUG("Shader {} compilation succeed", filepath);
+        }
+
+        return shaders;
     }
 
     Renderer* renderer_{};
     ImguiWrapper* imgui_{};
+    std::string selectedShaderKey_{};
+    std::vector<std::string> shaderKeys_{};
     std::unique_ptr<Window> window_{};
     std::unique_ptr<Camera> camera_{};
     std::unique_ptr<Viewport> viewport_{};

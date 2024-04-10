@@ -66,18 +66,24 @@ void ImguiWrapper::CorrectImguiIni_() {
     //const std::regex windowRegex{"^\\[Window\\]\\[.*\\]$"};
     const std::regex collapsedRegex{"^Collapsed\\s*=\\s*(\\d+?(\\.\\d+)?)$"};
     const std::regex sizeRegex{"^Size\\s*=\\s*(\\d+?(\\.\\d+)?)\\s*,\\s*(\\d+?(\\.\\d+)?)$"};
+    bool isCollapsedWritten = false;
 
     std::string str{};
 
     while (std::getline(in, str)) {
         if (std::regex_match(str, collapsedRegex)) {
             str = "Collapsed=1";
+            isCollapsedWritten = true;
         }
         else if (std::regex_match(str, sizeRegex)) {
-            str = "Size=400,200";
+            str = "Size=400,250";
         }
 
         out << str << '\n';
+    }
+
+    if (!isCollapsedWritten) {
+        out << "Collapsed=1\n";
     }
 
     out << std::flush;
