@@ -1,5 +1,7 @@
-#include "Application.hpp"
-#include "ArgParseWrapper.hpp"
+#include "ApplicationInstance/ApplicationInstance.hpp"
+#include "ArgParseWrapper/ArgParseWrapper.hpp"
+
+#include <spdlog/spdlog.h>
 
 int main(int argc, char** argv) {
     try {
@@ -16,7 +18,7 @@ int main(int argc, char** argv) {
         SPDLOG_INFO("Logger initialized");
         SPDLOG_INFO("Application initialization started");
 
-        Application application(config);
+        ApplicationInstance application(config);
 
         SPDLOG_INFO("Application initialization ended");
 

@@ -18,246 +18,420 @@
     <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\glad\glad.c">
+    <ClCompile Include="src\WindowInstance\WindowInstance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Window.cpp">
+    <ClCompile Include="src\VertexBufferObject\VertexBufferObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\VertexBufferObject.cpp">
+    <ClCompile Include="src\IndexBufferObject\IndexBufferObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\IndexBufferObject.cpp">
+    <ClCompile Include="src\BindableDataObject\BindableDataObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DataObject.cpp">
+    <ClCompile Include="src\BindableDataObjectGuard\BindableDataObjectGuard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DataObjectGuard.cpp">
+    <ClCompile Include="src\RendererInstance\RendererInstance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer.cpp">
+    <ClCompile Include="src\ShaderInstance\ShaderInstance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Shader.cpp">
+    <ClCompile Include="src\ShaderProgram\ShaderProgram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderProgram.cpp">
+    <ClCompile Include="src\TextureInstance\TextureInstance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Texture.cpp">
+    <ClCompile Include="src\VertexArrayObject\VertexArrayObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\VertexArrayObject.cpp">
+    <ClCompile Include="src\VertexBufferAttributes\VertexBufferAttributes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\VertexBufferAttributes.cpp">
+    <ClCompile Include="src\ImguiWrapper\ImguiWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ImguiWrapper.cpp">
+    <ClCompile Include="src\ArgParseWrapper\ArgParseWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\imgui\imgui.cpp">
+    <ClCompile Include="src\ArgParseBuilder\ArgParseBuilder.hpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\imgui\imgui_draw.cpp">
+    <ClCompile Include="src\ApplicationInstance\ApplicationInstance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\imgui\imgui_tables.cpp">
+    <ClCompile Include="src\ArgParseBuilder\BaseMeshParserBuilder\BaseMeshParseBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\imgui\imgui_widgets.cpp">
+    <ClCompile Include="src\ArgParseBuilder\CircleMeshParseBuilder\CircleMeshParseBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\imgui\imgui_impl_opengl3.cpp">
+    <ClCompile Include="src\ArgParseBuilder\CylinderMeshParseBuilder\CylinderMeshParseBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\imgui\imgui_impl_glfw.cpp">
+    <ClCompile Include="src\ArgParseBuilder\EllipseMeshParseBuilder\EllipseMeshParseBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ArgParseWrapper.cpp">
+    <ClCompile Include="src\ArgParseBuilder\IcosahedronMeshParseBuilder\IcosahedronMeshParseBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\ArgParseBuilder.hpp">
+    <ClCompile Include="src\ArgParseBuilder\IcosphereMeshParseBuilder\IcosphereMeshParseBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\BaseMeshParseBuilder.hpp">
+    <ClCompile Include="src\ArgParseBuilder\MainParseBuilder\MainParseBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArgParseBuilder\ParallelepipedMeshParseBuilder\ParallelepipedMeshParseBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArgParseBuilder\RectangleMeshParseBuilder\RectangleMeshParseBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArgParseBuilder\TorusMeshParseBuilder\TorusMeshParseBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArgParseBuilder\UvSphereMeshParseBuilder\UvSphereMeshParseBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CameraInstance\CameraInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\KeyboardInstance\KeyboardInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshGenerators\MeshGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshGenerators\GenericMeshGenerators\CircleGenerator\CircleGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshGenerators\GenericMeshGenerators\ConeGenerator\ConeGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshGenerators\GenericMeshGenerators\CylinderGenerator\CylinderGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshGenerators\GenericMeshGenerators\EllipseGenerator\EllipseGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshGenerators\GenericMeshGenerators\IcosahedronGenerator\IcosahedronGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshGenerators\GenericMeshGenerators\IcosphereGenerator\IcosphereGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshGenerators\GenericMeshGenerators\ParallelepipedGenerator\ParallelepipedGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshGenerators\GenericMeshGenerators\RectangleGenerator\RectangleGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshGenerators\GenericMeshGenerators\TorusGenerator\TorusGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshGenerators\GenericMeshGenerators\UvSphereGenerator\UvSphereGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshInstance\MeshInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MouseInstance\MouseInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextureLoader\TextureLoaderSTB\TextureLoaderSTB.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextureLoader\TextureLoaderCV\TextureLoaderCV.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ViewportInstance\ViewportInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\glad\src\glad.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui\src\imgui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui\src\imgui_draw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui\src\imgui_impl_glfw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui\src\imgui_impl_opengl3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui\src\imgui_tables.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui\src\imgui_widgets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArgParseMeshGeneratorCreator\CircleMeshGeneratorCreator\CircleMeshGeneratorCreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArgParseMeshGeneratorCreator\CylinderMeshGeneratorCreator\CylinderMeshGeneratorCreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArgParseMeshGeneratorCreator\EllipseMeshGeneratorCreator\EllipseMeshGeneratorCreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArgParseMeshGeneratorCreator\IcosahedronMeshGeneratorCreator\IcosahedronMeshGeneratorCreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArgParseMeshGeneratorCreator\IcosphereMeshGeneratorCreator\IcosphereMeshGeneratorCreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArgParseMeshGeneratorCreator\ParallelepipedMeshGeneratorCreator\ParallelepipedMeshGeneratorCreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArgParseMeshGeneratorCreator\RectangleMeshGeneratorCreator\RectangleMeshGeneratorCreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArgParseMeshGeneratorCreator\TorusMeshGeneratorCreator\TorusMeshGeneratorCreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArgParseMeshGeneratorCreator\UvSphereMeshGeneratorCreator\UvSphereMeshGeneratorCreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshGeneratorFactory\GenericMeshGeneratorFactory\GenericMeshGeneratorFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArgParseMeshGeneratorCreator\BaseArgParseMeshGeneratorCreator\BaseArgParseMeshGeneratorCreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshInstance\MaterialMeshInstance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Window.hpp">
+    <ClInclude Include="src\WindowInstance\WindowInstance.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\VertexBufferObject.hpp">
+    <ClInclude Include="src\VertexBufferObject\VertexBufferObject.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\IndexBufferObject.hpp">
+    <ClInclude Include="src\IndexBufferObject\IndexBufferObject.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\VertexArrayObject.hpp">
+    <ClInclude Include="src\VertexArrayObject\VertexArrayObject.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\DataObject.hpp">
+    <ClInclude Include="src\BindableDataObject\BindableDataObject.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\DataObjectGuard.hpp">
+    <ClInclude Include="src\BindableDataObjectGuard\BindableDataObjectGuard.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\VertexBufferAttributes.hpp">
+    <ClInclude Include="src\VertexBufferAttributes\VertexBufferAttributes.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ShaderProgram.hpp">
+    <ClInclude Include="src\ShaderProgram\ShaderProgram.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer.hpp">
+    <ClInclude Include="src\RendererInstance\RendererInstance.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Texture.hpp">
+    <ClInclude Include="src\TextureInstance\TextureInstance.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Shader.hpp">
+    <ClInclude Include="src\ShaderInstance\ShaderInstance.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Utils.hpp">
+    <ClInclude Include="src\Utils\Utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\glad\glad.h">
+    <ClInclude Include="src\TextureLoader\ITextureLoader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\KHR\khrplatform.h">
+    <ClInclude Include="src\TextureLoader\TextureLoaderCV\TextureLoaderCV.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\stb\stb_image.h">
+    <ClInclude Include="src\TextureLoader\TextureLoaderSTB\TextureLoaderSTB.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\TextureLoader\ITextureLoader.hpp">
+    <ClInclude Include="src\ImguiWrapper\ImguiWrapper.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\TextureLoader\TextureLoaderCV.hpp">
+    <ClInclude Include="src\MeshGenerators\GenericMeshGenerators\ParallelepipedGenerator\ParallelepipedGenerator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\TextureLoader\TextureLoaderSTB.hpp">
+    <ClInclude Include="src\MeshGenerators\MeshGenerator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ImguiWrapper.hpp">
+    <ClInclude Include="src\MeshGenerators\GenericMeshGenerators\RectangleGenerator\RectangleGenerator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\MeshGenerators\ParallelepipedGenerator.hpp">
+    <ClInclude Include="src\MeshGenerators\GenericMeshGenerators\CircleGenerator\CircleGenerator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\MeshGenerators\MeshGenerator.hpp">
+    <ClInclude Include="src\MeshGenerators\GenericMeshGenerators\EllipseGenerator\EllipseGenerator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\MeshGenerators\RectangleGenerator.hpp">
+    <ClInclude Include="src\MeshGenerators\GenericMeshGenerators\UvSphereGenerator\UvSphereGenerator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\MeshGenerators\CircleGenerator.hpp">
+    <ClInclude Include="src\MeshGenerators\GenericMeshGenerators\IcosahedronGenerator\IcosahedronGenerator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\MeshGenerators\EllipseGenerator.hpp">
+    <ClInclude Include="src\MeshGenerators\GenericMeshGenerators\ConeGenerator\ConeGenerator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\MeshGenerators\UVSphereGenerator.hpp">
+    <ClInclude Include="src\CameraInstance\CameraInstance.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\MeshGenerators\IcosahedronGenerator.hpp">
+    <ClInclude Include="src\ViewportInstance\ViewportInstance.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\MeshGenerators\ConeGenerator.hpp">
+    <ClInclude Include="src\MouseInstance\MouseInstance.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Camera.hpp">
+    <ClInclude Include="src\Control\Control.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Viewport.hpp">
+    <ClInclude Include="src\KeyboardInstance\KeyboardInstance.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Mouse.hpp">
+    <ClInclude Include="src\ApplicationInstance\ApplicationInstance.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Control.hpp">
+    <ClInclude Include="src\MeshGenerators\GenericMeshGenerators\CylinderGenerator\CylinderGenerator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Keyboard.hpp">
+    <ClInclude Include="src\MeshGenerators\GenericMeshGenerators\TorusGenerator\TorusGenerator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Application.hpp">
+    <ClInclude Include="src\MeshGenerators\GenericMeshGenerators\IcosphereGenerator\IcosphereGenerator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\MeshGenerators\CylinderGenerator.hpp">
+    <ClInclude Include="src\LogLevel\LogLevel.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\MeshGenerators\TorusGenerator.hpp">
+    <ClInclude Include="src\ApplicationConfig\ApplicationConfig.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\MeshGenerators\IcosphereGenerator.hpp">
+    <ClInclude Include="src\ArgParseWrapper\ArgParseWrapper.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\imgui\imconfig.h">
+    <ClInclude Include="src\MeshInstance\MeshInstance.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\imgui\imgui.h">
+    <ClInclude Include="lib\glad\include\glad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\imgui\imgui_internal.h">
+    <ClInclude Include="lib\imgui\include\imconfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\imgui\imstb_rectpack.h">
+    <ClInclude Include="lib\imgui\include\imgui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\imgui\imstb_textedit.h">
+    <ClInclude Include="lib\imgui\include\imgui_impl_glfw.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\imgui\imstb_truetype.h">
+    <ClInclude Include="lib\imgui\include\imgui_impl_opengl3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\imgui\imgui_impl_glfw.h">
+    <ClInclude Include="lib\imgui\include\imgui_impl_opengl3_loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\imgui\imgui_impl_opengl3.h">
+    <ClInclude Include="lib\imgui\include\imgui_internal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\imgui\imgui_impl_opengl3_loader.h">
+    <ClInclude Include="lib\imgui\include\imstb_rectpack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\LogLevel.hpp">
+    <ClInclude Include="lib\imgui\include\imstb_textedit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ApplicationConfig.hpp">
+    <ClInclude Include="lib\imgui\include\imstb_truetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ArgParseWrapper.hpp">
+    <ClInclude Include="src\ArgParseBuilder\CircleMeshParseBuilder\CircleMeshParseBuilder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\CircleMeshParseBuilder.hpp">
+    <ClInclude Include="src\ArgParseBuilder\CylinderMeshParseBuilder\CylinderMeshParseBuilder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\CylinderMeshParseBuilder.hpp">
+    <ClInclude Include="src\ArgParseBuilder\EllipseMeshParseBuilder\EllipseMeshParseBuilder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\EllipseMeshParseBuilder.hpp">
+    <ClInclude Include="src\ArgParseBuilder\IcosahedronMeshParseBuilder\IcosahedronMeshParseBuilder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\IcosahedronMeshParseBuilder.hpp">
+    <ClInclude Include="src\ArgParseBuilder\IcosphereMeshParseBuilder\IcosphereMeshParseBuilder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\IcosphereMeshParseBuilder.hpp">
+    <ClInclude Include="src\ArgParseBuilder\MainParseBuilder\MainParseBuilder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ParallelepipedMeshParseBuilder.hpp">
+    <ClInclude Include="src\ArgParseBuilder\ParallelepipedMeshParseBuilder\ParallelepipedMeshParseBuilder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\RectangleMeshParseBuilder.hpp">
+    <ClInclude Include="src\ArgParseBuilder\RectangleMeshParseBuilder\RectangleMeshParseBuilder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\TorusMeshParseBuilder.hpp">
+    <ClInclude Include="src\ArgParseBuilder\TorusMeshParseBuilder\TorusMeshParseBuilder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\UvSphereMeshParseBuilder.hpp">
+    <ClInclude Include="src\ArgParseBuilder\UvSphereMeshParseBuilder\UvSphereMeshParseBuilder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\MainParseBuilder.hpp">
+    <ClInclude Include="src\ArgParseBuilder\BaseMeshParserBuilder\BaseMeshParseBuilder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ArgParseMeshGeneratorCreator\CircleMeshGeneratorCreator\CircleMeshGeneratorCreator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ArgParseMeshGeneratorCreator\IArgParseMeshGeneratorCreator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ArgParseMeshGeneratorCreator\CylinderMeshGeneratorCreator\CylinderMeshGeneratorCreator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ArgParseMeshGeneratorCreator\EllipseMeshGeneratorCreator\EllipseMeshGeneratorCreator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ArgParseMeshGeneratorCreator\IcosahedronMeshGeneratorCreator\IcosahedronMeshGeneratorCreator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ArgParseMeshGeneratorCreator\IcosphereMeshGeneratorCreator\IcosphereMeshGeneratorCreator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ArgParseMeshGeneratorCreator\ParallelepipedMeshGeneratorCreator\ParallelepipedMeshGeneratorCreator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ArgParseMeshGeneratorCreator\RectangleMeshGeneratorCreator\RectangleMeshGeneratorCreator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ArgParseMeshGeneratorCreator\TorusMeshGeneratorCreator\TorusMeshGeneratorCreator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ArgParseMeshGeneratorCreator\UvSphereMeshGeneratorCreator\UvSphereMeshGeneratorCreator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MeshGeneratorFactory\IMeshGeneratorFactory.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MeshGeneratorFactory\GenericMeshGeneratorFactory\GenericMeshGeneratorFactory.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ArgParseMeshGeneratorCreator\BaseArgParseMeshGeneratorCreator\BaseArgParseMeshGeneratorCreator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MaterialInstance\MaterialInstance.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MeshGenerators\IMeshGenerator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MeshInstance\MaterialMeshInstance.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MeshInstance\IMeshInstance.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -269,7 +443,6 @@
     <None Include="shaders\RedBlueGreen.frag" />
     <None Include="shaders\RedShader.frag" />
     <None Include="shaders\BasicShader.geom" />
-    <None Include="imgui.ini" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\textures\paper-sheet.png">
