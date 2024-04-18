@@ -207,6 +207,12 @@
     <ClCompile Include="src\MeshInstance\MaterialMeshInstance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\MeshGenerators\MaterialMeshGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshGeneratorFactory\MaterialMeshGeneratorFactory\MaterialMeshGeneratorFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\WindowInstance\WindowInstance.hpp">
@@ -432,6 +438,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\MeshInstance\IMeshInstance.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MeshGeneratorFactory\MaterialMeshGeneratorFactory\MaterialMeshGeneratorFactory.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MeshGenerators\MaterialMeshGenerator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

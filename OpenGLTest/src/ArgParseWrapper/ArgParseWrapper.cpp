@@ -27,6 +27,7 @@
 #include "ArgParseMeshGeneratorCreator/UvSphereMeshGeneratorCreator/UvSphereMeshGeneratorCreator.hpp"
 
 #include "MeshGeneratorFactory/GenericMeshGeneratorFactory/GenericMeshGeneratorFactory.hpp"
+#include "MeshGeneratorFactory/MaterialMeshGeneratorFactory/MaterialMeshGeneratorFactory.hpp"
 
 const std::vector<std::string> ArgParseWrapper::COMMAND_ARRAY = {
     ArgParseWrapper::CIRCLE_COMMAND,
@@ -103,7 +104,7 @@ ApplicationConfig ArgParseWrapper::GetAppConfig() const {
         .VIEWPORT_FOV          = this->argumentParser_->get<float>(ArgParseWrapper::SHORT_VIEWPORT_FOV_ARGUMENT),
         .VIEWPORT_NEAR_Z       = this->argumentParser_->get<float>(ArgParseWrapper::SHORT_VIEWPORT_NEAR_Z_ARGUMENT),
         .VIEWPORT_FAR_Z        = this->argumentParser_->get<float>(ArgParseWrapper::SHORT_VIEWPORT_FAR_Z_ARGUMENT),
-        .MESH_FACTORY          = std::make_shared<GenericMeshGeneratorFactory>(),
+        .MESH_FACTORY          = std::make_shared<MaterialMeshGeneratorFactory>(MaterialInstance{}),
         .MESH_GENERATOR        = nullptr
     };
 

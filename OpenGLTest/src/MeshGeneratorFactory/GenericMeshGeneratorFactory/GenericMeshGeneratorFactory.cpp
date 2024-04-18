@@ -10,47 +10,47 @@
 #include "MeshGenerators/GenericMeshGenerators/TorusGenerator/TorusGenerator.hpp"
 #include "MeshGenerators/GenericMeshGenerators/UvSphereGenerator/UvSphereGenerator.hpp"
 
-std::unique_ptr<MeshGenerator> GenericMeshGeneratorFactory::GenerateUniqueCircleGenerator(
+std::unique_ptr<IMeshGenerator> GenericMeshGeneratorFactory::GenerateUniqueCircleGenerator(
     float radius, int segments, const glm::vec3& origin, const glm::vec3& color) {
     return std::make_unique<CircleGenerator>(radius, segments, origin, color);
 }
 
-std::unique_ptr<MeshGenerator> GenericMeshGeneratorFactory::GenerateUniqueCylinderGenerator(
+std::unique_ptr<IMeshGenerator> GenericMeshGeneratorFactory::GenerateUniqueCylinderGenerator(
     float height, float radius, int segments, int slices, const glm::vec3& circleOrigin, const glm::vec3& color) {
     return std::make_unique<CylinderGenerator>(height, radius, segments, slices, circleOrigin, color);
 }
 
-std::unique_ptr<MeshGenerator> GenericMeshGeneratorFactory::GenerateUniqueEllipseGenerator(
+std::unique_ptr<IMeshGenerator> GenericMeshGeneratorFactory::GenerateUniqueEllipseGenerator(
     float a, float b, int segments, const glm::vec3& origin, const glm::vec3& color) {
     return std::make_unique<EllipseGenerator>(a, b, segments, origin, color);
 }
 
-std::unique_ptr<MeshGenerator> GenericMeshGeneratorFactory::GenerateUniqueIcosahedronGenerator(
+std::unique_ptr<IMeshGenerator> GenericMeshGeneratorFactory::GenerateUniqueIcosahedronGenerator(
     float radius, const glm::vec3& origin, const glm::vec3& color) {
     return std::make_unique<IcosahedronGenerator>(radius, origin, color);
 }
 
-std::unique_ptr<MeshGenerator> GenericMeshGeneratorFactory::GenerateUniqueIcosphereGenerator(
+std::unique_ptr<IMeshGenerator> GenericMeshGeneratorFactory::GenerateUniqueIcosphereGenerator(
     float radius, int iterations, const glm::vec3& origin, const glm::vec3& colors) {
     return std::make_unique<IcosphereGenerator>(radius, iterations, origin, colors);
 }
 
-std::unique_ptr<MeshGenerator> GenericMeshGeneratorFactory::GenerateUniqueParallelipedGenerator(
+std::unique_ptr<IMeshGenerator> GenericMeshGeneratorFactory::GenerateUniqueParallelipedGenerator(
     float height, float width, float depth, const glm::vec3& origin, const glm::vec3& color) {
     return std::make_unique<ParallelepipedGenerator>(height, width, depth, origin, color);
 }
 
-std::unique_ptr<MeshGenerator> GenericMeshGeneratorFactory::GenerateUniqueRectangleGenerator(
+std::unique_ptr<IMeshGenerator> GenericMeshGeneratorFactory::GenerateUniqueRectangleGenerator(
     float height, float width, const glm::vec3& origin, const glm::vec3& color) {
     return std::make_unique<RectangleGenerator>(height, width, origin, color);
 }
 
-std::unique_ptr<MeshGenerator> GenericMeshGeneratorFactory::GenerateUniqueTorusGenerator(
+std::unique_ptr<IMeshGenerator> GenericMeshGeneratorFactory::GenerateUniqueTorusGenerator(
     float innerRadius, float outerRadius, int divSlices, int divLoops, const glm::vec3& origin, const glm::vec3& color) {
     return std::make_unique<TorusGenerator>(innerRadius, outerRadius, divSlices, divLoops, origin, color);
 }
 
-std::unique_ptr<MeshGenerator> GenericMeshGeneratorFactory::GenerateUniqueUvSphereGenerator(
+std::unique_ptr<IMeshGenerator> GenericMeshGeneratorFactory::GenerateUniqueUvSphereGenerator(
     float radius, int slices, int stacks, const glm::vec3& origin, const glm::vec3& color) {
     return std::make_unique<UVSphereGenerator>(radius, slices, stacks, origin, color);
 }

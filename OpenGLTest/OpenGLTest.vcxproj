@@ -167,12 +167,14 @@ if exist "$(ProjectDir)imgui.ini" (copy /Y "$(ProjectDir)imgui.ini" "$(TargetDir
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\IndexBufferObject\IndexBufferObject.cpp" />
     <ClCompile Include="src\MeshGeneratorFactory\GenericMeshGeneratorFactory\GenericMeshGeneratorFactory.cpp" />
+    <ClCompile Include="src\MeshGeneratorFactory\MaterialMeshGeneratorFactory\MaterialMeshGeneratorFactory.cpp" />
     <ClCompile Include="src\MeshGenerators\GenericMeshGenerators\CircleGenerator\CircleGenerator.cpp" />
     <ClCompile Include="src\MeshGenerators\GenericMeshGenerators\ConeGenerator\ConeGenerator.cpp" />
     <ClCompile Include="src\MeshGenerators\GenericMeshGenerators\CylinderGenerator\CylinderGenerator.cpp" />
     <ClCompile Include="src\MeshGenerators\GenericMeshGenerators\EllipseGenerator\EllipseGenerator.cpp" />
     <ClCompile Include="src\MeshGenerators\GenericMeshGenerators\IcosahedronGenerator\IcosahedronGenerator.cpp" />
     <ClCompile Include="src\MeshGenerators\GenericMeshGenerators\IcosphereGenerator\IcosphereGenerator.cpp" />
+    <ClCompile Include="src\MeshGenerators\MaterialMeshGenerator.cpp" />
     <ClCompile Include="src\MeshGenerators\MeshGenerator.cpp" />
     <ClCompile Include="src\MeshGenerators\GenericMeshGenerators\ParallelepipedGenerator\ParallelepipedGenerator.cpp" />
     <ClCompile Include="src\MeshGenerators\GenericMeshGenerators\RectangleGenerator\RectangleGenerator.cpp" />
@@ -238,6 +240,7 @@ if exist "$(ProjectDir)imgui.ini" (copy /Y "$(ProjectDir)imgui.ini" "$(TargetDir
     <ClInclude Include="src\MaterialInstance\MaterialInstance.hpp" />
     <ClInclude Include="src\MeshGeneratorFactory\GenericMeshGeneratorFactory\GenericMeshGeneratorFactory.hpp" />
     <ClInclude Include="src\MeshGeneratorFactory\IMeshGeneratorFactory.hpp" />
+    <ClInclude Include="src\MeshGeneratorFactory\MaterialMeshGeneratorFactory\MaterialMeshGeneratorFactory.hpp" />
     <ClInclude Include="src\MeshGenerators\GenericMeshGenerators\CircleGenerator\CircleGenerator.hpp" />
     <ClInclude Include="src\MeshGenerators\GenericMeshGenerators\ConeGenerator\ConeGenerator.hpp" />
     <ClInclude Include="src\MeshGenerators\GenericMeshGenerators\CylinderGenerator\CylinderGenerator.hpp" />
@@ -245,6 +248,7 @@ if exist "$(ProjectDir)imgui.ini" (copy /Y "$(ProjectDir)imgui.ini" "$(TargetDir
     <ClInclude Include="src\MeshGenerators\GenericMeshGenerators\IcosahedronGenerator\IcosahedronGenerator.hpp" />
     <ClInclude Include="src\MeshGenerators\GenericMeshGenerators\IcosphereGenerator\IcosphereGenerator.hpp" />
     <ClInclude Include="src\MeshGenerators\IMeshGenerator.hpp" />
+    <ClInclude Include="src\MeshGenerators\MaterialMeshGenerator.hpp" />
     <ClInclude Include="src\MeshGenerators\MeshGenerator.hpp" />
     <ClInclude Include="src\MeshGenerators\GenericMeshGenerators\RectangleGenerator\RectangleGenerator.hpp" />
     <ClInclude Include="src\MeshGenerators\GenericMeshGenerators\TorusGenerator\TorusGenerator.hpp" />
