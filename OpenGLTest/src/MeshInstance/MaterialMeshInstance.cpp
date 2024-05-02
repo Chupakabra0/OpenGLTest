@@ -1,5 +1,7 @@
 #include "MeshInstance/MaterialMeshInstance.hpp"
 
+#include "MaterialInstance/MaterialInstance.h"
+
 MaterialMeshInstance::MaterialMeshInstance(const std::shared_ptr<IMeshInstance>& mesh, const MaterialInstance& material)
     : meshInstance_(mesh) {
     if (this->meshInstance_ == nullptr) {
@@ -68,21 +70,21 @@ VertexArrayObject MaterialMeshInstance::GenerateVAO(IndexBufferObject* ibo) cons
     };
 
     VertexBufferAttributes diffuseAttribute {
-        vertexSize, static_cast<unsigned>(this->diffuseMaterial_.size()), ValueType::FLOAT, Normalize::NOT_NORMALIZE, VertexBufferAttributesType::AMBIENT
+        vertexSize, static_cast<unsigned>(this->diffuseMaterial_.size()), ValueType::FLOAT, Normalize::NOT_NORMALIZE, VertexBufferAttributesType::DIFFUSE
     };
 
     VertexBufferAttributes specularAttribute {
-        vertexSize, static_cast<unsigned>(this->specularMaterial_.size()), ValueType::FLOAT, Normalize::NOT_NORMALIZE, VertexBufferAttributesType::AMBIENT
+        vertexSize, static_cast<unsigned>(this->specularMaterial_.size()), ValueType::FLOAT, Normalize::NOT_NORMALIZE, VertexBufferAttributesType::SPECULAR
     };
 
     VertexBufferAttributes shininessAttribute {
-        1, static_cast<unsigned>(this->specularMaterial_.size()), ValueType::FLOAT, Normalize::NOT_NORMALIZE, VertexBufferAttributesType::AMBIENT
+        1, static_cast<unsigned>(this->specularMaterial_.size()), ValueType::FLOAT, Normalize::NOT_NORMALIZE, VertexBufferAttributesType::SHININESS
     };
 
     vao.AddBuffer(this->ambientMaterial_, ambientAttribute);
     vao.AddBuffer(this->diffuseMaterial_, diffuseAttribute);
     vao.AddBuffer(this->specularMaterial_, specularAttribute);
-    vao.AddBuffer(this->specularMaterial_, shininessAttribute);
+    vao.AddBuffer(this->shininessMaterial_, shininessAttribute);
 
     return vao;
 }

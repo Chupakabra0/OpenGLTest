@@ -1,13 +1,15 @@
-#include "ImguiWrapper.hpp"
+#include "ImguiWrapper/ImguiWrapper.hpp"
+#include "BindableDataObjectGuard/BindableDataObjectGuard.hpp"
+
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 #include <fstream>
 #include <regex>
 #include <filesystem>
 
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
-
-ImguiWrapper::ImguiWrapper(WindowInstance& window) {
+ImguiWrapper::ImguiWrapper(WindowInstance& window, const std::string& title, float x, float y, float xPivot, float yPivot)
+    : title_(title), x_(x), y_(y), xPivot_(xPivot), yPivot_(yPivot) {
     this->ConstructorHelper_(window);
 }
 
@@ -16,8 +18,10 @@ void ImguiWrapper::ConstructorHelper_(WindowInstance& window) {
         throw std::runtime_error("Imgui context creation error");
     }
 
-    this->io_ = &ImGui::GetIO();
+    this->io_ = UniqueImguiIo(&ImGui::GetIO());
     this->io_->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    this->io_->IniFilename = nullptr;
+    //this->io_->ConfigDragClickToInputText |= ImGuiSliderFlags_AlwaysClamp;
 
     ImGui::StyleColorsDark();
 
@@ -31,11 +35,6 @@ void ImguiWrapper::DestroyHelper_() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-}
-
-ImguiWrapper& ImguiWrapper::GetInstance(WindowInstance& window) {
-    static ImguiWrapper imgui{ window };
-    return imgui;
 }
 
 ImguiWrapper::~ImguiWrapper() {
@@ -65,8 +64,34 @@ void ImguiWrapper::Unbind() {
     BindableDataObject::Unbind();
 }
 
-ImGuiIO* ImguiWrapper::GetIO() const {
-    return this->io_;
+const ImGuiIO* ImguiWrapper::GetIO() const {
+    return this->io_.get();
+}
+
+ImGuiIO* ImguiWrapper::GetIO() {
+    return this->io_.get();
+}
+
+void ImguiWrapper::DrawAll() {
+    BindableDataObjectGuard guard{*this};
+
+    this->BeginDrawingWindow_();
+
+    for (const auto& element : this->elements_) {
+        element->Draw();
+    }
+
+    this->EndDrawingWindow_();
+}
+
+void ImguiWrapper::AddElement(const std::string& name, const std::shared_ptr<IImguiElement>& uiElement) {
+    //if (this->indexMap_.contains(name)) {
+    //    *this->indexMap_.at(name) = uiElement;
+    //}
+    //else {
+        this->elements_.emplace_back(uiElement);
+    //    this->indexMap_.emplace(name, this->elements_.rbegin().base());
+    //}
 }
 
 void ImguiWrapper::CorrectImguiIni_() {
@@ -96,7 +121,7 @@ void ImguiWrapper::CorrectImguiIni_() {
             isCollapsedWritten = true;
         }
         else if (std::regex_match(str, sizeRegex)) {
-            str = "Size=400,250";
+            str = "Size=450,500";
         }
 
         out << str << '\n';
@@ -113,4 +138,13 @@ void ImguiWrapper::CorrectImguiIni_() {
 
     std::filesystem::remove(ioFilename);
     std::filesystem::rename(tempFilename, ioFilename);
+}
+
+void ImguiWrapper::BeginDrawingWindow_() {
+    ImGui::SetNextWindowPos(ImVec2(this->x_, this->y_), ImGuiCond_Appearing, ImVec2(this->xPivot_, this->yPivot_));
+    ImGui::Begin(this->title_.c_str());
+}
+
+void ImguiWrapper::EndDrawingWindow_() {
+    ImGui::End();
 }

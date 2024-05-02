@@ -13,7 +13,10 @@ class CameraInstance {
 public:
     CameraInstance() = delete;
 
-    explicit CameraInstance(const glm::vec3& origin, const glm::vec3& target, const glm::vec3& x, const glm::vec3& y, const glm::vec3 z);
+    explicit CameraInstance(
+        const glm::vec3& origin, const glm::vec3& target,
+        const glm::vec3& x, const glm::vec3& y, const glm::vec3& z
+    );
 
     CameraInstance(const CameraInstance&) = default;
 

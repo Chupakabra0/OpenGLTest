@@ -42,7 +42,7 @@ const std::vector<std::string> ArgParseWrapper::COMMAND_ARRAY = {
 };
 
 const std::string ArgParseWrapper::DEFAULT_WINDOW_NAME_VALUE                  = "Test OpenGL";
-const std::vector<float> ArgParseWrapper::DEFAULT_CAMERA_POSITION_VALUE       = std::vector{0.0f, 0.0f, 500.0f};
+const std::vector<float> ArgParseWrapper::DEFAULT_CAMERA_POSITION_VALUE       = std::vector{0.0f, 0.0f, 5.0f};
 const std::vector<float> ArgParseWrapper::DEFAULT_CAMERA_TARET_VALUE          = std::vector{0.0f, 0.0f, 0.0f};
 const std::vector<float> ArgParseWrapper::DEFAULT_CAMERA_AXIS_X_VALUE         = std::vector{1.0f, 0.0f, 0.0f};
 const std::vector<float> ArgParseWrapper::DEFAULT_CAMERA_AXIS_Y_VALUE         = std::vector{0.0f, 1.0f, 0.0f};
@@ -104,9 +104,24 @@ ApplicationConfig ArgParseWrapper::GetAppConfig() const {
         .VIEWPORT_FOV          = this->argumentParser_->get<float>(ArgParseWrapper::SHORT_VIEWPORT_FOV_ARGUMENT),
         .VIEWPORT_NEAR_Z       = this->argumentParser_->get<float>(ArgParseWrapper::SHORT_VIEWPORT_NEAR_Z_ARGUMENT),
         .VIEWPORT_FAR_Z        = this->argumentParser_->get<float>(ArgParseWrapper::SHORT_VIEWPORT_FAR_Z_ARGUMENT),
-        .MESH_FACTORY          = std::make_shared<MaterialMeshGeneratorFactory>(MaterialInstance{}),
-        .MESH_GENERATOR        = nullptr
+        //.MATERIAL_AMBIENT      = glm::vec3(0.0f, 0.0f, 0.0f),
+        //.MATERIAL_DIFFUSE      = glm::vec3(0.0f, 0.0f, 0.0f),
+        //.MATERIAL_SPECULAR     = glm::vec3(0.0f, 0.0f, 0.0f),
+        //.MATERIAL_SHININESS    = 0.0f,
+        //.LIGHT_POSITION        = glm::vec3(0.0f, 0.0f, 0.0f),
+        //.LIGHT_AMBIENT         = glm::vec3(0.0f, 0.0f, 0.0f),
+        //.LIGHT_DIFFUSE         = glm::vec3(0.0f, 0.0f, 0.0f),
+        //.LIGHT_SPECULAR        = glm::vec3(0.0f, 0.0f, 0.0f)
     };
+
+    config.MESH_FACTORY   = std::make_shared<MaterialMeshGeneratorFactory>(
+        MaterialInstance {
+            .ambient   = config.MATERIAL_AMBIENT,
+            .diffuse   = config.MATERIAL_DIFFUSE,
+            .specular  = config.MATERIAL_SPECULAR,
+            .shininess = config.MATERIAL_SHININESS
+        }
+    );
 
     config.MESH_GENERATOR = this->GetMeshGenerator_(config.MESH_FACTORY);
 

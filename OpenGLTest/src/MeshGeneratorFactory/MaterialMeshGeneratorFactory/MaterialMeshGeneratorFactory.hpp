@@ -1,6 +1,6 @@
 #pragma once
-#include "MaterialInstance/MaterialInstance.hpp"
 #include "MeshGeneratorFactory/GenericMeshGeneratorFactory/GenericMeshGeneratorFactory.hpp"
+#include "MaterialInstance/MaterialInstance.h"
 
 class MaterialMeshGeneratorFactory : public IMeshGeneratorFactory {
 public:

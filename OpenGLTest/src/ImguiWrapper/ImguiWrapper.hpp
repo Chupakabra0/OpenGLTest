@@ -1,12 +1,15 @@
 #pragma once
 #include "BindableDataObject/BindableDataObject.hpp"
 #include "WindowInstance/WindowInstance.hpp"
+#include "ImguiWrapper/IImguiElement.hpp"
 
 #include <imgui.h>
 
+using UniqueImguiIo = std::unique_ptr<ImGuiIO, decltype([](ImGuiIO*) {})>;
+
 class ImguiWrapper : public BindableDataObject {
 public:
-    ImguiWrapper() = delete;
+    explicit ImguiWrapper(WindowInstance& window, const std::string& title, float x, float y, float xPivot = 0.0f, float yPivot = 0.0f);
 
     ImguiWrapper(const ImguiWrapper&) = delete;
 
@@ -16,24 +19,36 @@ public:
 
     ImguiWrapper& operator=(ImguiWrapper&&) noexcept = default;
 
-    static ImguiWrapper& GetInstance(WindowInstance& window);
-
     ~ImguiWrapper() override;
 
     void Bind() override;
 
     void Unbind() override;
 
-    ImGuiIO* GetIO() const;
+    const ImGuiIO* GetIO() const;
+
+    ImGuiIO* GetIO();
+
+    void DrawAll();
+
+    void AddElement(const std::string& name, const std::shared_ptr<IImguiElement>& uiElement);
 
 private:
-    ImGuiIO* io_;
-
-    explicit ImguiWrapper(WindowInstance& window);
+    std::vector<std::shared_ptr<IImguiElement>> elements_{};
+    std::string title_{};
+    UniqueImguiIo io_{};
+    float x_{};
+    float y_{};
+    float xPivot_{};
+    float yPivot_{};
 
     void ConstructorHelper_(WindowInstance& window);
 
     void DestroyHelper_();
 
     void CorrectImguiIni_();
+
+    void BeginDrawingWindow_();
+
+    void EndDrawingWindow_();
 };

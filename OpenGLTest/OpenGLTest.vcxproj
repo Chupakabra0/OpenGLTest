@@ -74,11 +74,13 @@
       <Command>mkdir "$(TargetDir)shaders"
 mkdir "$(TargetDir)resources\textures"
 copy /Y "$(ProjectDir)shaders\BasicShader.frag" "$(TargetDir)shaders\BasicShader.frag"
+copy /Y "$(ProjectDir)shaders\PhongLightingShader.frag" "$(TargetDir)shaders\PhongLightingShader.frag"
 copy /Y "$(ProjectDir)shaders\MagicShader.frag" "$(TargetDir)shaders\MagicShader.frag"
 copy /Y "$(ProjectDir)shaders\NormalVisualization.frag" "$(TargetDir)shaders\NormalVisualization.frag"
 copy /Y "$(ProjectDir)shaders\RedBlueGreen.frag" "$(TargetDir)shaders\RedBlueGreen.frag"
 copy /Y "$(ProjectDir)shaders\RedShader.frag" "$(TargetDir)shaders\RedShader.frag"
 copy /Y "$(ProjectDir)shaders\BasicShader.vert" "$(TargetDir)shaders\BasicShader.vert"
+copy /Y "$(ProjectDir)shaders\PhongLightingShader.vert" "$(TargetDir)shaders\PhongLightingShader.vert"
 copy /Y "$(ProjectDir)shaders\BasicShader.geom" "$(TargetDir)shaders\BasicShader.geom"
 copy /Y "$(ProjectDir)resources\textures\paper-sheet.png" "$(TargetDir)resources\textures\paper-sheet.png"
 if exist "$(ProjectDir)imgui.ini" (copy /Y "$(ProjectDir)imgui.ini" "$(TargetDir)imgui.ini")</Command>
@@ -112,11 +114,13 @@ if exist "$(ProjectDir)imgui.ini" (copy /Y "$(ProjectDir)imgui.ini" "$(TargetDir
       <Command>mkdir "$(TargetDir)shaders"
 mkdir "$(TargetDir)resources\textures"
 copy /Y "$(ProjectDir)shaders\BasicShader.frag" "$(TargetDir)shaders\BasicShader.frag"
+copy /Y "$(ProjectDir)shaders\PhongLightingShader.frag" "$(TargetDir)shaders\PhongLightingShader.frag"
 copy /Y "$(ProjectDir)shaders\MagicShader.frag" "$(TargetDir)shaders\MagicShader.frag"
 copy /Y "$(ProjectDir)shaders\NormalVisualization.frag" "$(TargetDir)shaders\NormalVisualization.frag"
 copy /Y "$(ProjectDir)shaders\RedBlueGreen.frag" "$(TargetDir)shaders\RedBlueGreen.frag"
 copy /Y "$(ProjectDir)shaders\RedShader.frag" "$(TargetDir)shaders\RedShader.frag"
 copy /Y "$(ProjectDir)shaders\BasicShader.vert" "$(TargetDir)shaders\BasicShader.vert"
+copy /Y "$(ProjectDir)shaders\PhongLightingShader.vert" "$(TargetDir)shaders\PhongLightingShader.vert"
 copy /Y "$(ProjectDir)shaders\BasicShader.geom" "$(TargetDir)shaders\BasicShader.geom"
 copy /Y "$(ProjectDir)resources\textures\paper-sheet.png" "$(TargetDir)resources\textures\paper-sheet.png"
 if exist "$(ProjectDir)imgui.ini" (copy /Y "$(ProjectDir)imgui.ini" "$(TargetDir)imgui.ini")</Command>
@@ -160,10 +164,15 @@ if exist "$(ProjectDir)imgui.ini" (copy /Y "$(ProjectDir)imgui.ini" "$(TargetDir
     <ClCompile Include="src\ArgParseMeshGeneratorCreator\UvSphereMeshGeneratorCreator\UvSphereMeshGeneratorCreator.cpp" />
     <ClCompile Include="src\ArgParseWrapper\ArgParseWrapper.cpp" />
     <ClCompile Include="src\CameraInstance\CameraInstance.cpp" />
+    <ClCompile Include="src\ImguiWrapper\ImguiCheckBox\ImguiCheckBox.cpp" />
+    <ClCompile Include="src\ImguiWrapper\ImguiColorPicker\ImguiColorPicker.cpp" />
+    <ClCompile Include="src\ImguiWrapper\ImguiComboBox\ImguiComboBox.cpp" />
+    <ClCompile Include="src\ImguiWrapper\ImguiSameLine\ImguiSameLine.cpp" />
     <ClCompile Include="src\ImguiWrapper\ImguiWrapper.cpp" />
     <ClCompile Include="src\BindableDataObject\BindableDataObject.cpp" />
     <ClCompile Include="src\BindableDataObjectGuard\BindableDataObjectGuard.cpp" />
     <ClCompile Include="src\KeyboardInstance\KeyboardInstance.cpp" />
+    <ClCompile Include="src\LightInstance\LightInstance.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\IndexBufferObject\IndexBufferObject.cpp" />
     <ClCompile Include="src\MeshGeneratorFactory\GenericMeshGeneratorFactory\GenericMeshGeneratorFactory.cpp" />
@@ -231,13 +240,21 @@ if exist "$(ProjectDir)imgui.ini" (copy /Y "$(ProjectDir)imgui.ini" "$(TargetDir
     <ClInclude Include="src\ArgParseMeshGeneratorCreator\UvSphereMeshGeneratorCreator\UvSphereMeshGeneratorCreator.hpp" />
     <ClInclude Include="src\ArgParseWrapper\ArgParseWrapper.hpp" />
     <ClInclude Include="src\Control\Control.hpp" />
+    <ClInclude Include="src\ImguiWrapper\ImguiCheckBox\ImguiCheckBox.hpp" />
+    <ClInclude Include="src\ImguiWrapper\IImguiElement.hpp" />
+    <ClInclude Include="src\ImguiWrapper\ImguiColorPicker\ImguiColorPicker.hpp" />
+    <ClInclude Include="src\ImguiWrapper\ImguiComboBox\ImguiComboBox.hpp" />
+    <ClInclude Include="src\ImguiWrapper\ImguiSameLine\ImguiSameLine.hpp" />
+    <ClInclude Include="src\ImguiWrapper\ImguiSlider\ImguiSlider.hpp" />
+    <ClInclude Include="src\ImguiWrapper\ImguiTextBox\ImguiTextBox.hpp" />
     <ClInclude Include="src\ImguiWrapper\ImguiWrapper.hpp" />
     <ClInclude Include="src\BindableDataObject\BindableDataObject.hpp" />
     <ClInclude Include="src\BindableDataObjectGuard\BindableDataObjectGuard.hpp" />
     <ClInclude Include="src\KeyboardInstance\KeyboardInstance.hpp" />
+    <ClInclude Include="src\LightInstance\LightInstance.hpp" />
     <ClInclude Include="src\LogLevel\LogLevel.hpp" />
     <ClInclude Include="src\ArgParseMeshGeneratorCreator\BaseArgParseMeshGeneratorCreator\BaseArgParseMeshGeneratorCreator.hpp" />
-    <ClInclude Include="src\MaterialInstance\MaterialInstance.hpp" />
+    <ClInclude Include="src\MaterialInstance\MaterialInstance.h" />
     <ClInclude Include="src\MeshGeneratorFactory\GenericMeshGeneratorFactory\GenericMeshGeneratorFactory.hpp" />
     <ClInclude Include="src\MeshGeneratorFactory\IMeshGeneratorFactory.hpp" />
     <ClInclude Include="src\MeshGeneratorFactory\MaterialMeshGeneratorFactory\MaterialMeshGeneratorFactory.hpp" />
@@ -280,6 +297,8 @@ if exist "$(ProjectDir)imgui.ini" (copy /Y "$(ProjectDir)imgui.ini" "$(TargetDir
     <None Include="shaders\BasicShader.vert" />
     <None Include="shaders\MagicShader.frag" />
     <None Include="shaders\NormalVisualization.frag" />
+    <None Include="shaders\PhongLightingShader.frag" />
+    <None Include="shaders\PhongLightingShader.vert" />
     <None Include="shaders\RedBlueGreen.frag" />
     <None Include="shaders\RedShader.frag" />
   </ItemGroup>

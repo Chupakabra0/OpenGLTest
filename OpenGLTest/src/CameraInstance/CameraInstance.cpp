@@ -1,8 +1,9 @@
 #include "CameraInstance/CameraInstance.hpp"
 
 CameraInstance::CameraInstance(
-    const glm::vec3& origin, const glm::vec3& target, const glm::vec3& x,
-    const glm::vec3& y, const glm::vec3 z)
+    const glm::vec3& origin, const glm::vec3& target,
+    const glm::vec3& x, const glm::vec3& y, const glm::vec3& z
+)
     : x_(x), y_(y), z_(z), origin_(origin), target_(target) {
 
 }

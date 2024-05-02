@@ -22,6 +22,14 @@ public:
     float       VIEWPORT_FOV                            = 90.0f;
     float       VIEWPORT_NEAR_Z                         = 0.1f;
     float       VIEWPORT_FAR_Z                          = 1.0f;
+    glm::vec3   MATERIAL_AMBIENT                        = glm::vec3(0.25, 0.148, 0.06475);
+    glm::vec3   MATERIAL_DIFFUSE                        = glm::vec3(0.4, 0.2368, 0.1036);
+    glm::vec3   MATERIAL_SPECULAR                       = glm::vec3(0.774597, 0.458561, 0.200621);
+    //glm::vec3   MATERIAL_AMBIENT                           = glm::vec3(0.05375, 0.05, 0.06625);
+    //glm::vec3   MATERIAL_DIFFUSE                           = glm::vec3(0.18275, 0.17, 0.22525);
+    //glm::vec3   MATERIAL_SPECULAR                          = glm::vec3(0.332741, 0.328634, 0.346435);
+    float       MATERIAL_SHININESS                      = 25.6f;
+    //float       MATERIAL_SHININESS                      = 38.4f;
     std::shared_ptr<IMeshGeneratorFactory> MESH_FACTORY = nullptr;
     std::shared_ptr<IMeshGenerator> MESH_GENERATOR      = nullptr;
 };

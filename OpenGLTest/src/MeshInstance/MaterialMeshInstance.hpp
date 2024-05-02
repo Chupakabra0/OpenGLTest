@@ -1,10 +1,8 @@
 #pragma once
 #include "MeshInstance/IMeshInstance.hpp"
+#include "MaterialInstance/MaterialInstance.h"
 
 #include <memory>
-
-#include "MeshInstance.hpp"
-#include "MaterialInstance/MaterialInstance.hpp"
 
 class MaterialMeshInstance : public IMeshInstance {
 public:
@@ -49,6 +47,14 @@ public:
     const std::vector<glm::vec3>& GetVertexNormals() const override;
 
     const std::vector<glm::vec3>& GetTextCoords() const override;
+
+    const std::vector<float>& GetShininess() const {
+        return this->shininessMaterial_;
+    }
+
+    void SetShininess(float shininess) {
+        this->shininessMaterial_ = std::vector(this->shininessMaterial_.size(), shininess);
+    }
 
 private:
     std::vector<glm::vec3> ambientMaterial_{};

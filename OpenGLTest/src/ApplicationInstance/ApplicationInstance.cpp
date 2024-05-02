@@ -1,8 +1,17 @@
 #include "ApplicationInstance/ApplicationInstance.hpp"
 
+#include <ranges>
 #include <regex>
 
 #include <spdlog/spdlog.h>
+
+#include "ImguiWrapper/ImguiCheckBox/ImguiCheckBox.hpp"
+#include "ImguiWrapper/ImguiColorPicker/ImguiColorPicker.hpp"
+#include "ImguiWrapper/ImguiComboBox/ImguiComboBox.hpp"
+#include "ImguiWrapper/ImguiSameLine/ImguiSameLine.hpp"
+#include "ImguiWrapper/ImguiSlider/ImguiSlider.hpp"
+#include "ImguiWrapper/ImguiTextBox/ImguiTextBox.hpp"
+#include "MeshInstance/MaterialMeshInstance.hpp"
 
 ApplicationInstance::ApplicationInstance(const ApplicationConfig& applicationConfig) {
     SPDLOG_INFO("Mesh generator initialization started");
@@ -20,11 +29,6 @@ ApplicationInstance::ApplicationInstance(const ApplicationConfig& applicationCon
     this->InitRenderer_();
 
     SPDLOG_INFO("Renderer initialization ended");
-    SPDLOG_INFO("ImGUI context initialization started");
-
-    this->InitImgui_();
-
-    SPDLOG_INFO("ImGUI context initialization ended");
     SPDLOG_INFO("Camera initialization started");
 
     this->InitCamera_(
@@ -52,11 +56,20 @@ ApplicationInstance::ApplicationInstance(const ApplicationConfig& applicationCon
     this->InitShaders_();
 
     SPDLOG_INFO("Shaders initialization ended");
+
+    SPDLOG_INFO("Lighting initialization started");
+
+    this->InitLighting_();
+
+    SPDLOG_INFO("Lighting initialization ended");
+    SPDLOG_INFO("ImGUI context initialization started");
+
+    this->InitImgui_();
+
+    SPDLOG_INFO("ImGUI context initialization ended");
 }
 
 void ApplicationInstance::Run() {
-    const glm::vec4 backgroundColor = glm::vec4(125.0f, 0.0f, 255.0f, 255.0f);
-
     SPDLOG_INFO("Mesh generation started");
 
     std::shared_ptr<IMeshInstance> mesh = this->meshGenerator_->GenerateMesh();
@@ -71,32 +84,15 @@ void ApplicationInstance::Run() {
     SPDLOG_INFO("Render loop started");
 
     while (!this->window_->ShouldWindowClose()) {
-        const float timeInSeconds = static_cast<float>(glfwGetTime());
-        const int hours = static_cast<int>(timeInSeconds) / 3600;
-        const int minutes = (static_cast<int>(timeInSeconds) % 3600) / 60;
-        const int seconds = static_cast<int>(timeInSeconds) % 60;
-        const int milliseconds = static_cast<int>(timeInSeconds * 1000) % 1000;
+        this->UpdateTime_();
 
-        static ImVec4 clear_color{
-            backgroundColor.r / 255.0f,
-            backgroundColor.g / 255.0f,
-            backgroundColor.b / 255.0f,
-            backgroundColor.a / 255.0f
-        };
-        static float viewPos[]{
-            this->camera_->GetOrigin().x,
-            this->camera_->GetOrigin().y,
-            this->camera_->GetOrigin().z
-        };
-        static float viewRotate[]{ 0.0f, 0.0f, 0.0f };
-        static bool isFlatShading{};
-        static bool isDrawNormals{};
-
-        this->renderer_->ClearScreen(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+        this->renderer_->ClearScreen(this->backgroundColor_.r, this->backgroundColor_.g, this->backgroundColor_.b);
 
         const glm::mat4 modelMatrix = glm::identity<glm::mat4>();
         const glm::mat4 viewMatrix = this->camera_->CalcViewMatrix();
         const glm::mat4 projectionMatrix = this->viewport_->CalcPerspectiveMatrix();
+
+        this->fovRadians_ = this->viewport_->GetFieldOfView();
 
         this->shaderPrograms_[ApplicationInstance::NORMALS_SHADER_STR]->SetUniformMatrix("u_proj", projectionMatrix);
         this->shaderPrograms_[ApplicationInstance::NORMALS_SHADER_STR]->SetUniformMatrix("u_view", viewMatrix);
@@ -109,49 +105,22 @@ void ApplicationInstance::Run() {
         this->shaderPrograms_[this->selectedShaderKey_]->SetUniformMatrix("u_proj", projectionMatrix);
         this->shaderPrograms_[this->selectedShaderKey_]->SetUniformMatrix("u_view", viewMatrix);
         this->shaderPrograms_[this->selectedShaderKey_]->SetUniformMatrix("u_model", modelMatrix);
-        this->shaderPrograms_[this->selectedShaderKey_]->SetUniformInt("u_isFlat", isFlatShading);
-        this->shaderPrograms_[this->selectedShaderKey_]->SetUniformFloat("u_time", timeInSeconds);
+        this->shaderPrograms_[this->selectedShaderKey_]->SetUniformFloat("u_time", this->applicationTime_.totalTimeInSeconds);
+
+        this->shaderPrograms_[this->selectedShaderKey_]->SetUniformInt("u_is_flat", this->isFlatShading_);
+        this->shaderPrograms_[this->selectedShaderKey_]->SetUniformInt("u_is_phong_specular", this->isPhongSpecular_);
+        this->shaderPrograms_[this->selectedShaderKey_]->SetUniformVector("u_camera_position", this->camera_->GetOrigin());
+
+        this->UpdateDirectionalLight_();
+        this->UpdatePointLight_();
+        this->UpdateSpotLight_();
 
         this->renderer_->DrawIndecies(vao, *this->shaderPrograms_[this->selectedShaderKey_]);
-        if (isDrawNormals) {
+        if (this->isDrawNormals_) {
             this->renderer_->DrawIndecies(vao, *this->shaderPrograms_[ApplicationInstance::NORMALS_SHADER_STR]);
         }
 
-        this->imgui_->Bind();
-
-        const ImVec2 center{ ImGui::GetMainViewport()->GetCenter().x, 0.0f };
-        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
-        ImGui::Begin("Hello, world!");
-        ImGui::Text("Background color:");
-        ImGui::ColorEdit3("Clear color", reinterpret_cast<float*>(&clear_color));
-        ImGui::Text("Display settings:");
-        ImGui::Checkbox("Flat shading", &isFlatShading);
-        ImGui::SameLine();
-        ImGui::Checkbox("Draw normals", &isDrawNormals);
-        if (ImGui::BeginCombo("Shaders", this->selectedShaderKey_.c_str())) {
-            for (int i = 0; i < this->shaderKeys_.size(); ++i) {
-                const bool isSelected = (this->selectedShaderKey_ == this->shaderKeys_[i]);
-
-                if (ImGui::Selectable(this->shaderKeys_[i].c_str(), isSelected)) {
-                    this->selectedShaderKey_ = this->shaderKeys_[i];
-                }
-
-                if (isSelected) {
-                    ImGui::SetItemDefaultFocus();
-                }
-            }
-
-            ImGui::EndCombo();
-        }
-        ImGui::Text("Display info:");
-        ImGui::Text(std::format("Field of view: {:.2f} degrees", glm::degrees(this->viewport_->GetFieldOfView())).c_str());
-        ImGui::Text("Application data:");
-        ImGui::Text(std::format("Application average {:.0f} FPS", ImGui::GetIO().Framerate).c_str());
-        ImGui::Text(std::format("Application time: {:02d}:{:02d}:{:02d}:{:02d}", hours, minutes, seconds, milliseconds).c_str());
-        ImGui::End();
-
-        this->imgui_->Unbind();
+        this->imgui_->DrawAll();
 
         this->window_->PollEvents();
         this->window_->SwapBuffers();
@@ -177,7 +146,217 @@ void ApplicationInstance::InitRenderer_() {
 }
 
 void ApplicationInstance::InitImgui_() {
-    this->imgui_ = &ImguiWrapper::GetInstance(*this->window_);
+    this->imgui_ = std::make_unique<ImguiWrapper>(*this->window_, "OpenGL Test", 0.0, 0.0);
+
+    this->imgui_->AddElement("background_color_label", std::make_shared<ImguiTextBox<>>("Background color"));
+    this->imgui_->AddElement("background_color_picker", std::make_shared<ImguiColorPicker>("Clear color", this->backgroundColor_));
+
+    this->imgui_->AddElement("display_settings_label", std::make_shared<ImguiTextBox<>>("Display settings:"));
+    this->imgui_->AddElement("flat_shading_checkbox", std::make_shared<ImguiCheckBox>("Flat shading", this->isFlatShading_));
+    this->imgui_->AddElement("same_line_0", std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement("draw_normals_checkbox", std::make_shared<ImguiCheckBox>("Draw normals", this->isDrawNormals_));
+    this->imgui_->AddElement("same_line_1", std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement("phong_specular_checkbox", std::make_shared<ImguiCheckBox>("Phong specular", this->isPhongSpecular_));
+
+    this->imgui_->AddElement("directional_light_label", std::make_shared<ImguiTextBox<>>("Directional light:"));
+    this->imgui_->AddElement("directional_light_enable", std::make_shared<ImguiCheckBox>("Enable light 1", this->directionalLightParams_.isEnable));
+    this->imgui_->AddElement(
+        "directional_light_direction",
+        std::make_shared<ImguiSlider<glm::vec3>>(
+            "Direction",
+            this->directionalLightParams_.lightDirection, -1.0f, 1.0f
+        )
+    );
+    this->imgui_->AddElement(
+        "directional_light_ambient",
+        std::make_shared<ImguiColorPicker>("Ambient 1", this->directionalLightParams_.ambient)
+    );
+    this->imgui_->AddElement("same_line_2", std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement(
+        "directional_light_is_ambient", std::make_shared<ImguiCheckBox>("Ambient 1", this->directionalLightParams_.isAmbient)
+    );
+    this->imgui_->AddElement(
+        "directional_light_diffuse",
+        std::make_shared<ImguiColorPicker>("Diffuse 1", this->directionalLightParams_.diffuse)
+    );
+    this->imgui_->AddElement("same_line_3", std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement(
+        "directional_light_is_diffuse", std::make_shared<ImguiCheckBox>("Diffuse 1", this->directionalLightParams_.isDiffuse)
+    );
+    this->imgui_->AddElement(
+        "directional_light_specular",
+        std::make_shared<ImguiColorPicker>("Specular 1", this->directionalLightParams_.specular)
+    );
+    this->imgui_->AddElement("same_line_4", std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement(
+        "directional_light_is_specular", std::make_shared<ImguiCheckBox>("Specular 1", this->directionalLightParams_.isSpecular)
+    );
+    this->imgui_->AddElement("", std::make_shared<ImguiSlider<float>>("Ambient Intensity 1", this->directionalLightParams_.ambientIntensity, 0.0, 1.0));
+    this->imgui_->AddElement("", std::make_shared<ImguiSlider<float>>("Diffuse Intensity 1", this->directionalLightParams_.diffuseIntensity, 0.0, 1.0));
+    this->imgui_->AddElement("", std::make_shared<ImguiSlider<float>>("Specular Intensity 1", this->directionalLightParams_.specularIntensity, 0.0, 1.0));
+
+    this->imgui_->AddElement("point_light_label", std::make_shared<ImguiTextBox<>>("Point light:"));
+    this->imgui_->AddElement("point_light_enable", std::make_shared<ImguiCheckBox>("Enable light 2", this->pointLightParams_.isEnable));
+    this->imgui_->AddElement(
+        "point_light_position",
+        std::make_shared<ImguiSlider<glm::vec3>>(
+            "Position",
+            this->pointLightParams_.lightPosition, -10.0f, 10.0f
+        )
+    );
+    this->imgui_->AddElement(
+        "point_light_ambient",
+        std::make_shared<ImguiColorPicker>("Ambient 2", this->pointLightParams_.ambient)
+    );
+    this->imgui_->AddElement("same_line_5", std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement(
+        "point_light_is_ambient", std::make_shared<ImguiCheckBox>("Ambient 2", this->pointLightParams_.isAmbient)
+    );
+    this->imgui_->AddElement(
+        "point_light_diffuse",
+        std::make_shared<ImguiColorPicker>("Diffuse 2", this->pointLightParams_.diffuse)
+    );
+    this->imgui_->AddElement("same_line_6", std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement(
+        "point_light_is_diffuse", std::make_shared<ImguiCheckBox>("Diffuse 2", this->pointLightParams_.isDiffuse)
+    );
+    this->imgui_->AddElement(
+        "point_light_specular",
+        std::make_shared<ImguiColorPicker>("Specular 2", this->pointLightParams_.specular)
+    );
+    this->imgui_->AddElement("same_line_7", std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement(
+        "point_light_is_specular", std::make_shared<ImguiCheckBox>("Specular 2", this->pointLightParams_.isSpecular)
+    );
+    this->imgui_->AddElement(
+        "point_light_constant_attenuation",
+        std::make_shared<ImguiSlider<float>>("Constant attenuation 2", this->pointLightParams_.constantAttenuation, 0.0f, 1.0f)
+    );
+    this->imgui_->AddElement(
+        "point_light_linear_attenuation",
+        std::make_shared<ImguiSlider<float>>("Linear attenuation 2", this->pointLightParams_.linearAttenuation, 0.0f, 1.0f)
+    );
+    this->imgui_->AddElement(
+        "point_light_quadratic_attenuation",
+        std::make_shared<ImguiSlider<float>>("Quadratic attenuation 2", this->pointLightParams_.quadraticAttenuation, 0.0f, 1.0f)
+    );
+    this->imgui_->AddElement("", std::make_shared<ImguiSlider<float>>("Ambient Intensity 2", this->pointLightParams_.ambientIntensity, 0.0, 1.0));
+    this->imgui_->AddElement("", std::make_shared<ImguiSlider<float>>("Diffuse Intensity 2", this->pointLightParams_.diffuseIntensity, 0.0, 1.0));
+    this->imgui_->AddElement("", std::make_shared<ImguiSlider<float>>("Specular Intensity 2", this->pointLightParams_.specularIntensity, 0.0, 1.0));
+
+    this->imgui_->AddElement("spot_light_label", std::make_shared<ImguiTextBox<>>("Spot light:"));
+    this->imgui_->AddElement("spot_light_enable", std::make_shared<ImguiCheckBox>("Enable light 3", this->spotLightParams_.isEnable));
+    this->imgui_->AddElement(
+        "spot_light_position",
+        std::make_shared<ImguiSlider<glm::vec3>>(
+            "Position 3",
+            this->spotLightParams_.lightPosition, -10.0f, 10.0f
+        )
+    );
+    this->imgui_->AddElement(
+        "spot_light_direction",
+        std::make_shared<ImguiSlider<glm::vec3>>(
+            "Direction 3",
+            this->spotLightParams_.lightDirection, -1.0f, 1.0f
+        )
+    );
+    this->imgui_->AddElement(
+        "spot_light_ambient",
+        std::make_shared<ImguiColorPicker>("Ambient 3", this->spotLightParams_.ambient)
+    );
+    this->imgui_->AddElement("same_line_8", std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement(
+        "spot_light_is_ambient", std::make_shared<ImguiCheckBox>("Ambient 3", this->spotLightParams_.isAmbient)
+    );
+    this->imgui_->AddElement(
+        "spot_light_diffuse",
+        std::make_shared<ImguiColorPicker>("Diffuse 3", this->spotLightParams_.diffuse)
+    );
+    this->imgui_->AddElement("same_line_9", std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement(
+        "spot_light_is_diffuse", std::make_shared<ImguiCheckBox>("Diffuse 3", this->spotLightParams_.isDiffuse)
+    );
+    this->imgui_->AddElement(
+        "spot_light_specular",
+        std::make_shared<ImguiColorPicker>("Specular 3", this->spotLightParams_.specular)
+    );
+    this->imgui_->AddElement("same_line_10", std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement(
+        "spot_light_is_specular", std::make_shared<ImguiCheckBox>("Specular 3", this->spotLightParams_.isSpecular)
+    );
+    this->imgui_->AddElement(
+        "spot_light_constant_attenuation",
+        std::make_shared<ImguiSlider<float>>(
+            "Constant attenuation 3",
+            this->spotLightParams_.constantAttenuation, 0.0f, 1.0f
+        )
+    );
+    this->imgui_->AddElement(
+        "spot_light_linear_attenuation",
+        std::make_shared<ImguiSlider<float>>(
+            "Linear attenuation 3",
+            this->spotLightParams_.linearAttenuation, 0.0f, 1.0f
+        )
+    );
+    this->imgui_->AddElement(
+        "spot_light_quadratic_attenuation",
+        std::make_shared<ImguiSlider<float>>(
+            "Quadratic attenuation 3",
+            this->spotLightParams_.quadraticAttenuation, 0.0f, 1.0f
+        )
+    );
+    this->imgui_->AddElement(
+        "spot_light_inner_cutoff",
+        std::make_shared<ImguiSlider<float>>(
+            "Inner Cutoff 3",
+            this->spotLightParams_.innerCutoff, 0.0f, glm::pi<float>()
+        )
+    );
+    this->imgui_->AddElement(
+        "spot_light_outer_cutoff",
+        std::make_shared<ImguiSlider<float>>(
+            "Outer Cutoff 3",
+            this->spotLightParams_.outerCutoff, 0.0f, glm::pi<float>()
+        )
+    );
+    this->imgui_->AddElement(
+        "spot_light_exponent",
+        std::make_shared<ImguiSlider<float>>(
+            "Exponent 3",
+            this->spotLightParams_.exponent, 0.0f, 128.0f
+        )
+    );
+    this->imgui_->AddElement("", std::make_shared<ImguiSlider<float>>("Ambient Intensity 3", this->spotLightParams_.ambientIntensity, 0.0, 1.0));
+    this->imgui_->AddElement("", std::make_shared<ImguiSlider<float>>("Diffuse Intensity 3", this->spotLightParams_.diffuseIntensity, 0.0, 1.0));
+    this->imgui_->AddElement("", std::make_shared<ImguiSlider<float>>("Specular Intensity 3", this->spotLightParams_.specularIntensity, 0.0, 1.0));
+
+    this->imgui_->AddElement("shaders_combobox", std::make_shared<ImguiComboBox>("Shaders", this->selectedShaderKey_, this->shaderKeys_));
+
+    this->imgui_->AddElement("display_info_label", std::make_shared<ImguiTextBox<>>("Display info:"));
+    this->imgui_->AddElement(
+        "fov_info_label",
+        std::make_shared<ImguiTextBox<float&>>(
+            "Field of view: %.2f degrees",
+            std::ref(this->fovRadians_)
+        )
+    );
+    this->imgui_->AddElement(
+        "fps_info_label",
+        std::make_shared<ImguiTextBox<float&>>(
+            "Application average %.0f FPS",
+            std::ref(ImGui::GetIO().Framerate)
+        )
+    );
+    this->imgui_->AddElement(
+        "time_info_label",
+        std::make_shared<ImguiTextBox<size_t&, size_t&, size_t&, size_t&>>(
+            "Application time: %02d:%02d:%02d:%02d",
+            std::ref(this->applicationTime_.hours),
+            std::ref(this->applicationTime_.minutes),
+            std::ref(this->applicationTime_.seconds),
+            std::ref(this->applicationTime_.milliseconds)
+        )
+    );
 }
 
 void ApplicationInstance::InitCamera_(
@@ -421,7 +600,7 @@ void ApplicationInstance::InitLoopCallbacks_() {
             if (window.IsKeyPressed(KeyboardInstance::Key::W)) {
                 SPDLOG_DEBUG("Key W repeated");
 
-                const float speed = 1.0f;
+                const float speed = 0.01f;
 
                 this->camera_->MoveCamera(glm::vec3(0.0f, -speed, 0.0f));
                 SPDLOG_DEBUG("Camera origin moved ({}, {}, {})", 0.0f, -speed, 0.0f);
@@ -435,7 +614,7 @@ void ApplicationInstance::InitLoopCallbacks_() {
                 if (window.IsKeyPressed(KeyboardInstance::Key::S)) {
                     SPDLOG_DEBUG("Key S repeated");
 
-                    const float speed = 1.0f;
+                    const float speed = 0.01f;
 
                     this->camera_->MoveCamera(glm::vec3(0.0f, speed, 0.0f));
                     SPDLOG_DEBUG("Camera origin moved ({}, {}, {})", 0.0f, speed, 0.0f);
@@ -449,7 +628,7 @@ void ApplicationInstance::InitLoopCallbacks_() {
                     if (window.IsKeyPressed(KeyboardInstance::Key::D)) {
                         SPDLOG_DEBUG("Key D repeated");
 
-                        const float speed = 1.0f;
+                        const float speed = 0.01f;
 
                         this->camera_->MoveCamera(glm::vec3(-speed, 0.0f, 0.0f));
                         SPDLOG_DEBUG("Camera origin moved ({}, {}, {})", -speed, 0.0f, 0.0f);
@@ -463,7 +642,7 @@ void ApplicationInstance::InitLoopCallbacks_() {
                         if (window.IsKeyPressed(KeyboardInstance::Key::A)) {
                             SPDLOG_DEBUG("Key A repeated");
 
-                            const float speed = 1.0f;
+                            const float speed = 0.01f;
 
                             this->camera_->MoveCamera(glm::vec3(speed, 0.0f, 0.0f));
                             SPDLOG_DEBUG("Camera origin moved ({}, {}, {})", speed, 0.0f, 0.0f);
@@ -519,34 +698,37 @@ void ApplicationInstance::InitCallbacks_() {
 }
 
 void ApplicationInstance::InitShaders_() {
-    const static std::vector<std::string> vertexShaderData{
-        "shaders\\BasicShader.vert"
+    const static std::vector<std::string> vertexShaderData {
+        "shaders\\BasicShader.vert",
+        "shaders\\PhongLightingShader.vert",
     };
 
-    const static std::vector<std::string> fragmentShaderData{
+    const static std::vector<std::string> fragmentShaderData {
         "shaders\\BasicShader.frag",
         "shaders\\NormalVisualization.frag",
         "shaders\\RedBlueGreen.frag",
         "shaders\\MagicShader.frag",
-        "shaders\\RedShader.frag"
+        "shaders\\RedShader.frag",
+        "shaders\\PhongLightingShader.frag",
     };
 
-    const static std::vector<std::string> geomeryShaderData{
+    const static std::vector<std::string> geometryShaderData {
         "shaders\\BasicShader.geom"
     };
 
     auto vertexShaders = this->CompileShaders_(vertexShaderData, ShaderType::VERTEX_SHADER);
     auto fragmentShaders = this->CompileShaders_(fragmentShaderData, ShaderType::FRAGMENT_SHADER);
-    auto geomeryShaders = this->CompileShaders_(geomeryShaderData, ShaderType::GEOMETRY_SHADER);
+    auto geometryShaders= this->CompileShaders_(geometryShaderData, ShaderType::GEOMETRY_SHADER);
 
     // Creating shader programs
+    this->shaderPrograms_.emplace(ApplicationInstance::LIGHTING_STR, std::make_unique<ShaderProgram>(vertexShaders.at("PhongLightingShader"), fragmentShaders.at("PhongLightingShader")));
     this->shaderPrograms_.emplace(ApplicationInstance::BASIC_MESH_SHADER_STR, std::make_unique<ShaderProgram>(vertexShaders.at("BasicShader"), fragmentShaders.at("NormalVisualization")));
     this->shaderPrograms_.emplace(ApplicationInstance::RED_SHADER_STR, std::make_unique<ShaderProgram>(vertexShaders.at("BasicShader"), fragmentShaders.at("RedShader")));
     this->shaderPrograms_.emplace(ApplicationInstance::RGB_SHADER_STR, std::make_unique<ShaderProgram>(vertexShaders.at("BasicShader"), fragmentShaders.at("RedBlueGreen")));
     this->shaderPrograms_.emplace(ApplicationInstance::MAGIC_SHADER_STR, std::make_unique<ShaderProgram>(vertexShaders.at("BasicShader"), fragmentShaders.at("MagicShader")));
-    this->shaderPrograms_.emplace(ApplicationInstance::NORMALS_SHADER_STR, std::make_unique<ShaderProgram>(vertexShaders.at("BasicShader"), fragmentShaders.at("RedShader"), geomeryShaders.at("BasicShader")));
+    this->shaderPrograms_.emplace(ApplicationInstance::NORMALS_SHADER_STR, std::make_unique<ShaderProgram>(vertexShaders.at("BasicShader"), fragmentShaders.at("RedShader"), geometryShaders.at("BasicShader")));
 
-    for (auto& [key, _] : this->shaderPrograms_) {
+    for (const auto& key : this->shaderPrograms_ | std::views::keys) {
         if (key == ApplicationInstance::NORMALS_SHADER_STR) {
             continue;
         }
@@ -554,7 +736,75 @@ void ApplicationInstance::InitShaders_() {
         this->shaderKeys_.emplace_back(key);
     }
 
-    this->selectedShaderKey_ = this->shaderKeys_.front();
+    this->selectedShaderKey_ = ApplicationInstance::LIGHTING_STR;
+}
+
+void ApplicationInstance::InitLighting_() {
+    constexpr glm::vec3 directionalLightDirection = glm::vec3(-1.0f, -1.0f, -1.0f);
+    constexpr glm::vec3 directionalLightAmbient   = glm::vec3(1.0f, 1.0f, 1.0f);
+    constexpr glm::vec3 directionalLightDiffuse   = glm::vec3(1.0f, 1.0f, 1.0f);
+    constexpr glm::vec3 directionalLightSpecular  = glm::vec3(1.0f, 1.0f, 1.0f);
+
+    this->lights_.emplace(
+        "directional",
+        new LightInstance(
+            "directional",
+            directionalLightDirection,
+            directionalLightAmbient,
+            directionalLightDiffuse,
+            directionalLightSpecular
+        )
+    );
+
+    constexpr glm::vec3 pointLightPosition         = glm::vec3(100.0f, 100.0f, 100.0f);
+    constexpr glm::vec3 pointLightAmbient          = glm::vec3(1.0f, 1.0f, 1.0f);
+    constexpr glm::vec3 pointLightDiffuse          = glm::vec3(1.0f, 1.0f, 1.0f);
+    constexpr glm::vec3 pointLightSpecular         = glm::vec3(1.0f, 1.0f, 1.0f);
+    constexpr float pointLightConstantAttenuation  = 1.0f;
+    constexpr float pointLightLinearAttenuation    = 1.0f;
+    constexpr float pointLightQuadraticAttenuation = 1.0f;
+
+    this->lights_.emplace(
+        "point",
+        new LightInstance(
+            "point",
+            pointLightPosition,
+            pointLightAmbient,
+            pointLightDiffuse,
+            pointLightSpecular,
+            pointLightConstantAttenuation,
+            pointLightLinearAttenuation,
+            pointLightQuadraticAttenuation
+        )
+    );
+
+    constexpr glm::vec3 spotLightPosition         = glm::vec3(100.0f, 100.0f, 100.0f);
+    constexpr glm::vec3 spotLightDirection        = glm::vec3(-1.0f, -1.0f, -1.0f);
+    constexpr glm::vec3 spotLightAmbient          = glm::vec3(1.0f, 1.0f, 1.0f);
+    constexpr glm::vec3 spotLightDiffuse          = glm::vec3(1.0f, 1.0f, 1.0f);
+    constexpr glm::vec3 spotLightSpecular         = glm::vec3(1.0f, 1.0f, 1.0f);
+    constexpr float spotLightConstantAttenuation  = 1.0f;
+    constexpr float spotLightLinearAttenuation    = 1.0f;
+    constexpr float spotLightQuadraticAttenuation = 1.0f;
+    constexpr float spotLightExponent             = 1.0f;
+    constexpr float spotLightCutoff               = 1.0f;
+
+    this->lights_.emplace(
+        "spot",
+        new LightInstance(
+            "spot",
+            spotLightPosition,
+            spotLightDirection,
+            spotLightAmbient,
+            spotLightDiffuse,
+            spotLightSpecular,
+            spotLightConstantAttenuation,
+            spotLightLinearAttenuation,
+            spotLightQuadraticAttenuation,
+            spotLightCutoff,
+            spotLightExponent
+        )
+    );
 }
 
 std::unordered_map<std::string, ShaderInstance> ApplicationInstance::CompileShaders_(const std::vector<std::string>& shaderFilepath, ShaderType shaderType) {
@@ -578,3 +828,170 @@ std::unordered_map<std::string, ShaderInstance> ApplicationInstance::CompileShad
     return shaders;
 }
 
+void ApplicationInstance::UpdateDirectionalLight_() {
+    this->lights_.at("directional")->SetDirection(
+        glm::vec3(
+            this->directionalLightParams_.lightDirection[0],
+            this->directionalLightParams_.lightDirection[1],
+            this->directionalLightParams_.lightDirection[2]
+        )
+    );
+
+    this->lights_.at("directional")->SetAmbient(
+        glm::vec3(
+            this->directionalLightParams_.ambient[0],
+            this->directionalLightParams_.ambient[1],
+            this->directionalLightParams_.ambient[2]
+        )
+    );
+
+    this->lights_.at("directional")->SetDiffuse(
+        glm::vec3(
+            this->directionalLightParams_.diffuse[0],
+            this->directionalLightParams_.diffuse[1],
+            this->directionalLightParams_.diffuse[2]
+        )
+    );
+
+    this->lights_.at("directional")->SetSpecular(
+        glm::vec3(
+            this->directionalLightParams_.specular[0],
+            this->directionalLightParams_.specular[1],
+            this->directionalLightParams_.specular[2]
+        )
+    );
+
+    this->lights_.at("directional")->SetEnable(this->directionalLightParams_.isEnable);
+    this->lights_.at("directional")->SetAmbient(this->directionalLightParams_.isAmbient);
+    this->lights_.at("directional")->SetDiffuse(this->directionalLightParams_.isDiffuse);
+    this->lights_.at("directional")->SetSpecular(this->directionalLightParams_.isSpecular);
+
+    this->lights_.at("directional")->SetAmbientIntensity(this->directionalLightParams_.ambientIntensity);
+    this->lights_.at("directional")->SetDiffuseIntensity(this->directionalLightParams_.diffuseIntensity);
+    this->lights_.at("directional")->SetSpecularIntensity(this->directionalLightParams_.specularIntensity);
+
+    this->lights_.at("directional")->UpdateLight(*this->shaderPrograms_[this->selectedShaderKey_]);
+}
+
+void ApplicationInstance::UpdatePointLight_() {
+    this->lights_.at("point")->SetPosition(
+        glm::vec3(
+            this->pointLightParams_.lightPosition[0],
+            this->pointLightParams_.lightPosition[1],
+            this->pointLightParams_.lightPosition[2]
+        )
+    );
+
+    this->lights_.at("point")->SetAmbient(
+        glm::vec3(
+            this->pointLightParams_.ambient[0],
+            this->pointLightParams_.ambient[1],
+            this->pointLightParams_.ambient[2]
+        )
+    );
+
+    this->lights_.at("point")->SetDiffuse(
+        glm::vec3(
+            this->pointLightParams_.diffuse[0],
+            this->pointLightParams_.diffuse[1],
+            this->pointLightParams_.diffuse[2]
+        )
+    );
+
+    this->lights_.at("point")->SetSpecular(
+        glm::vec3(
+            this->pointLightParams_.specular[0],
+            this->pointLightParams_.specular[1],
+            this->pointLightParams_.specular[2]
+        )
+    );
+
+    this->lights_.at("point")->SetConstantAttenuation(this->pointLightParams_.constantAttenuation);
+    this->lights_.at("point")->SetLinearAttenuation(this->pointLightParams_.linearAttenuation);
+    this->lights_.at("point")->SetQuadraticAttenuation(this->pointLightParams_.quadraticAttenuation);
+
+    this->lights_.at("point")->SetEnable(this->pointLightParams_.isEnable);
+    this->lights_.at("point")->SetAmbient(this->pointLightParams_.isAmbient);
+    this->lights_.at("point")->SetDiffuse(this->pointLightParams_.isDiffuse);
+    this->lights_.at("point")->SetSpecular(this->pointLightParams_.isSpecular);
+
+    this->lights_.at("point")->SetAmbientIntensity(this->pointLightParams_.ambientIntensity);
+    this->lights_.at("point")->SetDiffuseIntensity(this->pointLightParams_.diffuseIntensity);
+    this->lights_.at("point")->SetSpecularIntensity(this->pointLightParams_.specularIntensity);
+
+    this->lights_.at("point")->UpdateLight(*this->shaderPrograms_[this->selectedShaderKey_]);
+}
+
+void ApplicationInstance::UpdateSpotLight_() {
+    this->lights_.at("spot")->SetPosition(
+        glm::vec3(
+            this->spotLightParams_.lightPosition[0],
+            this->spotLightParams_.lightPosition[1],
+            this->spotLightParams_.lightPosition[2]
+        )
+    );
+
+    this->lights_.at("spot")->SetDirection(
+        glm::vec3(
+            this->spotLightParams_.lightDirection[0],
+            this->spotLightParams_.lightDirection[1],
+            this->spotLightParams_.lightDirection[2]
+        )
+    );
+
+    this->lights_.at("spot")->SetAmbient(
+        glm::vec3(
+            this->spotLightParams_.ambient[0],
+            this->spotLightParams_.ambient[1],
+            this->spotLightParams_.ambient[2]
+        )
+    );
+
+    this->lights_.at("spot")->SetDiffuse(
+        glm::vec3(
+            this->spotLightParams_.diffuse[0],
+            this->spotLightParams_.diffuse[1],
+            this->spotLightParams_.diffuse[2]
+        )
+    );
+
+    this->lights_.at("spot")->SetSpecular(
+        glm::vec3(
+            this->spotLightParams_.specular[0],
+            this->spotLightParams_.specular[1],
+            this->spotLightParams_.specular[2]
+        )
+    );
+
+    this->lights_.at("spot")->SetConstantAttenuation(this->spotLightParams_.constantAttenuation);
+    this->lights_.at("spot")->SetLinearAttenuation(this->spotLightParams_.linearAttenuation);
+    this->lights_.at("spot")->SetQuadraticAttenuation(this->spotLightParams_.quadraticAttenuation);
+    this->lights_.at("spot")->SetExponent(this->spotLightParams_.exponent);
+    this->lights_.at("spot")->SetInnerCutoff(glm::radians(this->spotLightParams_.innerCutoff));
+    this->lights_.at("spot")->SetOuterCutoff(glm::radians(this->spotLightParams_.outerCutoff));
+
+    this->lights_.at("spot")->SetEnable(this->spotLightParams_.isEnable);
+    this->lights_.at("spot")->SetAmbient(this->spotLightParams_.isAmbient);
+    this->lights_.at("spot")->SetDiffuse(this->spotLightParams_.isDiffuse);
+    this->lights_.at("spot")->SetSpecular(this->spotLightParams_.isSpecular);
+
+    this->lights_.at("spot")->SetAmbientIntensity(this->spotLightParams_.ambientIntensity);
+    this->lights_.at("spot")->SetDiffuseIntensity(this->spotLightParams_.diffuseIntensity);
+    this->lights_.at("spot")->SetSpecularIntensity(this->spotLightParams_.specularIntensity);
+
+    this->lights_.at("spot")->UpdateLight(*this->shaderPrograms_[this->selectedShaderKey_]);
+}
+
+void ApplicationInstance::UpdateTime_() {
+    const float timeInSeconds = static_cast<float>(glfwGetTime());
+    const size_t hours        = static_cast<size_t>(timeInSeconds) / 3600;
+    const size_t minutes      = (static_cast<size_t>(timeInSeconds) % 3600) / 60;
+    const size_t seconds      = static_cast<size_t>(timeInSeconds) % 60;
+    const size_t milliseconds = static_cast<size_t>(timeInSeconds * 1000) % 1000;
+
+    this->applicationTime_.totalTimeInSeconds = timeInSeconds;
+    this->applicationTime_.hours              = hours;
+    this->applicationTime_.minutes            = minutes;
+    this->applicationTime_.seconds            = seconds;
+    this->applicationTime_.milliseconds       = milliseconds;
+}

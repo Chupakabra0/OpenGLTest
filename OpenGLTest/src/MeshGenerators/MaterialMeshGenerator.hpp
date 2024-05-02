@@ -1,12 +1,12 @@
 #pragma once
+#include "MaterialInstance/MaterialInstance.h"
 #include "MeshGenerators/IMeshGenerator.hpp"
-#include "MaterialInstance/MaterialInstance.hpp"
 
 class MaterialMeshGenerator : public IMeshGenerator {
 public:
     MaterialMeshGenerator() = delete;
 
-    explicit MaterialMeshGenerator(const std::shared_ptr<IMeshGenerator>& meshGenerator,  const MaterialInstance& material);
+    explicit MaterialMeshGenerator(const std::shared_ptr<IMeshGenerator>& meshGenerator, const MaterialInstance& material);
 
     MaterialMeshGenerator(const MaterialMeshGenerator&) = default;
 
