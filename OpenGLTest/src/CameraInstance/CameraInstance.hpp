@@ -40,17 +40,23 @@ public:
 
     void SetZ(const glm::vec3& z);
 
-    const glm::vec3 GetOrigin() const;
+    glm::vec3 GetOrigin() const;
 
     void SetOrigin(const glm::vec3& origin);
 
-    const glm::vec3 GetTarget() const;
+    glm::vec3 GetTarget() const;
 
     void SetTarget(const glm::vec3& target);
 
     float GetDistanceToTarget() const;
 
-    void SetDistanceToTarget(float d);
+    float GetDistanceMult() const;
+
+    void SetDistanceMult(float d);
+
+    void IncreaseDistanceMult();
+
+    void DecreaseDistanceMult();
 
     void Arcball(float u, float v, float viewportHeight, float viewportWidth);
 
@@ -65,11 +71,11 @@ public:
     glm::mat4 CalcViewMatrix() const;
 
 private:
-    glm::vec3 x_{};
+    glm::mat4 pan_{glm::identity<glm::mat4>()};
+    glm::mat4 view_{glm::identity<glm::mat4>()};glm::vec3 x_{};
     glm::vec3 y_{};
     glm::vec3 z_{};
     glm::vec3 origin_{};
     glm::vec3 target_{};
-    glm::mat4 pan_{glm::identity<glm::mat4>()};
-    glm::mat4 view_{glm::identity<glm::mat4>()};
+    float t_{};
 };

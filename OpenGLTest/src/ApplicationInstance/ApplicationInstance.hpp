@@ -11,6 +11,8 @@
 
 #include <unordered_map>
 
+#include "MaterialInstance/MaterialInstance.h"
+
 constexpr bool IsDebug() {
     #if defined(_DEBUG)
         return true;
@@ -72,7 +74,7 @@ public:
     float linearAttenuation    = 0.0f;
     float quadraticAttenuation = 0.0f;
     float innerCutoff          = glm::half_pi<float>();
-    float outerCutoff          = glm::pi<float>();
+    float outerCutoff          = glm::half_pi<float>();
     float exponent             = 1.0f;
     float ambientIntensity     = 1.0f;
     float diffuseIntensity     = 1.0f;
@@ -109,7 +111,7 @@ public:
     void Run();
 
 private:
-    void InitMeshGenerator_(const std::shared_ptr<IMeshGenerator>& generator);
+    void InitMeshGenerator_(const std::shared_ptr<IMeshGenerator>& meshGenerator, const MaterialInstance& material);
 
     void InitWindow_(int windowHeight, int windowWidth, const std::string& windowName);
 

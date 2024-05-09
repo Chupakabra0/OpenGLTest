@@ -99,31 +99,21 @@ ApplicationConfig ArgParseWrapper::GetAppConfig() const {
         .CAMERA_AXIS_X         = VectorToVec3(cameraAxisX),
         .CAMERA_AXIS_Y         = VectorToVec3(cameraAxisY),
         .CAMERA_AXIS_Z         = VectorToVec3(cameraAxisZ),
-        .VIEWPORT_TOP_LEFT     = VectorToVec2(viewportTopLeftTemp),
-        .VIEWPORT_BOTTOM_RIGHT = VectorToVec2(viewportBottomRight),
         .VIEWPORT_FOV          = this->argumentParser_->get<float>(ArgParseWrapper::SHORT_VIEWPORT_FOV_ARGUMENT),
         .VIEWPORT_NEAR_Z       = this->argumentParser_->get<float>(ArgParseWrapper::SHORT_VIEWPORT_NEAR_Z_ARGUMENT),
         .VIEWPORT_FAR_Z        = this->argumentParser_->get<float>(ArgParseWrapper::SHORT_VIEWPORT_FAR_Z_ARGUMENT),
-        //.MATERIAL_AMBIENT      = glm::vec3(0.0f, 0.0f, 0.0f),
-        //.MATERIAL_DIFFUSE      = glm::vec3(0.0f, 0.0f, 0.0f),
-        //.MATERIAL_SPECULAR     = glm::vec3(0.0f, 0.0f, 0.0f),
-        //.MATERIAL_SHININESS    = 0.0f,
-        //.LIGHT_POSITION        = glm::vec3(0.0f, 0.0f, 0.0f),
-        //.LIGHT_AMBIENT         = glm::vec3(0.0f, 0.0f, 0.0f),
-        //.LIGHT_DIFFUSE         = glm::vec3(0.0f, 0.0f, 0.0f),
-        //.LIGHT_SPECULAR        = glm::vec3(0.0f, 0.0f, 0.0f)
     };
 
-    config.MESH_FACTORY   = std::make_shared<MaterialMeshGeneratorFactory>(
-        MaterialInstance {
-            .ambient   = config.MATERIAL_AMBIENT,
-            .diffuse   = config.MATERIAL_DIFFUSE,
-            .specular  = config.MATERIAL_SPECULAR,
-            .shininess = config.MATERIAL_SHININESS
-        }
-    );
+    //config.MESH_FACTORY   = std::make_shared<MaterialMeshGeneratorFactory>(
+    //    MaterialInstance {
+    //        .ambient   = config.MATERIAL_AMBIENT,
+    //        .diffuse   = config.MATERIAL_DIFFUSE,
+    //        .specular  = config.MATERIAL_SPECULAR,
+    //        .shininess = config.MATERIAL_SHININESS
+    //    }
+    //);
 
-    config.MESH_GENERATOR = this->GetMeshGenerator_(config.MESH_FACTORY);
+    //config.MESH_GENERATOR = this->GetMeshGenerator_(config.MESH_FACTORY);
 
     return config;
 }

@@ -3,10 +3,12 @@
 
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include <imgui_internal.h>
 
 #include <fstream>
 #include <regex>
 #include <filesystem>
+
 
 ImguiWrapper::ImguiWrapper(WindowInstance& window, const std::string& title, float x, float y, float xPivot, float yPivot)
     : title_(title), x_(x), y_(y), xPivot_(xPivot), yPivot_(yPivot) {
@@ -20,8 +22,10 @@ void ImguiWrapper::ConstructorHelper_(WindowInstance& window) {
 
     this->io_ = UniqueImguiIo(&ImGui::GetIO());
     this->io_->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	this->io_->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     this->io_->IniFilename = nullptr;
-    //this->io_->ConfigDragClickToInputText |= ImGuiSliderFlags_AlwaysClamp;
+    this->io_->ConfigDockingNoSplit = true;
+
 
     ImGui::StyleColorsDark();
 
@@ -141,8 +145,26 @@ void ImguiWrapper::CorrectImguiIni_() {
 }
 
 void ImguiWrapper::BeginDrawingWindow_() {
+    const ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar |
+        ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus |
+        ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize;
+
+    const ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(viewport->Pos);
+    ImGui::SetNextWindowSize(ImVec2(viewport->Size.x / 3.0f, viewport->Size.y));
+    ImGui::SetNextWindowViewport(viewport->ID);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+    ImGui::Begin("Left Invisible Window", nullptr, windowFlags);
+    ImGui::PopStyleVar(3);
+    const ImGuiID leftDockSpaceId = ImGui::GetID("Left Invisible Window Space");
+    ImGui::DockSpace(leftDockSpaceId, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+    ImGui::End();
+
     ImGui::SetNextWindowPos(ImVec2(this->x_, this->y_), ImGuiCond_Appearing, ImVec2(this->xPivot_, this->yPivot_));
-    ImGui::Begin(this->title_.c_str());
+    ImGui::Begin(this->title_.c_str(), nullptr, ImGuiWindowFlags_NoBackground);
+    ImGui::DockBuilderDockWindow(this->title_.c_str(), leftDockSpaceId);
 }
 
 void ImguiWrapper::EndDrawingWindow_() {

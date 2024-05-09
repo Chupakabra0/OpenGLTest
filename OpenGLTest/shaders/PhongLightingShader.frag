@@ -104,7 +104,8 @@ vec3 calcDirectionalLighting(vec3 normal) {
 
 vec3 calcPointLighting(vec3 normal) {
     float lightDistance     = length(u_point_light_position - fragmentWorldPosition);
-    float attenuationFactor = 1.0 / (u_point_light_constant_attenuation + u_point_light_linear_attenuation * lightDistance + u_point_light_quadratic_attenuation * pow(lightDistance, 2.0));
+    float attenuationFactor = u_point_light_constant_attenuation + u_point_light_linear_attenuation * lightDistance + u_point_light_quadratic_attenuation * pow(lightDistance, 2.0);
+    attenuationFactor       = attenuationFactor == 0.0 ? 1000000.0 : 1.0 / attenuationFactor;
 
     // AMBIENT
     vec3 ambientComponent = vec3(0.0);
@@ -140,7 +141,8 @@ vec3 calcSpotLighting(vec3 normal) {
     float lightDistance  = length(positionToLight);
     positionToLight      = normalize(positionToLight);
 
-    float attenuationFactor = 1.0 / (u_spot_light_constant_attenuation + u_spot_light_linear_attenuation * lightDistance + u_spot_light_quadratic_attenuation * pow(lightDistance, 2.0)); 
+    float attenuationFactor = u_spot_light_constant_attenuation + u_spot_light_linear_attenuation * lightDistance + u_spot_light_quadratic_attenuation * pow(lightDistance, 2.0);
+    attenuationFactor       = attenuationFactor == 0.0 ? 1000000.0 : 1.0 / attenuationFactor;
 
     vec3 ambientComponent  = vec3(0.0);
     if (u_spot_is_ambient) {
@@ -153,8 +155,8 @@ vec3 calcSpotLighting(vec3 normal) {
     float innerCos = cos(u_spot_light_inner_cutoff);
 
     if (thetaCos > outerCos)  {   
-        if (innerCos > outerCos) {    
-            float epsilon      = innerCos - outerCos;
+        if (innerCos > outerCos) {
+            float epsilon = innerCos - outerCos;
             attenuationFactor *= pow(saturate((thetaCos - outerCos) / epsilon), u_spot_light_exponent); 
         }
         

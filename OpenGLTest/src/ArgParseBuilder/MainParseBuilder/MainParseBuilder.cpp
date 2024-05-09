@@ -7,6 +7,7 @@ MainParseBuilder::MainParseBuilder(const std::string programName)
 }
 
 std::unique_ptr<argparse::ArgumentParser> MainParseBuilder::GetUniqueProduct() {
+    this->AddJsonArgument_();
     this->AddHeightArgument_();
     this->AddWidthArgument_();
     this->AddTitleArgument_();
@@ -20,6 +21,14 @@ std::unique_ptr<argparse::ArgumentParser> MainParseBuilder::GetUniqueProduct() {
     this->AddFieldOfViewArgument_();
 
     return this->GetResultHelper_();
+}
+
+void MainParseBuilder::AddJsonArgument_() {
+    this->argumentParser_->add_argument(
+        ArgParseWrapper::SHORT_CONFIG_JSON_ARGUMENT,
+        ArgParseWrapper::LONG_CONFIG_JSON_ARGUMENT)
+        .help("Config json filepath")
+        .nargs(1).default_value(ArgParseWrapper::DEFAULT_CONFIG_JSON_VALUE);
 }
 
 void MainParseBuilder::AddHeightArgument_() {

@@ -22,7 +22,7 @@ const glm::vec3& ImguiColorPicker::GetColor() const {
 }
 
 void ImguiColorPicker::Draw() {
-    ImGui::ColorEdit3(this->label_.c_str(), this->colorArray_, ImGuiColorEditFlags_PickerHueWheel);
+    ImGui::ColorEdit3(this->label_.c_str(), this->colorArray_);
     this->color_.get().r = this->colorArray_[0];
     this->color_.get().g = this->colorArray_[1];
     this->color_.get().b = this->colorArray_[2];

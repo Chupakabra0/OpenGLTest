@@ -1,5 +1,7 @@
 #include "CameraInstance/CameraInstance.hpp"
 
+#include "ApplicationConfig/ApplicationConfig.hpp"
+
 CameraInstance::CameraInstance(
     const glm::vec3& origin, const glm::vec3& target,
     const glm::vec3& x, const glm::vec3& y, const glm::vec3& z
@@ -32,15 +34,15 @@ void CameraInstance::SetZ(const glm::vec3& z) {
     this->z_ = z;
 }
 
-const glm::vec3 CameraInstance::GetOrigin() const {
-    return this->origin_;
+glm::vec3 CameraInstance::GetOrigin() const {
+    return this->t_ * (this->target_ - this->origin_) + this->origin_;
 }
 
 void CameraInstance::SetOrigin(const glm::vec3& origin) {
     this->origin_ = origin;
 }
 
-const glm::vec3 CameraInstance::GetTarget() const {
+glm::vec3 CameraInstance::GetTarget() const {
     return this->target_;
 }
 
@@ -52,8 +54,21 @@ float CameraInstance::GetDistanceToTarget() const {
     return glm::length(this->target_ - this->origin_);
 }
 
-void CameraInstance::SetDistanceToTarget(float d) {
-    this->origin_ = this->target_ - d * this->z_;
+float CameraInstance::GetDistanceMult() const {
+    return this->t_;
+}
+
+void CameraInstance::SetDistanceMult(float t) {
+    //this->origin_ = this->target_ - d * this->z_;
+    this->t_ = t > 1.0f ? 1.0f : (t < -1.0f ? -1.0f : t);
+}
+
+void CameraInstance::IncreaseDistanceMult() {
+    this->SetDistanceMult(this->t_ + 0.05f);
+}
+
+void CameraInstance::DecreaseDistanceMult() {
+    this->SetDistanceMult(this->t_ - 0.05f);
 }
 
 void CameraInstance::Arcball(float u, float v, float viewportHeight, float viewportWidth) {
@@ -131,7 +146,7 @@ void CameraInstance::Pan(float u, float v, float sensivity) {
 
 glm::mat4 CameraInstance::CalcViewMatrix() const {
     return this->pan_ * glm::lookAt(
-        glm::vec3(glm::vec4(this->origin_, 1.0f)),
+        glm::vec3(glm::vec4(this->GetOrigin(), 1.0f)),
         glm::vec3(glm::vec4(this->target_, 1.0f)),
         glm::vec3(glm::vec4(this->y_, 0.0f))
     );

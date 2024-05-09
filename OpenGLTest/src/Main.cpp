@@ -1,17 +1,14 @@
 #include "ApplicationInstance/ApplicationInstance.hpp"
 #include "ArgParseWrapper/ArgParseWrapper.hpp"
+#include "ApplicationConfigCreator/ApplicationConfigCreator.hpp"
 
 #include <spdlog/spdlog.h>
 
+
 int main(int argc, char** argv) {
     try {
-        ArgParseWrapper argParseWrapper(argv, argc);
-        
-        if (!argParseWrapper.ParseAllArgs()) {
-            return EXIT_SUCCESS;
-        }
-
-        const auto config = argParseWrapper.GetAppConfig();
+        const std::string defaultConfigJsonFilename = "config.json";
+        const ApplicationConfig config = ApplicationConfigCreator(argc < 2 ? defaultConfigJsonFilename : argv[1]).CreateApplicationConfig();
 
         spdlog::set_level(LogLevelToSpdlog(IsDebug() ? LogLevel::DEBUG : LogLevel::INFO));
 

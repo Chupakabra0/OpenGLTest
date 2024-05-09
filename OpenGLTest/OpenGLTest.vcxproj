@@ -132,6 +132,7 @@ if exist "$(ProjectDir)imgui.ini" (copy /Y "$(ProjectDir)imgui.ini" "$(TargetDir
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ApplicationConfigCreator\ApplicationConfigCreator.cpp" />
     <ClCompile Include="src\ArgParseMeshGeneratorCreator\BaseArgParseMeshGeneratorCreator\BaseArgParseMeshGeneratorCreator.cpp" />
     <ClCompile Include="src\ArgParseMeshGeneratorCreator\CylinderMeshGeneratorCreator\CylinderMeshGeneratorCreator.cpp" />
     <ClCompile Include="lib\glad\src\glad.c" />
@@ -205,6 +206,7 @@ if exist "$(ProjectDir)imgui.ini" (copy /Y "$(ProjectDir)imgui.ini" "$(TargetDir
     <ClCompile Include="src\VertexBufferObject\VertexBufferObject.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ApplicationConfigCreator\ApplicationConfigCreator.hpp" />
     <ClInclude Include="src\ArgParseMeshGeneratorCreator\CylinderMeshGeneratorCreator\CylinderMeshGeneratorCreator.hpp" />
     <ClInclude Include="lib\glad\include\glad.h" />
     <ClInclude Include="lib\imgui\include\imconfig.h" />
@@ -274,6 +276,7 @@ if exist "$(ProjectDir)imgui.ini" (copy /Y "$(ProjectDir)imgui.ini" "$(TargetDir
     <ClInclude Include="src\MeshInstance\MaterialMeshInstance.hpp" />
     <ClInclude Include="src\MeshInstance\MeshInstance.hpp" />
     <ClInclude Include="src\MouseInstance\MouseInstance.hpp" />
+    <ClInclude Include="src\NlohmannUtils\NlohmannUtils.hpp" />
     <ClInclude Include="src\TextureLoader\ITextureLoader.hpp" />
     <ClInclude Include="src\RendererInstance\RendererInstance.hpp" />
     <ClInclude Include="src\ShaderInstance\ShaderInstance.hpp" />

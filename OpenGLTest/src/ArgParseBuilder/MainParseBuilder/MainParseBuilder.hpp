@@ -18,6 +18,8 @@ public:
     std::unique_ptr<argparse::ArgumentParser> GetUniqueProduct() override;
 
 private:
+    void AddJsonArgument_();
+
     void AddHeightArgument_();
 
     void AddWidthArgument_();

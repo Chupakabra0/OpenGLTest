@@ -4,7 +4,7 @@ layout(line_strip, max_vertices = 8) out;
 
 layout(location = 4) in vec4 clippedNormals[];
 
-float MAGNITUDE = 50.0;
+float MAGNITUDE = 0.5;
 
 void GenerateNormal(int index) {
     gl_Position = gl_in[index].gl_Position;

@@ -43,6 +43,7 @@ public:
     static constexpr const char* SHORT_DEPTH_ARGUMENT                 = "-d";
     static constexpr const char* SHORT_A_PARAMETER_ARGUMENT           = "-a";
     static constexpr const char* SHORT_B_PARAMETER_ARGUMENT           = "-b";
+    static constexpr const char* SHORT_CONFIG_JSON_ARGUMENT           = "-j";
 
     static constexpr const char* LONG_WINDOW_HEIGHT_ARGUMENT          = "--window-height";
     static constexpr const char* LONG_WINDOW_WIDTH_ARGUMENT           = "--window-width";
@@ -70,6 +71,7 @@ public:
     static constexpr const char* LONG_DEPTH_ARGUMENT                  = "--depth";
     static constexpr const char* LONG_A_PARAMETER_ARGUMENT            = "--a-parameter";
     static constexpr const char* LONG_B_PARAMETER_ARGUMENT            = "--b-parameter";
+    static constexpr const char* LONG_CONFIG_JSON_ARGUMENT            = "--json";
 
     static constexpr int DEFAULT_WINDOW_HEIGHT_VALUE                  = 1080;
     static constexpr int DEFAULT_WINDOW_WIDTH_VALUE                   = 1920;
@@ -84,6 +86,7 @@ public:
     static constexpr float DEFAULT_VIEWPORT_FOV_VALUE                 = 45.0f;
     static constexpr float DEFAULT_VIEWPORT_NEAR_Z_VALUE              = 0.1f;
     static constexpr float DEFAULT_VIEWPORT_FAR_Z_VALUE               = 1000.0f;
+    static constexpr const char* DEFAULT_CONFIG_JSON_VALUE            = "config.json";
 
     ArgParseWrapper() = delete;
 

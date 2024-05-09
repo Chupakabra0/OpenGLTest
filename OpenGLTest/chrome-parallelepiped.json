@@ -1,0 +1,72 @@
+{
+    "CONFIG": {
+      "WINDOW_HEIGHT": 1080,
+      "WINDOW_WIDTH": 1920,
+      "WINDOW_NAME": "Default",
+      "WINDOW_BACKGROUND": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      },
+      "CAMERA_POSITION": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 2.0
+      },
+      "CAMERA_TARGET": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      },
+      "CAMERA_AXIS_X": {
+        "X": 1.0,
+        "Y": 0.0,
+        "Z": 0.0
+      },
+      "CAMERA_AXIS_Y": {
+        "X": 0.0,
+        "Y": 1.0,
+        "Z": 0.0
+      },
+      "CAMERA_AXIS_Z": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 1.0
+      },
+      "VIEWPORT_FOV": 90.0,
+      "VIEWPORT_NEAR_Z": 0.1,
+      "VIEWPORT_FAR_Z": 100.0,
+      "MATERIAL_AMBIENT": {
+          "X": 0.25,
+          "Y": 0.25,
+          "Z": 0.25
+      },
+      "MATERIAL_DIFFUSE": {
+        "X": 0.4,
+        "Y": 0.4,
+        "Z": 0.4
+      },
+      "MATERIAL_SPECULAR": {
+        "X": 0.774597, 
+        "Y": 0.774597,
+        "Z": 0.774597
+      },
+      "MATERIAL_SHININESS": 76.8,
+      "MESH_NAME": "parallelepiped",
+      "MESH_PARAMS": {
+        "ORIGIN": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "COLOR": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "HEIGHT": 1.0,
+        "WIDTH": 1.0,
+        "DEPTH": 1.0
+      }
+    }
+  }

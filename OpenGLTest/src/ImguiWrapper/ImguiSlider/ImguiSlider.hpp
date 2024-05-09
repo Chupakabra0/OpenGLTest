@@ -76,23 +76,26 @@ public:
     }
 
     void Draw() override {
+        constexpr ImGuiSliderFlags flag = ImGuiSliderFlags_AlwaysClamp;
+        constexpr const char* format = "%.3f";
+
         if constexpr (typeid(Vec) == typeid(float)) {
-            ImGui::SliderFloat(this->label_.c_str(), this->vectorArray_, this->min_, this->max_);
+            ImGui::SliderFloat(this->label_.c_str(), this->vectorArray_, this->min_, this->max_, format, flag);
             this->vector_.get() = *this->vectorArray_;
         }
         else if constexpr (typeid(Vec) == typeid(glm::vec2)) {
-            ImGui::SliderFloat2(this->label_.c_str(), this->vectorArray_, this->min_, this->max_);
+            ImGui::SliderFloat2(this->label_.c_str(), this->vectorArray_, this->min_, this->max_, format, flag);
             this->vector_.get().x  = this->vectorArray_[0];
             this->vector_.get().y  = this->vectorArray_[1];
         }
         else if constexpr (typeid(Vec) == typeid(glm::vec3)) {
-            ImGui::SliderFloat3(this->label_.c_str(), this->vectorArray_, this->min_, this->max_);
+            ImGui::SliderFloat3(this->label_.c_str(), this->vectorArray_, this->min_, this->max_, format, flag);
             this->vector_.get().x = this->vectorArray_[0];
             this->vector_.get().y = this->vectorArray_[1];
             this->vector_.get().z = this->vectorArray_[2];
         }
         else if constexpr (typeid(Vec) == typeid(glm::vec4)) {
-            ImGui::SliderFloat3(this->label_.c_str(), this->vectorArray_, this->min_, this->max_);
+            ImGui::SliderFloat3(this->label_.c_str(), this->vectorArray_, this->min_, this->max_, format, flag);
             this->vector_.get().x = this->vectorArray_[0];
             this->vector_.get().y = this->vectorArray_[1];
             this->vector_.get().z = this->vectorArray_[2];

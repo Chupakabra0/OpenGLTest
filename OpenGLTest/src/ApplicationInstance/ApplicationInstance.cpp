@@ -1,22 +1,31 @@
 #include "ApplicationInstance/ApplicationInstance.hpp"
-
-#include <ranges>
-#include <regex>
-
-#include <spdlog/spdlog.h>
-
 #include "ImguiWrapper/ImguiCheckBox/ImguiCheckBox.hpp"
 #include "ImguiWrapper/ImguiColorPicker/ImguiColorPicker.hpp"
 #include "ImguiWrapper/ImguiComboBox/ImguiComboBox.hpp"
 #include "ImguiWrapper/ImguiSameLine/ImguiSameLine.hpp"
 #include "ImguiWrapper/ImguiSlider/ImguiSlider.hpp"
 #include "ImguiWrapper/ImguiTextBox/ImguiTextBox.hpp"
+#include "MeshGenerators/MaterialMeshGenerator.hpp"
 #include "MeshInstance/MaterialMeshInstance.hpp"
 
-ApplicationInstance::ApplicationInstance(const ApplicationConfig& applicationConfig) {
+#include <spdlog/spdlog.h>
+
+#include <ranges>
+#include <regex>
+
+ApplicationInstance::ApplicationInstance(const ApplicationConfig& applicationConfig)
+    : backgroundColor_(applicationConfig.WINDOW_BACKGROUND) {
     SPDLOG_INFO("Mesh generator initialization started");
 
-    this->InitMeshGenerator_(applicationConfig.MESH_GENERATOR);
+    this->InitMeshGenerator_(
+        applicationConfig.MESH_GENERATOR,
+        MaterialInstance(
+            applicationConfig.MATERIAL_AMBIENT,
+            applicationConfig.MATERIAL_DIFFUSE,
+            applicationConfig.MATERIAL_SPECULAR,
+            applicationConfig.MATERIAL_SHININESS
+        )
+    );
 
     SPDLOG_INFO("Mesh generator initialization started");
     SPDLOG_INFO("Window initialization started");
@@ -41,7 +50,8 @@ ApplicationInstance::ApplicationInstance(const ApplicationConfig& applicationCon
     SPDLOG_INFO("Viewport initialization started");
 
     this->InitViewport_(
-        applicationConfig.VIEWPORT_TOP_LEFT, applicationConfig.VIEWPORT_BOTTOM_RIGHT,
+        glm::vec2(applicationConfig.WINDOW_WIDTH / 3.0f, 0.0f),
+        glm::vec2(applicationConfig.WINDOW_WIDTH, applicationConfig.WINDOW_HEIGHT),
         applicationConfig.VIEWPORT_FOV, applicationConfig.VIEWPORT_NEAR_Z, applicationConfig.VIEWPORT_FAR_Z
     );
 
@@ -85,6 +95,7 @@ void ApplicationInstance::Run() {
 
     while (!this->window_->ShouldWindowClose()) {
         this->UpdateTime_();
+        this->viewport_->UpdateViewport();
 
         this->renderer_->ClearScreen(this->backgroundColor_.r, this->backgroundColor_.g, this->backgroundColor_.b);
 
@@ -129,12 +140,12 @@ void ApplicationInstance::Run() {
     SPDLOG_INFO("Render loop ended");
 }
 
-void ApplicationInstance::InitMeshGenerator_(const std::shared_ptr<IMeshGenerator>& generator) {
-    if (generator == nullptr) {
+void ApplicationInstance::InitMeshGenerator_(const std::shared_ptr<IMeshGenerator>& meshGenerator, const MaterialInstance& material) {
+    if (meshGenerator == nullptr) {
         throw std::runtime_error("Mesh generator is null");
     }
 
-    this->meshGenerator_ = generator;
+    this->meshGenerator_ = std::make_shared<MaterialMeshGenerator>(meshGenerator, material);
 }
 
 void ApplicationInstance::InitWindow_(int windowHeight, int windowWidth, const std::string& windowName) {
@@ -309,14 +320,14 @@ void ApplicationInstance::InitImgui_() {
         "spot_light_inner_cutoff",
         std::make_shared<ImguiSlider<float>>(
             "Inner Cutoff 3",
-            this->spotLightParams_.innerCutoff, 0.0f, glm::pi<float>()
+            this->spotLightParams_.innerCutoff, 0.0f, glm::half_pi<float>()
         )
     );
     this->imgui_->AddElement(
         "spot_light_outer_cutoff",
         std::make_shared<ImguiSlider<float>>(
             "Outer Cutoff 3",
-            this->spotLightParams_.outerCutoff, 0.0f, glm::pi<float>()
+            this->spotLightParams_.outerCutoff, 0.0f, glm::half_pi<float>()
         )
     );
     this->imgui_->AddElement(
@@ -332,14 +343,7 @@ void ApplicationInstance::InitImgui_() {
 
     this->imgui_->AddElement("shaders_combobox", std::make_shared<ImguiComboBox>("Shaders", this->selectedShaderKey_, this->shaderKeys_));
 
-    this->imgui_->AddElement("display_info_label", std::make_shared<ImguiTextBox<>>("Display info:"));
-    this->imgui_->AddElement(
-        "fov_info_label",
-        std::make_shared<ImguiTextBox<float&>>(
-            "Field of view: %.2f degrees",
-            std::ref(this->fovRadians_)
-        )
-    );
+
     this->imgui_->AddElement(
         "fps_info_label",
         std::make_shared<ImguiTextBox<float&>>(
@@ -437,11 +441,11 @@ void ApplicationInstance::InitMouseMoveCallbacks_() {
                     window.GetCurrCursorPos().first, window.GetCurrCursorPos().second
                 );
 
-                this->camera_->Pan(static_cast<float>(x2 - x1), static_cast<float>(y2 - y1), 1.0f);
+                this->camera_->Pan(static_cast<float>(x2 - x1), static_cast<float>(y2 - y1), 0.01f);
 
                 SPDLOG_DEBUG(
                     "Camera panning with u = {}, v = {}, s = {})",
-                    static_cast<float>(x2 - x1), static_cast<float>(y2 - y1), 1.0f
+                    static_cast<float>(x2 - x1), static_cast<float>(y2 - y1), 0.01f
                 );
             }
         },
@@ -487,23 +491,30 @@ void ApplicationInstance::InitMouseMoveCallbacks_() {
 void ApplicationInstance::InitMouseScrollCallbacks_() {
     const auto mouseScrollCallback = std::make_shared<WindowInstance::MouseScrollCallback>(
         [this](WindowInstance& window, double xpos, double ypos) {
-            constexpr float fieldOfViewStep = 3.0f;
+            //constexpr float fieldOfViewStep = 3.0f;
             if (this->imgui_->GetIO()->WantCaptureMouse) {
                 return;
             }
 
             SPDLOG_DEBUG("Mouse scrolled ({}, {})", xpos, ypos);
 
-            float newFov = glm::radians(glm::degrees(this->viewport_->GetFieldOfView()) + (ypos > 0 ? -fieldOfViewStep : fieldOfViewStep));
-
-            if (isFloatGreater(newFov, 0.0f) && isFloatLess(newFov, glm::pi<float>())) {
-                this->viewport_->SetFieldOfView(newFov);
-
-                SPDLOG_DEBUG("Set camera FOV: {}", newFov);
+            if (ypos < 0.0) {
+                this->camera_->DecreaseDistanceMult();
             }
             else {
-                SPDLOG_DEBUG("Camera FOV didn't change: {}", this->viewport_->GetFieldOfView());
+                this->camera_->IncreaseDistanceMult();
             }
+
+            //float newFov = glm::radians(glm::degrees(this->viewport_->GetFieldOfView()) + (ypos > 0 ? -fieldOfViewStep : fieldOfViewStep));
+
+            //if (isFloatGreater(newFov, 0.0f) && isFloatLess(newFov, glm::pi<float>())) {
+            //    this->viewport_->SetFieldOfView(newFov);
+
+            //    SPDLOG_DEBUG("Set camera FOV: {}", newFov);
+            //}
+            //else {
+            //    SPDLOG_DEBUG("Camera FOV didn't change: {}", this->viewport_->GetFieldOfView());
+            //}
         }
     );
 

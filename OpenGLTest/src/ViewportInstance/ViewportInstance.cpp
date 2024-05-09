@@ -16,10 +16,11 @@ int ViewportInstance::GetTopX() const {
 
 void ViewportInstance::SetTopX(int x) {
     if (!this->ValidateSize_(x, this->topY_, this->bottomX_, this->bottomY_)) {
-        throw std::runtime_error("Error: setting top x value makes negative viewport size is invalid");
+        this->topX_ = 0;
     }
-
-    this->topX_ = x;
+    else {
+        this->topX_ = x;
+    }
 }
 
 int ViewportInstance::GetTopY() const {
@@ -28,10 +29,11 @@ int ViewportInstance::GetTopY() const {
 
 void ViewportInstance::SetTopY(int y) {
     if (!this->ValidateSize_(this->topX_, y, this->bottomX_, this->bottomY_)) {
-        throw std::runtime_error("Error: setting top y value makes negative viewport size is invalid");
+        this->topY_ = 0;
     }
-
-    this->topY_ = y;
+    else {
+        this->topY_ = y;
+    }
 }
 
 int ViewportInstance::GetBottomX() const {
@@ -40,10 +42,11 @@ int ViewportInstance::GetBottomX() const {
 
 void ViewportInstance::SetBottomX(int x) {
     if (!this->ValidateSize_(this->topX_, this->topY_, x, this->bottomY_)) {
-        throw std::runtime_error("Error: setting bottom x value makes negative viewport size is invalid");
+        this->bottomX_ = 0;
     }
-
-    this->bottomX_ = x;
+    else {
+        this->bottomX_ = x;
+    }
 }
 
 int ViewportInstance::GetBottomY() const {
@@ -52,10 +55,11 @@ int ViewportInstance::GetBottomY() const {
 
 void ViewportInstance::SetBottomY(int y) {
     if (!this->ValidateSize_(this->topX_, this->topY_, this->bottomX_, y)) {
-        throw std::runtime_error("Error: setting bottom y value makes negative viewport size is invalid");
+        this->bottomY_ = 0;
     }
-
-    this->bottomY_ = y;
+    else {
+        this->bottomY_ = y;
+    }
 }
 
 float ViewportInstance::GetFieldOfView() const {
@@ -92,7 +96,7 @@ int ViewportInstance::GetWidth() const {
 
 void ViewportInstance::UpdateViewport() {
     if (this->GetWidth() != 0 && this->GetHeight() != 0) {
-        glViewport(0, 0, this->GetWidth(), this->GetHeight());
+        glViewport(this->topX_, this->topY_, this->GetWidth(), this->GetHeight());
     }
 }
 
