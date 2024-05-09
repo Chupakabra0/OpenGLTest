@@ -1,16 +1,14 @@
-#include "ApplicationInstance/ApplicationInstance.hpp"
-#include "ArgParseWrapper/ArgParseWrapper.hpp"
-#include "ApplicationConfigCreator/ApplicationConfigCreator.hpp"
-
 #include <spdlog/spdlog.h>
 
+#include "ApplicationInstance/ApplicationInstance.hpp"
+#include "ApplicationConfigCreator/ApplicationConfigCreator.hpp"
 
 int main(int argc, char** argv) {
     try {
-        const std::string defaultConfigJsonFilename = "config.json";
-        const ApplicationConfig config = ApplicationConfigCreator(argc < 2 ? defaultConfigJsonFilename : argv[1]).CreateApplicationConfig();
-
         spdlog::set_level(LogLevelToSpdlog(IsDebug() ? LogLevel::DEBUG : LogLevel::INFO));
+
+        constexpr const char* defaultConfigJsonFilename = "configs\\config.json";
+        const ApplicationConfig config = ApplicationConfigCreator(argc < 2 ? defaultConfigJsonFilename : argv[1]).CreateApplicationConfig();
 
         SPDLOG_INFO("Logger initialized");
         SPDLOG_INFO("Application initialization started");

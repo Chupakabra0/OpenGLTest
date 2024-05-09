@@ -31,7 +31,7 @@ public:
 
     void DrawAll();
 
-    void AddElement(const std::string& name, const std::shared_ptr<IImguiElement>& uiElement);
+    void AddElement(const std::shared_ptr<IImguiElement>& uiElement);
 
 private:
     std::vector<std::shared_ptr<IImguiElement>> elements_{};

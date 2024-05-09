@@ -1,6 +1,6 @@
 #pragma once
 #include "MeshInstance/IMeshInstance.hpp"
-#include "MaterialInstance/MaterialInstance.h"
+#include "..\MaterialInstance\MaterialInstance.hpp"
 
 #include <memory>
 

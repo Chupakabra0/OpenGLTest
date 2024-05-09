@@ -6,12 +6,12 @@
 #include "CameraInstance/CameraInstance.hpp"
 #include "ViewportInstance/ViewportInstance.hpp"
 #include "ShaderProgram/ShaderProgram.hpp"
+#include "MaterialInstance/MaterialInstance.hpp"
 #include "LightInstance/LightInstance.hpp"
 #include "LogLevel/LogLevel.hpp"
 
 #include <unordered_map>
 
-#include "MaterialInstance/MaterialInstance.h"
 
 constexpr bool IsDebug() {
     #if defined(_DEBUG)
@@ -47,7 +47,7 @@ public:
 
 struct PointLightParams {
 public:
-    glm::vec3 lightPosition    = glm::vec3(-10.0f);
+    glm::vec3 lightPosition    = glm::vec3(10.0f);
     glm::vec3 ambient          = glm::vec3(1.0f);
     glm::vec3 diffuse          = glm::vec3(1.0f);
     glm::vec3 specular         = glm::vec3(1.0f);
@@ -73,7 +73,7 @@ public:
     float constantAttenuation  = 1.0f;
     float linearAttenuation    = 0.0f;
     float quadraticAttenuation = 0.0f;
-    float innerCutoff          = glm::half_pi<float>();
+    float innerCutoff          = glm::quarter_pi<float>();
     float outerCutoff          = glm::half_pi<float>();
     float exponent             = 1.0f;
     float ambientIntensity     = 1.0f;

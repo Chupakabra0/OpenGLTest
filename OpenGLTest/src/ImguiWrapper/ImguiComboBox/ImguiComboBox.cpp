@@ -2,6 +2,8 @@
 
 #include <imgui.h>
 
+#include <format>
+
 std::string ImguiComboBox::GetLabel() const {
     return this->label_;
 }
@@ -31,7 +33,9 @@ void ImguiComboBox::Draw() {
         return;
     }
 
-    if (ImGui::BeginCombo(this->label_.c_str(), this->values_.at(this->selectedIndex_).c_str())) {
+    const std::string label = std::format("{}##{}", this->label_, reinterpret_cast<unsigned long long>(this));
+
+    if (ImGui::BeginCombo(label.c_str(), this->values_.at(this->selectedIndex_).c_str())) {
         for (int i = 0; i < this->values_.size(); ++i) {
             const bool isSelected = this->selectedIndex_ == i;
 

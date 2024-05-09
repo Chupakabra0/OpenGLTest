@@ -5,10 +5,10 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <imgui.h>
 
 #include <string>
-
-#include "imgui.h"
+#include <format>
 
 template<class Vec>
 class ImguiSlider : public IImguiElement {
@@ -76,26 +76,27 @@ public:
     }
 
     void Draw() override {
+        const std::string label = std::format("{}##{}", this->label_, reinterpret_cast<unsigned long long>(this));
         constexpr ImGuiSliderFlags flag = ImGuiSliderFlags_AlwaysClamp;
         constexpr const char* format = "%.3f";
 
         if constexpr (typeid(Vec) == typeid(float)) {
-            ImGui::SliderFloat(this->label_.c_str(), this->vectorArray_, this->min_, this->max_, format, flag);
+            ImGui::SliderFloat(label.c_str(), this->vectorArray_, this->min_, this->max_, format, flag);
             this->vector_.get() = *this->vectorArray_;
         }
         else if constexpr (typeid(Vec) == typeid(glm::vec2)) {
-            ImGui::SliderFloat2(this->label_.c_str(), this->vectorArray_, this->min_, this->max_, format, flag);
+            ImGui::SliderFloat2(label.c_str(), this->vectorArray_, this->min_, this->max_, format, flag);
             this->vector_.get().x  = this->vectorArray_[0];
             this->vector_.get().y  = this->vectorArray_[1];
         }
         else if constexpr (typeid(Vec) == typeid(glm::vec3)) {
-            ImGui::SliderFloat3(this->label_.c_str(), this->vectorArray_, this->min_, this->max_, format, flag);
+            ImGui::SliderFloat3(label.c_str(), this->vectorArray_, this->min_, this->max_, format, flag);
             this->vector_.get().x = this->vectorArray_[0];
             this->vector_.get().y = this->vectorArray_[1];
             this->vector_.get().z = this->vectorArray_[2];
         }
         else if constexpr (typeid(Vec) == typeid(glm::vec4)) {
-            ImGui::SliderFloat3(this->label_.c_str(), this->vectorArray_, this->min_, this->max_, format, flag);
+            ImGui::SliderFloat3(label.c_str(), this->vectorArray_, this->min_, this->max_, format, flag);
             this->vector_.get().x = this->vectorArray_[0];
             this->vector_.get().y = this->vectorArray_[1];
             this->vector_.get().z = this->vectorArray_[2];

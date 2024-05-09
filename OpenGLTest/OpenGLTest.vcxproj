@@ -73,6 +73,7 @@
     <PostBuildEvent>
       <Command>mkdir "$(TargetDir)shaders"
 mkdir "$(TargetDir)resources\textures"
+mkdir "$(TargetDir)configs"
 copy /Y "$(ProjectDir)shaders\BasicShader.frag" "$(TargetDir)shaders\BasicShader.frag"
 copy /Y "$(ProjectDir)shaders\PhongLightingShader.frag" "$(TargetDir)shaders\PhongLightingShader.frag"
 copy /Y "$(ProjectDir)shaders\MagicShader.frag" "$(TargetDir)shaders\MagicShader.frag"
@@ -83,7 +84,15 @@ copy /Y "$(ProjectDir)shaders\BasicShader.vert" "$(TargetDir)shaders\BasicShader
 copy /Y "$(ProjectDir)shaders\PhongLightingShader.vert" "$(TargetDir)shaders\PhongLightingShader.vert"
 copy /Y "$(ProjectDir)shaders\BasicShader.geom" "$(TargetDir)shaders\BasicShader.geom"
 copy /Y "$(ProjectDir)resources\textures\paper-sheet.png" "$(TargetDir)resources\textures\paper-sheet.png"
-if exist "$(ProjectDir)imgui.ini" (copy /Y "$(ProjectDir)imgui.ini" "$(TargetDir)imgui.ini")</Command>
+copy /Y "$(ProjectDir)configs\black-plastic-torus.json" "$(TargetDir)configs\black-plastic-torus.json"
+copy /Y "$(ProjectDir)configs\black-rubber-torus.json" "$(TargetDir)configs\black-rubber-torus.json"
+copy /Y "$(ProjectDir)configs\brass-icosphere.json" "$(TargetDir)configs\brass-icosphere.json"
+copy /Y "$(ProjectDir)configs\bronse-icosphere.json" "$(TargetDir)configs\bronse-icosphere.json"
+copy /Y "$(ProjectDir)configs\chrome-parallelepiped.json" "$(TargetDir)configs\chrome-parallelepiped.json"
+copy /Y "$(ProjectDir)configs\config.json" "$(TargetDir)configs\config.json"
+copy /Y "$(ProjectDir)configs\golden-cone.json" "$(TargetDir)configs\golden-cone.json"
+copy /Y "$(ProjectDir)configs\pewter-torus.json" "$(TargetDir)configs\pewter-torus.json"
+copy /Y "$(ProjectDir)configs\silver-uv-sphere.json" "$(TargetDir)configs\silver-uv-sphere.json"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>
@@ -113,6 +122,7 @@ if exist "$(ProjectDir)imgui.ini" (copy /Y "$(ProjectDir)imgui.ini" "$(TargetDir
     <PostBuildEvent>
       <Command>mkdir "$(TargetDir)shaders"
 mkdir "$(TargetDir)resources\textures"
+mkdir "$(TargetDir)configs"
 copy /Y "$(ProjectDir)shaders\BasicShader.frag" "$(TargetDir)shaders\BasicShader.frag"
 copy /Y "$(ProjectDir)shaders\PhongLightingShader.frag" "$(TargetDir)shaders\PhongLightingShader.frag"
 copy /Y "$(ProjectDir)shaders\MagicShader.frag" "$(TargetDir)shaders\MagicShader.frag"
@@ -123,7 +133,15 @@ copy /Y "$(ProjectDir)shaders\BasicShader.vert" "$(TargetDir)shaders\BasicShader
 copy /Y "$(ProjectDir)shaders\PhongLightingShader.vert" "$(TargetDir)shaders\PhongLightingShader.vert"
 copy /Y "$(ProjectDir)shaders\BasicShader.geom" "$(TargetDir)shaders\BasicShader.geom"
 copy /Y "$(ProjectDir)resources\textures\paper-sheet.png" "$(TargetDir)resources\textures\paper-sheet.png"
-if exist "$(ProjectDir)imgui.ini" (copy /Y "$(ProjectDir)imgui.ini" "$(TargetDir)imgui.ini")</Command>
+copy /Y "$(ProjectDir)configs\black-plastic-torus.json" "$(TargetDir)configs\black-plastic-torus.json"
+copy /Y "$(ProjectDir)configs\black-rubber-torus.json" "$(TargetDir)configs\black-rubber-torus.json"
+copy /Y "$(ProjectDir)configs\brass-icosphere.json" "$(TargetDir)configs\brass-icosphere.json"
+copy /Y "$(ProjectDir)configs\bronse-icosphere.json" "$(TargetDir)configs\bronse-icosphere.json"
+copy /Y "$(ProjectDir)configs\chrome-parallelepiped.json" "$(TargetDir)configs\chrome-parallelepiped.json"
+copy /Y "$(ProjectDir)configs\config.json" "$(TargetDir)configs\config.json"
+copy /Y "$(ProjectDir)configs\golden-cone.json" "$(TargetDir)configs\golden-cone.json"
+copy /Y "$(ProjectDir)configs\pewter-torus.json" "$(TargetDir)configs\pewter-torus.json"
+copy /Y "$(ProjectDir)configs\silver-uv-sphere.json" "$(TargetDir)configs\silver-uv-sphere.json"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>
@@ -133,8 +151,6 @@ if exist "$(ProjectDir)imgui.ini" (copy /Y "$(ProjectDir)imgui.ini" "$(TargetDir
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\ApplicationConfigCreator\ApplicationConfigCreator.cpp" />
-    <ClCompile Include="src\ArgParseMeshGeneratorCreator\BaseArgParseMeshGeneratorCreator\BaseArgParseMeshGeneratorCreator.cpp" />
-    <ClCompile Include="src\ArgParseMeshGeneratorCreator\CylinderMeshGeneratorCreator\CylinderMeshGeneratorCreator.cpp" />
     <ClCompile Include="lib\glad\src\glad.c" />
     <ClCompile Include="lib\imgui\src\imgui.cpp" />
     <ClCompile Include="lib\imgui\src\imgui_draw.cpp" />
@@ -143,27 +159,6 @@ if exist "$(ProjectDir)imgui.ini" (copy /Y "$(ProjectDir)imgui.ini" "$(TargetDir
     <ClCompile Include="lib\imgui\src\imgui_tables.cpp" />
     <ClCompile Include="lib\imgui\src\imgui_widgets.cpp" />
     <ClCompile Include="src\ApplicationInstance\ApplicationInstance.cpp" />
-    <ClCompile Include="src\ArgParseBuilder\ArgParseBuilder.hpp" />
-    <ClCompile Include="src\ArgParseBuilder\BaseMeshParserBuilder\BaseMeshParseBuilder.cpp" />
-    <ClCompile Include="src\ArgParseBuilder\CircleMeshParseBuilder\CircleMeshParseBuilder.cpp" />
-    <ClCompile Include="src\ArgParseBuilder\CylinderMeshParseBuilder\CylinderMeshParseBuilder.cpp" />
-    <ClCompile Include="src\ArgParseBuilder\EllipseMeshParseBuilder\EllipseMeshParseBuilder.cpp" />
-    <ClCompile Include="src\ArgParseBuilder\IcosahedronMeshParseBuilder\IcosahedronMeshParseBuilder.cpp" />
-    <ClCompile Include="src\ArgParseBuilder\IcosphereMeshParseBuilder\IcosphereMeshParseBuilder.cpp" />
-    <ClCompile Include="src\ArgParseBuilder\MainParseBuilder\MainParseBuilder.cpp" />
-    <ClCompile Include="src\ArgParseBuilder\ParallelepipedMeshParseBuilder\ParallelepipedMeshParseBuilder.cpp" />
-    <ClCompile Include="src\ArgParseBuilder\RectangleMeshParseBuilder\RectangleMeshParseBuilder.cpp" />
-    <ClCompile Include="src\ArgParseBuilder\TorusMeshParseBuilder\TorusMeshParseBuilder.cpp" />
-    <ClCompile Include="src\ArgParseBuilder\UvSphereMeshParseBuilder\UvSphereMeshParseBuilder.cpp" />
-    <ClCompile Include="src\ArgParseMeshGeneratorCreator\CircleMeshGeneratorCreator\CircleMeshGeneratorCreator.cpp" />
-    <ClCompile Include="src\ArgParseMeshGeneratorCreator\EllipseMeshGeneratorCreator\EllipseMeshGeneratorCreator.cpp" />
-    <ClCompile Include="src\ArgParseMeshGeneratorCreator\IcosahedronMeshGeneratorCreator\IcosahedronMeshGeneratorCreator.cpp" />
-    <ClCompile Include="src\ArgParseMeshGeneratorCreator\IcosphereMeshGeneratorCreator\IcosphereMeshGeneratorCreator.cpp" />
-    <ClCompile Include="src\ArgParseMeshGeneratorCreator\ParallelepipedMeshGeneratorCreator\ParallelepipedMeshGeneratorCreator.cpp" />
-    <ClCompile Include="src\ArgParseMeshGeneratorCreator\RectangleMeshGeneratorCreator\RectangleMeshGeneratorCreator.cpp" />
-    <ClCompile Include="src\ArgParseMeshGeneratorCreator\TorusMeshGeneratorCreator\TorusMeshGeneratorCreator.cpp" />
-    <ClCompile Include="src\ArgParseMeshGeneratorCreator\UvSphereMeshGeneratorCreator\UvSphereMeshGeneratorCreator.cpp" />
-    <ClCompile Include="src\ArgParseWrapper\ArgParseWrapper.cpp" />
     <ClCompile Include="src\CameraInstance\CameraInstance.cpp" />
     <ClCompile Include="src\ImguiWrapper\ImguiCheckBox\ImguiCheckBox.cpp" />
     <ClCompile Include="src\ImguiWrapper\ImguiColorPicker\ImguiColorPicker.cpp" />
@@ -207,7 +202,6 @@ if exist "$(ProjectDir)imgui.ini" (copy /Y "$(ProjectDir)imgui.ini" "$(TargetDir
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ApplicationConfigCreator\ApplicationConfigCreator.hpp" />
-    <ClInclude Include="src\ArgParseMeshGeneratorCreator\CylinderMeshGeneratorCreator\CylinderMeshGeneratorCreator.hpp" />
     <ClInclude Include="lib\glad\include\glad.h" />
     <ClInclude Include="lib\imgui\include\imconfig.h" />
     <ClInclude Include="lib\imgui\include\imgui.h" />
@@ -220,27 +214,6 @@ if exist "$(ProjectDir)imgui.ini" (copy /Y "$(ProjectDir)imgui.ini" "$(TargetDir
     <ClInclude Include="lib\imgui\include\imstb_truetype.h" />
     <ClInclude Include="src\ApplicationInstance\ApplicationInstance.hpp" />
     <ClInclude Include="src\ApplicationConfig\ApplicationConfig.hpp" />
-    <ClInclude Include="src\ArgParseBuilder\BaseMeshParserBuilder\BaseMeshParseBuilder.hpp" />
-    <ClInclude Include="src\ArgParseBuilder\CircleMeshParseBuilder\CircleMeshParseBuilder.hpp" />
-    <ClInclude Include="src\ArgParseBuilder\CylinderMeshParseBuilder\CylinderMeshParseBuilder.hpp" />
-    <ClInclude Include="src\ArgParseBuilder\EllipseMeshParseBuilder\EllipseMeshParseBuilder.hpp" />
-    <ClInclude Include="src\ArgParseBuilder\IcosahedronMeshParseBuilder\IcosahedronMeshParseBuilder.hpp" />
-    <ClInclude Include="src\ArgParseBuilder\IcosphereMeshParseBuilder\IcosphereMeshParseBuilder.hpp" />
-    <ClInclude Include="src\ArgParseBuilder\MainParseBuilder\MainParseBuilder.hpp" />
-    <ClInclude Include="src\ArgParseBuilder\ParallelepipedMeshParseBuilder\ParallelepipedMeshParseBuilder.hpp" />
-    <ClInclude Include="src\ArgParseBuilder\RectangleMeshParseBuilder\RectangleMeshParseBuilder.hpp" />
-    <ClInclude Include="src\ArgParseBuilder\TorusMeshParseBuilder\TorusMeshParseBuilder.hpp" />
-    <ClInclude Include="src\ArgParseBuilder\UvSphereMeshParseBuilder\UvSphereMeshParseBuilder.hpp" />
-    <ClInclude Include="src\ArgParseMeshGeneratorCreator\CircleMeshGeneratorCreator\CircleMeshGeneratorCreator.hpp" />
-    <ClInclude Include="src\ArgParseMeshGeneratorCreator\EllipseMeshGeneratorCreator\EllipseMeshGeneratorCreator.hpp" />
-    <ClInclude Include="src\ArgParseMeshGeneratorCreator\IArgParseMeshGeneratorCreator.hpp" />
-    <ClInclude Include="src\ArgParseMeshGeneratorCreator\IcosahedronMeshGeneratorCreator\IcosahedronMeshGeneratorCreator.hpp" />
-    <ClInclude Include="src\ArgParseMeshGeneratorCreator\IcosphereMeshGeneratorCreator\IcosphereMeshGeneratorCreator.hpp" />
-    <ClInclude Include="src\ArgParseMeshGeneratorCreator\ParallelepipedMeshGeneratorCreator\ParallelepipedMeshGeneratorCreator.hpp" />
-    <ClInclude Include="src\ArgParseMeshGeneratorCreator\RectangleMeshGeneratorCreator\RectangleMeshGeneratorCreator.hpp" />
-    <ClInclude Include="src\ArgParseMeshGeneratorCreator\TorusMeshGeneratorCreator\TorusMeshGeneratorCreator.hpp" />
-    <ClInclude Include="src\ArgParseMeshGeneratorCreator\UvSphereMeshGeneratorCreator\UvSphereMeshGeneratorCreator.hpp" />
-    <ClInclude Include="src\ArgParseWrapper\ArgParseWrapper.hpp" />
     <ClInclude Include="src\Control\Control.hpp" />
     <ClInclude Include="src\ImguiWrapper\ImguiCheckBox\ImguiCheckBox.hpp" />
     <ClInclude Include="src\ImguiWrapper\IImguiElement.hpp" />
@@ -255,8 +228,7 @@ if exist "$(ProjectDir)imgui.ini" (copy /Y "$(ProjectDir)imgui.ini" "$(TargetDir
     <ClInclude Include="src\KeyboardInstance\KeyboardInstance.hpp" />
     <ClInclude Include="src\LightInstance\LightInstance.hpp" />
     <ClInclude Include="src\LogLevel\LogLevel.hpp" />
-    <ClInclude Include="src\ArgParseMeshGeneratorCreator\BaseArgParseMeshGeneratorCreator\BaseArgParseMeshGeneratorCreator.hpp" />
-    <ClInclude Include="src\MaterialInstance\MaterialInstance.h" />
+    <ClInclude Include="src\MaterialInstance\MaterialInstance.hpp" />
     <ClInclude Include="src\MeshGeneratorFactory\GenericMeshGeneratorFactory\GenericMeshGeneratorFactory.hpp" />
     <ClInclude Include="src\MeshGeneratorFactory\IMeshGeneratorFactory.hpp" />
     <ClInclude Include="src\MeshGeneratorFactory\MaterialMeshGeneratorFactory\MaterialMeshGeneratorFactory.hpp" />
@@ -307,9 +279,6 @@ if exist "$(ProjectDir)imgui.ini" (copy /Y "$(ProjectDir)imgui.ini" "$(TargetDir
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\textures\paper-sheet.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="test\launch.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

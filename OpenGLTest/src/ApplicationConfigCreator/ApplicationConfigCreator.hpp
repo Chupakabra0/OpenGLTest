@@ -4,6 +4,7 @@
 #include <nlohmann/json.hpp>
 
 #include <fstream>
+#include <format>
 
 class ApplicationConfigCreator {
 public:
@@ -11,7 +12,9 @@ public:
 
     explicit ApplicationConfigCreator(const std::filesystem::path& configFilepath)
         : configFileStream_(configFilepath, std::fstream::in) {
-
+        if (!configFileStream_.is_open()) {
+            throw std::runtime_error(std::format("Config file {} does not exist!", configFilepath.string()));
+        }
     }
 
     ApplicationConfigCreator(const ApplicationConfigCreator&) = delete;

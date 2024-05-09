@@ -1,6 +1,6 @@
 #include "MeshInstance/MaterialMeshInstance.hpp"
 
-#include "MaterialInstance/MaterialInstance.h"
+#include "..\MaterialInstance\MaterialInstance.hpp"
 
 MaterialMeshInstance::MaterialMeshInstance(const std::shared_ptr<IMeshInstance>& mesh, const MaterialInstance& material)
     : meshInstance_(mesh) {

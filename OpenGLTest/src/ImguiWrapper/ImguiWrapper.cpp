@@ -88,14 +88,8 @@ void ImguiWrapper::DrawAll() {
     this->EndDrawingWindow_();
 }
 
-void ImguiWrapper::AddElement(const std::string& name, const std::shared_ptr<IImguiElement>& uiElement) {
-    //if (this->indexMap_.contains(name)) {
-    //    *this->indexMap_.at(name) = uiElement;
-    //}
-    //else {
-        this->elements_.emplace_back(uiElement);
-    //    this->indexMap_.emplace(name, this->elements_.rbegin().base());
-    //}
+void ImguiWrapper::AddElement(const std::shared_ptr<IImguiElement>& uiElement) {
+    this->elements_.emplace_back(uiElement);
 }
 
 void ImguiWrapper::CorrectImguiIni_() {

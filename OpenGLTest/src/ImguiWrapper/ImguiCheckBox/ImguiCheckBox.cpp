@@ -2,13 +2,17 @@
 
 #include <imgui.h>
 
+#include <format>
+
 ImguiCheckBox::ImguiCheckBox(const std::string& label, bool& isActive)
     : label_(label), isActive_(isActive) {
         
 }
 
 void ImguiCheckBox::Draw() {
-    ImGui::Checkbox(this->label_.c_str(), &this->isActive_.get());
+    const std::string label = std::format("{}##{}", this->label_, reinterpret_cast<unsigned long long>(this));
+
+    ImGui::Checkbox(label.c_str(), &this->isActive_.get());
 }
 
 std::string ImguiCheckBox::GetLabel() const {

@@ -4,6 +4,7 @@
 #include <imgui.h>
 
 #include <string>
+#include <format>
 
 template<class... Args>
 class ImguiTextBox : public IImguiElement {

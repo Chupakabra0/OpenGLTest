@@ -159,200 +159,223 @@ void ApplicationInstance::InitRenderer_() {
 void ApplicationInstance::InitImgui_() {
     this->imgui_ = std::make_unique<ImguiWrapper>(*this->window_, "OpenGL Test", 0.0, 0.0);
 
-    this->imgui_->AddElement("background_color_label", std::make_shared<ImguiTextBox<>>("Background color"));
-    this->imgui_->AddElement("background_color_picker", std::make_shared<ImguiColorPicker>("Clear color", this->backgroundColor_));
+    this->imgui_->AddElement(std::make_shared<ImguiTextBox<>>("Background color"));
+    this->imgui_->AddElement(std::make_shared<ImguiColorPicker>("Clear color", this->backgroundColor_));
 
-    this->imgui_->AddElement("display_settings_label", std::make_shared<ImguiTextBox<>>("Display settings:"));
-    this->imgui_->AddElement("flat_shading_checkbox", std::make_shared<ImguiCheckBox>("Flat shading", this->isFlatShading_));
-    this->imgui_->AddElement("same_line_0", std::make_shared<ImguiSameLine>());
-    this->imgui_->AddElement("draw_normals_checkbox", std::make_shared<ImguiCheckBox>("Draw normals", this->isDrawNormals_));
-    this->imgui_->AddElement("same_line_1", std::make_shared<ImguiSameLine>());
-    this->imgui_->AddElement("phong_specular_checkbox", std::make_shared<ImguiCheckBox>("Phong specular", this->isPhongSpecular_));
+    this->imgui_->AddElement(std::make_shared<ImguiTextBox<>>("Display settings:"));
+    this->imgui_->AddElement(std::make_shared<ImguiCheckBox>("Flat shading", this->isFlatShading_));
+    this->imgui_->AddElement(std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement(std::make_shared<ImguiCheckBox>("Draw normals", this->isDrawNormals_));
+    this->imgui_->AddElement(std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement(std::make_shared<ImguiCheckBox>("Phong specular", this->isPhongSpecular_));
 
-    this->imgui_->AddElement("directional_light_label", std::make_shared<ImguiTextBox<>>("Directional light:"));
-    this->imgui_->AddElement("directional_light_enable", std::make_shared<ImguiCheckBox>("Enable light 1", this->directionalLightParams_.isEnable));
+    this->imgui_->AddElement(std::make_shared<ImguiTextBox<>>("Directional light:"));
+    this->imgui_->AddElement(std::make_shared<ImguiCheckBox>("Enable light", this->directionalLightParams_.isEnable));
     this->imgui_->AddElement(
-        "directional_light_direction",
         std::make_shared<ImguiSlider<glm::vec3>>(
             "Direction",
             this->directionalLightParams_.lightDirection, -1.0f, 1.0f
         )
     );
     this->imgui_->AddElement(
-        "directional_light_ambient",
-        std::make_shared<ImguiColorPicker>("Ambient 1", this->directionalLightParams_.ambient)
+        std::make_shared<ImguiColorPicker>("Ambient", this->directionalLightParams_.ambient)
     );
-    this->imgui_->AddElement("same_line_2", std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement(std::make_shared<ImguiSameLine>());
     this->imgui_->AddElement(
-        "directional_light_is_ambient", std::make_shared<ImguiCheckBox>("Ambient 1", this->directionalLightParams_.isAmbient)
-    );
-    this->imgui_->AddElement(
-        "directional_light_diffuse",
-        std::make_shared<ImguiColorPicker>("Diffuse 1", this->directionalLightParams_.diffuse)
-    );
-    this->imgui_->AddElement("same_line_3", std::make_shared<ImguiSameLine>());
-    this->imgui_->AddElement(
-        "directional_light_is_diffuse", std::make_shared<ImguiCheckBox>("Diffuse 1", this->directionalLightParams_.isDiffuse)
+        std::make_shared<ImguiCheckBox>("Ambient", this->directionalLightParams_.isAmbient)
     );
     this->imgui_->AddElement(
-        "directional_light_specular",
-        std::make_shared<ImguiColorPicker>("Specular 1", this->directionalLightParams_.specular)
+        std::make_shared<ImguiColorPicker>("Diffuse", this->directionalLightParams_.diffuse)
     );
-    this->imgui_->AddElement("same_line_4", std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement(std::make_shared<ImguiSameLine>());
     this->imgui_->AddElement(
-        "directional_light_is_specular", std::make_shared<ImguiCheckBox>("Specular 1", this->directionalLightParams_.isSpecular)
+        std::make_shared<ImguiCheckBox>("Diffuse", this->directionalLightParams_.isDiffuse)
     );
-    this->imgui_->AddElement("", std::make_shared<ImguiSlider<float>>("Ambient Intensity 1", this->directionalLightParams_.ambientIntensity, 0.0, 1.0));
-    this->imgui_->AddElement("", std::make_shared<ImguiSlider<float>>("Diffuse Intensity 1", this->directionalLightParams_.diffuseIntensity, 0.0, 1.0));
-    this->imgui_->AddElement("", std::make_shared<ImguiSlider<float>>("Specular Intensity 1", this->directionalLightParams_.specularIntensity, 0.0, 1.0));
+    this->imgui_->AddElement(
+        std::make_shared<ImguiColorPicker>("Specular", this->directionalLightParams_.specular)
+    );
+    this->imgui_->AddElement(std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement(
+        std::make_shared<ImguiCheckBox>("Specular", this->directionalLightParams_.isSpecular)
+    );
+    this->imgui_->AddElement(
+        std::make_shared<ImguiSlider<float>>(
+            "Ambient Intensity",
+            this->directionalLightParams_.ambientIntensity, 0.0, 1.0
+        )
+    );
+    this->imgui_->AddElement(
+        std::make_shared<ImguiSlider<float>>(
+            "Diffuse Intensity",
+            this->directionalLightParams_.diffuseIntensity, 0.0, 1.0
+        )
+    );
+    this->imgui_->AddElement(
+        std::make_shared<ImguiSlider<float>>(
+            "Specular Intensity",
+            this->directionalLightParams_.specularIntensity, 0.0, 1.0
+        )
+    );
 
-    this->imgui_->AddElement("point_light_label", std::make_shared<ImguiTextBox<>>("Point light:"));
-    this->imgui_->AddElement("point_light_enable", std::make_shared<ImguiCheckBox>("Enable light 2", this->pointLightParams_.isEnable));
+    this->imgui_->AddElement(std::make_shared<ImguiTextBox<>>("Point light:"));
     this->imgui_->AddElement(
-        "point_light_position",
+        std::make_shared<ImguiCheckBox>(
+            "Enable light",
+            this->pointLightParams_.isEnable
+        )
+    );
+    this->imgui_->AddElement(
         std::make_shared<ImguiSlider<glm::vec3>>(
             "Position",
             this->pointLightParams_.lightPosition, -10.0f, 10.0f
         )
     );
     this->imgui_->AddElement(
-        "point_light_ambient",
-        std::make_shared<ImguiColorPicker>("Ambient 2", this->pointLightParams_.ambient)
+        std::make_shared<ImguiColorPicker>("Ambient", this->pointLightParams_.ambient)
     );
-    this->imgui_->AddElement("same_line_5", std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement(std::make_shared<ImguiSameLine>());
     this->imgui_->AddElement(
-        "point_light_is_ambient", std::make_shared<ImguiCheckBox>("Ambient 2", this->pointLightParams_.isAmbient)
-    );
-    this->imgui_->AddElement(
-        "point_light_diffuse",
-        std::make_shared<ImguiColorPicker>("Diffuse 2", this->pointLightParams_.diffuse)
-    );
-    this->imgui_->AddElement("same_line_6", std::make_shared<ImguiSameLine>());
-    this->imgui_->AddElement(
-        "point_light_is_diffuse", std::make_shared<ImguiCheckBox>("Diffuse 2", this->pointLightParams_.isDiffuse)
+        std::make_shared<ImguiCheckBox>("Ambient", this->pointLightParams_.isAmbient)
     );
     this->imgui_->AddElement(
-        "point_light_specular",
-        std::make_shared<ImguiColorPicker>("Specular 2", this->pointLightParams_.specular)
+        std::make_shared<ImguiColorPicker>("Diffuse", this->pointLightParams_.diffuse)
     );
-    this->imgui_->AddElement("same_line_7", std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement(std::make_shared<ImguiSameLine>());
     this->imgui_->AddElement(
-        "point_light_is_specular", std::make_shared<ImguiCheckBox>("Specular 2", this->pointLightParams_.isSpecular)
-    );
-    this->imgui_->AddElement(
-        "point_light_constant_attenuation",
-        std::make_shared<ImguiSlider<float>>("Constant attenuation 2", this->pointLightParams_.constantAttenuation, 0.0f, 1.0f)
+        std::make_shared<ImguiCheckBox>("Diffuse", this->pointLightParams_.isDiffuse)
     );
     this->imgui_->AddElement(
-        "point_light_linear_attenuation",
-        std::make_shared<ImguiSlider<float>>("Linear attenuation 2", this->pointLightParams_.linearAttenuation, 0.0f, 1.0f)
+        std::make_shared<ImguiColorPicker>("Specular", this->pointLightParams_.specular)
+    );
+    this->imgui_->AddElement(std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement(
+        std::make_shared<ImguiCheckBox>("Specular", this->pointLightParams_.isSpecular)
     );
     this->imgui_->AddElement(
-        "point_light_quadratic_attenuation",
-        std::make_shared<ImguiSlider<float>>("Quadratic attenuation 2", this->pointLightParams_.quadraticAttenuation, 0.0f, 1.0f)
+        std::make_shared<ImguiSlider<float>>("Constant attenuation", this->pointLightParams_.constantAttenuation, 0.0f, 1.0f)
     );
-    this->imgui_->AddElement("", std::make_shared<ImguiSlider<float>>("Ambient Intensity 2", this->pointLightParams_.ambientIntensity, 0.0, 1.0));
-    this->imgui_->AddElement("", std::make_shared<ImguiSlider<float>>("Diffuse Intensity 2", this->pointLightParams_.diffuseIntensity, 0.0, 1.0));
-    this->imgui_->AddElement("", std::make_shared<ImguiSlider<float>>("Specular Intensity 2", this->pointLightParams_.specularIntensity, 0.0, 1.0));
+    this->imgui_->AddElement(
+        std::make_shared<ImguiSlider<float>>("Linear attenuation", this->pointLightParams_.linearAttenuation, 0.0f, 1.0f)
+    );
+    this->imgui_->AddElement(
+        std::make_shared<ImguiSlider<float>>("Quadratic attenuation", this->pointLightParams_.quadraticAttenuation, 0.0f, 1.0f)
+    );
+    this->imgui_->AddElement(
+        std::make_shared<ImguiSlider<float>>(
+            "Ambient Intensity",
+            this->pointLightParams_.ambientIntensity, 0.0, 1.0
+        )
+    );
+    this->imgui_->AddElement(
+        std::make_shared<ImguiSlider<float>>(
+            "Diffuse Intensity",
+            this->pointLightParams_.diffuseIntensity, 0.0, 1.0
+        )
+    );
+    this->imgui_->AddElement(
+        std::make_shared<ImguiSlider<float>>(
+            "Specular Intensity",
+            this->pointLightParams_.specularIntensity, 0.0, 1.0
+        )
+    );
 
-    this->imgui_->AddElement("spot_light_label", std::make_shared<ImguiTextBox<>>("Spot light:"));
-    this->imgui_->AddElement("spot_light_enable", std::make_shared<ImguiCheckBox>("Enable light 3", this->spotLightParams_.isEnable));
+    this->imgui_->AddElement(std::make_shared<ImguiTextBox<>>("Spot light:"));
+    this->imgui_->AddElement(std::make_shared<ImguiCheckBox>("Enable light", this->spotLightParams_.isEnable));
     this->imgui_->AddElement(
-        "spot_light_position",
         std::make_shared<ImguiSlider<glm::vec3>>(
-            "Position 3",
+            "Position",
             this->spotLightParams_.lightPosition, -10.0f, 10.0f
         )
     );
     this->imgui_->AddElement(
-        "spot_light_direction",
         std::make_shared<ImguiSlider<glm::vec3>>(
-            "Direction 3",
+            "Direction",
             this->spotLightParams_.lightDirection, -1.0f, 1.0f
         )
     );
     this->imgui_->AddElement(
-        "spot_light_ambient",
-        std::make_shared<ImguiColorPicker>("Ambient 3", this->spotLightParams_.ambient)
+        std::make_shared<ImguiColorPicker>("Ambient", this->spotLightParams_.ambient)
     );
-    this->imgui_->AddElement("same_line_8", std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement(std::make_shared<ImguiSameLine>());
     this->imgui_->AddElement(
-        "spot_light_is_ambient", std::make_shared<ImguiCheckBox>("Ambient 3", this->spotLightParams_.isAmbient)
-    );
-    this->imgui_->AddElement(
-        "spot_light_diffuse",
-        std::make_shared<ImguiColorPicker>("Diffuse 3", this->spotLightParams_.diffuse)
-    );
-    this->imgui_->AddElement("same_line_9", std::make_shared<ImguiSameLine>());
-    this->imgui_->AddElement(
-        "spot_light_is_diffuse", std::make_shared<ImguiCheckBox>("Diffuse 3", this->spotLightParams_.isDiffuse)
+        std::make_shared<ImguiCheckBox>("Ambient", this->spotLightParams_.isAmbient)
     );
     this->imgui_->AddElement(
-        "spot_light_specular",
-        std::make_shared<ImguiColorPicker>("Specular 3", this->spotLightParams_.specular)
+        std::make_shared<ImguiColorPicker>("Diffuse", this->spotLightParams_.diffuse)
     );
-    this->imgui_->AddElement("same_line_10", std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement(std::make_shared<ImguiSameLine>());
     this->imgui_->AddElement(
-        "spot_light_is_specular", std::make_shared<ImguiCheckBox>("Specular 3", this->spotLightParams_.isSpecular)
+        std::make_shared<ImguiCheckBox>("Diffuse", this->spotLightParams_.isDiffuse)
     );
     this->imgui_->AddElement(
-        "spot_light_constant_attenuation",
+        std::make_shared<ImguiColorPicker>("Specular", this->spotLightParams_.specular)
+    );
+    this->imgui_->AddElement(std::make_shared<ImguiSameLine>());
+    this->imgui_->AddElement(
+        std::make_shared<ImguiCheckBox>("Specular", this->spotLightParams_.isSpecular)
+    );
+    this->imgui_->AddElement(
         std::make_shared<ImguiSlider<float>>(
-            "Constant attenuation 3",
+            "Constant attenuation",
             this->spotLightParams_.constantAttenuation, 0.0f, 1.0f
         )
     );
     this->imgui_->AddElement(
-        "spot_light_linear_attenuation",
         std::make_shared<ImguiSlider<float>>(
-            "Linear attenuation 3",
+            "Linear attenuation",
             this->spotLightParams_.linearAttenuation, 0.0f, 1.0f
         )
     );
     this->imgui_->AddElement(
-        "spot_light_quadratic_attenuation",
         std::make_shared<ImguiSlider<float>>(
-            "Quadratic attenuation 3",
+            "Quadratic attenuation",
             this->spotLightParams_.quadraticAttenuation, 0.0f, 1.0f
         )
     );
     this->imgui_->AddElement(
-        "spot_light_inner_cutoff",
         std::make_shared<ImguiSlider<float>>(
-            "Inner Cutoff 3",
+            "Inner Cutoff",
             this->spotLightParams_.innerCutoff, 0.0f, glm::half_pi<float>()
         )
     );
     this->imgui_->AddElement(
-        "spot_light_outer_cutoff",
         std::make_shared<ImguiSlider<float>>(
-            "Outer Cutoff 3",
+            "Outer Cutoff",
             this->spotLightParams_.outerCutoff, 0.0f, glm::half_pi<float>()
         )
     );
     this->imgui_->AddElement(
-        "spot_light_exponent",
         std::make_shared<ImguiSlider<float>>(
-            "Exponent 3",
+            "Exponent",
             this->spotLightParams_.exponent, 0.0f, 128.0f
         )
     );
-    this->imgui_->AddElement("", std::make_shared<ImguiSlider<float>>("Ambient Intensity 3", this->spotLightParams_.ambientIntensity, 0.0, 1.0));
-    this->imgui_->AddElement("", std::make_shared<ImguiSlider<float>>("Diffuse Intensity 3", this->spotLightParams_.diffuseIntensity, 0.0, 1.0));
-    this->imgui_->AddElement("", std::make_shared<ImguiSlider<float>>("Specular Intensity 3", this->spotLightParams_.specularIntensity, 0.0, 1.0));
-
-    this->imgui_->AddElement("shaders_combobox", std::make_shared<ImguiComboBox>("Shaders", this->selectedShaderKey_, this->shaderKeys_));
-
+    this->imgui_->AddElement(
+        std::make_shared<ImguiSlider<float>>(
+            "Ambient Intensity",
+            this->spotLightParams_.ambientIntensity, 0.0, 1.0
+        )
+    );
+    this->imgui_->AddElement(
+        std::make_shared<ImguiSlider<float>>(
+            "Diffuse Intensity",
+            this->spotLightParams_.diffuseIntensity, 0.0, 1.0
+        )
+    );
+    this->imgui_->AddElement(
+        std::make_shared<ImguiSlider<float>>(
+            "Specular Intensity",
+            this->spotLightParams_.specularIntensity, 0.0, 1.0
+        )
+    );
 
     this->imgui_->AddElement(
-        "fps_info_label",
         std::make_shared<ImguiTextBox<float&>>(
             "Application average %.0f FPS",
             std::ref(ImGui::GetIO().Framerate)
         )
     );
     this->imgui_->AddElement(
-        "time_info_label",
         std::make_shared<ImguiTextBox<size_t&, size_t&, size_t&, size_t&>>(
             "Application time: %02d:%02d:%02d:%02d",
             std::ref(this->applicationTime_.hours),
